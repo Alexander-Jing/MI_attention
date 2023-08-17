@@ -45,9 +45,9 @@ chararray = native2unicode(recv_data,'utf-8');
 str = convertCharsToStrings(chararray);  % 接收到的数据，为字典格式
 try
     dic = jsondecode(str);%将json形式的字典数据里面的矩阵数据提取
-    U = str.U;
-    S = str.S;
-    V = str.V;
+    U = dic.U;
+    S = dic.S;
+    V = dic.V;
     re = U*diag(S)*V;
 catch
     disp('WARNNING:接收不完全')
