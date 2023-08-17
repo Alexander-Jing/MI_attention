@@ -41,11 +41,11 @@ while length(recv_data)<recv_bytes
 end
 close(h)
 chararray = native2unicode(recv_data,'utf-8');
-str = convertCharsToStrings(chararray);
+str = convertCharsToStrings(chararray);  % 接收到的数据，为字典格式
 try
-    U = dic.U;
-    S = dic.S;
-    V = dic.V;
+    U = str.U;
+    S = str.S;
+    V = str.V;
     re = U*diag(S)*V;
 catch
     disp('WARNNING:接收不完全')
