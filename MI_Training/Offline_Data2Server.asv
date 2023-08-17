@@ -11,8 +11,8 @@ fopen(tcpipClient);
 disp("连接成功")
 disp("数据发送")
 
-send_order = 1.0;  % 发送命令控制，用于控制服务器
-send_data = [send_order; config.size(:); data(:)];
+send_order = 1.0;  % 
+send_data = [config.size(:);data(:)];
 config_send = whos('send_data');   % whos('send_data')将返回该变量的名称、大小、字节数、类型等信息
 fwrite(tcpipClient,[config_send.bytes/2;send_data],'float32');  % 这里matlab的double是8个字节，然后这里使用的4字节的float32传输，所以config_send.bytes要除以2，表示使用4字节的float32形式传输用了多少个字节
 disp("数据接收")
@@ -44,7 +44,6 @@ close(h)
 chararray = native2unicode(recv_data,'utf-8');
 str = convertCharsToStrings(chararray);  % 接收到的数据，为字典格式
 try
-    dic = jsondecode(str);%将json形式的字典数据里面的矩阵数据提取
     U = str.U;
     S = str.S;
     V = str.V;
