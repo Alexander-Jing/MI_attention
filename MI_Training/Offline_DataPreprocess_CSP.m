@@ -1,4 +1,4 @@
-function [random_X, random_Y] = Offline_DataPreprocess(rawdata, classes)
+function [random_X, random_Y] = Offline_DataPreprocess_CSP(rawdata, classes)
 
     assert(classes == 2, "CSP only supports binary classification.")
     
@@ -77,7 +77,7 @@ function [random_X, random_Y] = Offline_DataPreprocess(rawdata, classes)
     walk_samples_all = WalkFilterSample;
     ascend_samples_all = AscendFilterSample;
     descend_samples_all = DescendFilterSample;
-
+    
 
 
     %% CSP（CSP只能做2分类，for 4分类可做2分类三次）

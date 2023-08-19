@@ -26,13 +26,13 @@ fwrite(UnityControl,sendbuf);
 pause(3)
 
 %% 设置脑电采集参数
-init = 0;
-freq = 256;
-startStop = 1;
-con = pnet('tcpconnect','127.0.0.1',4455);                                 % 建立一个连接
-status = CheckNetStreamingVersion(con);                                    % 判断版本信息，正确返回状态值为1
-[~, basicInfo] = ClientGetBasicMessage(con);                               % 获取设备基本信息basicInfo包含 size,eegChan,sampleRate,dataSize
-[~, infoList] = ClientGetChannelMessage(con,basicInfo.eegChan);            % 获取通道信息
+% init = 0;
+% freq = 256;
+% startStop = 1;
+% con = pnet('tcpconnect','127.0.0.1',4455);                                 % 建立一个连接
+% status = CheckNetStreamingVersion(con);                                    % 判断版本信息，正确返回状态值为1
+% [~, basicInfo] = ClientGetBasicMessage(con);                               % 获取设备基本信息basicInfo包含 size,eegChan,sampleRate,dataSize
+% [~, infoList] = ClientGetChannelMessage(con,basicInfo.eegChan);            % 获取通道信息
 
 %% 实验相关参数设置
 TrialNum = 10;                                                             % 设置采集的数量
@@ -92,12 +92,12 @@ while(AllTrial <= TrialNum)
     % 生成标签
     TriggerRepeat = repmat(Trigger,1,256);  % 生成标签
     % 脑电信号采集
-    tic
+%     tic
     pause(1);
-    [~, data] = ClientGetDataPacket(con,basicInfo,infoList,startStop,init); % Obtain EEG data, 需要在ClientGetDataPacket设置要不要移除基线
-    toc
-    data = [data;TriggerRepeat];
-    TrialData = [TrialData,data];
+%     [~, data] = ClientGetDataPacket(con,basicInfo,infoList,startStop,init); % Obtain EEG data, 需要在ClientGetDataPacket设置要不要移除基线
+%     toc
+%     data = [data;TriggerRepeat];
+%     TrialData = [TrialData,data];
     Timer = Timer + 1;
     
     if Timer == 13
@@ -107,10 +107,10 @@ while(AllTrial <= TrialNum)
     
 end
 %% 存储数据
-close all
-TrialData = TrialData(2:end,:);  %去掉矩阵第一行
-ChanLabel = flip({infoList.chanLabel});
-pnet('closeall')   % 将连接关闭
-
-save(FunctionNowFilename('Offline_EEGdata_', '.mat' ),'TrialData','TrialIndex','ChanLabel');
+% close all
+% TrialData = TrialData(2:end,:);  %去掉矩阵第一行
+% ChanLabel = flip({infoList.chanLabel});
+% pnet('closeall')   % 将连接关闭
+% 
+% save(FunctionNowFilename('Offline_EEGdata_', '.mat' ),'TrialData','TrialIndex','ChanLabel');
 
