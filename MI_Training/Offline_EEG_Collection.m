@@ -112,5 +112,5 @@ TrialData = TrialData(2:end,:);  %去掉矩阵第一行
 ChanLabel = flip({infoList.chanLabel});
 pnet('closeall')   % 将连接关闭
 
-save(FunctionNowFilename('Offline_EEGdata_', '.mat' ),'TrialData','TrialIndex','ChanLabel');
+save(FunctionNowFilename('Offline_EEG_Rawdata_', '.mat' ),'TrialData','TrialIndex','ChanLabel');
 

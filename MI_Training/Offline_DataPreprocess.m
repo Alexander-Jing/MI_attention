@@ -1,7 +1,6 @@
-function [DataX, DataY] = Offline_DataPreprocess(rawdata, seconds_per_trial, classes)    
+function [DataX, DataY] = Offline_DataPreprocess(rawdata, classes)    
     %% 采集参数
     sample_frequency = 256; 
-    data_points_per_trial = sample_frequency * seconds_per_trial;
     
     WindowLength = 512;  % 每个窗口的长度
     SlideWindowLength = 256;  % 滑窗间隔
@@ -22,7 +21,8 @@ function [DataX, DataY] = Offline_DataPreprocess(rawdata, seconds_per_trial, cla
         DataX = [DataX; DataSample];
         DataY = [DataY, LabelWindows];
     end
-    
+    save(FunctionNowFilename('Offline_EEG_data', '.mat' ),'DataX');
+    save(FunctionNowFilename('Offline_EEG_label', '.mat' ),'DataY');
     
     
     %% 滤波函数

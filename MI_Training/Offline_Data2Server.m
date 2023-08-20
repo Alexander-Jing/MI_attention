@@ -15,6 +15,7 @@ send_order = 1.0;  % 发送命令控制，用于控制服务器
 send_data = [send_order; config.size(:); data(:)];
 config_send = whos('send_data');   % whos('send_data')将返回该变量的名称、大小、字节数、类型等信息
 fwrite(tcpipClient,[config_send.bytes/2;send_data],'float32');  % 这里matlab的double是8个字节，然后这里使用的4字节的float32传输，所以config_send.bytes要除以2，表示使用4字节的float32形式传输用了多少个字节
+
 disp("数据接收")
 recv_data = [];
 
