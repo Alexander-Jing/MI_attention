@@ -1,14 +1,14 @@
-function [DataX, DataY] = Offline_DataPreprocess(rawdata, classes)    
+function [DataX, DataY, windows_per_session] = Offline_DataPreprocess(rawdata, classes, sample_frequency, WindowLength, SlideWindowLength, channels)    
     %% 采集参数
-    sample_frequency = 256; 
+    %sample_frequency = 256; 
     
-    WindowLength = 512;  % 每个窗口的长度
-    SlideWindowLength = 256;  % 滑窗间隔
+    %WindowLength = 512;  % 每个窗口的长度
+    %SlideWindowLength = 256;  % 滑窗间隔
     
     Trigger = double(rawdata(end,:)); %rawdata最后一行
     RawData = double(rawdata(1:32, Trigger~=6));
     %Labels = double(rawdata(33, Trigger~=6));  % 收集rawdata和label
-    channels = [3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];  % 选择的通道
+    %channels = [3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];  % 选择的通道
     
     DataX = [];
     DataY = [];  % 初始化整理的X和Y的数据
@@ -21,8 +21,8 @@ function [DataX, DataY] = Offline_DataPreprocess(rawdata, classes)
         DataX = [DataX; DataSample];
         DataY = [DataY, LabelWindows];
     end
-    save(FunctionNowFilename('Offline_EEG_data', '.mat' ),'DataX');
-    save(FunctionNowFilename('Offline_EEG_label', '.mat' ),'DataY');
+%     save(FunctionNowFilename('Offline_EEG_data', '.mat' ),'DataX');
+%     save(FunctionNowFilename('Offline_EEG_label', '.mat' ),'DataY');
     
     
     %% 滤波函数
@@ -41,7 +41,7 @@ function [DataX, DataY] = Offline_DataPreprocess(rawdata, classes)
     end
     
     %% 计算划窗的函数
-    function [windows_per_session,DataSamplePre] = WindowsDataPre(RawData, WindowLength, SlideWindowLength)
+    function [windows_per_session, DataSamplePre] = WindowsDataPre(RawData, WindowLength, SlideWindowLength)
         data_points_per_session = size(RawData,2);  % 每一个session的数据量
         % seconds_per_session  = size(EIRawData,2)/sample_frequency;  % 每一个session的时间长度
 

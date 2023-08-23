@@ -106,11 +106,28 @@ while(AllTrial <= TrialNum)
     end
     
 end
-%% 存储数据
+%% 存储原始数据
 close all
 TrialData = TrialData(2:end,:);  %去掉矩阵第一行
 ChanLabel = flip({infoList.chanLabel});
 pnet('closeall')   % 将连接关闭
+subject_name = 'Jyt'
+save(FunctionNowFilename('Offline_EEG_Rawdata_', subject_name,'.mat' ),'TrialData','TrialIndex','ChanLabel');
 
-save(FunctionNowFilename('Offline_EEG_Rawdata_', '.mat' ),'TrialData','TrialIndex','ChanLabel');
+%% 数据预处理
+% 划窗参数设置
+sample_frequency = 256; 
+WindowLength = 512;  % 每个窗口的长度
+SlideWindowLength = 256;  % 滑窗间隔
+channels = [3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];  % 选择的通道
+[DataX, DataY, windows_per_session] = Offline_DataPreprocess(rawdata, classes, sample_frequency, WindowLength, SlideWindowLength, channels);
+% 预处理之后的数据存储，如果下面传输失败，直接将这两个mat文件送到服务器里
+save(FunctionNowFilename('Offline_EEG_data_', subject_name, '.mat' ),'DataX');
+save(FunctionNowFilename('Offline_EEG_label_', subject_name, '.mat' ),'DataY');
 
+%% 预处理数据传输
+% 设置传输的参数
+ip = '172.18.22.21';
+port = 8888;
+config_data = [WindowLength, size(channels, 2), windows_per_session, MotorClasses];
+Offline_Data2Server_Send(DataX, ip, port, subject_name, config_data);
