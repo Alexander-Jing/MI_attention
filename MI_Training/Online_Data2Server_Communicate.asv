@@ -1,15 +1,8 @@
-function Offline_Data2Server_Send(data_x, ip, port, subject_name, config_data)
+function Online_Data2Server_Communicate(data_x, ip, port, subject_name, config_data)
     
     config = whos('data_x');
     data2Server = [];
-    h = waitbar(0, '数据转换');
-    for class_type = 1:config.size(1,1)
-       for windows_num = 1:config.size(1,2)
-           size_ = size(data2Server);
-           waitbar((size_(1)/30)/(config.size(1,1)*config.size(1,2)), h); 
-           data2Server = [data2Server;data_x{class_type,windows_num}];
-       end
-    end
+    
     % 中途保存下要发送的数据
     save(FunctionNowFilename('Offline_EEG_data2Server_', subject_name, '.mat' ),'data2Server');
     % save('data2Server.mat','data2Server');
