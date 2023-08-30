@@ -78,3 +78,4 @@ fwrite(tcpipClient,[config_send.bytes/2; send_data],'float32');  % 这里matlab�
 fwrite(tcpipClient,dataBytes,'float32');
 
 fclose(tcpipClient);
+

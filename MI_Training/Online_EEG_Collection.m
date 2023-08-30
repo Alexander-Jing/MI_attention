@@ -10,7 +10,7 @@ close all;
 %           Byte3：画面文字显示（离线训练实验无文字提示）
 %           Byte4：动作类型
 %           Byte5：预留
-%system('F:\CASIA\mwl_data_collection\climbstair\ClimbStair3.exe&');      % Unity动画exe文件地址
+%system('F:\CASIA\mwl_data_collection\climbstair\ClimbStair3.exe&');       % Unity动画exe文件地址
 system('E:\MI_engagement\unity_test\unity_test\build_test\unity_test.exe&');
 pause(3)
 UnityControl = tcpip('localhost', 8881, 'NetworkRole', 'client');          % 新的端口改为8881
