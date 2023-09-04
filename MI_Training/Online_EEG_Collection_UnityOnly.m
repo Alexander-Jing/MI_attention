@@ -114,3 +114,12 @@ end
 % 
 % save(FunctionNowFilename('Offline_EEGdata_', '.mat' ),'TrialData','TrialIndex','ChanLabel');
 
+function Level2task(MotorClasses, MajorPoportion, TrailNum)  % MajorPoportion 每一个session中的主要动作的比例；TrailNum 每一个session中的trial数量 
+    session = [];
+    DiffLevels = [1:MotorClasses];  % 从低到高生成难度的矩阵
+    
+    for sessionIndex = 1:MotorClasses
+        
+    end
+    
+end
