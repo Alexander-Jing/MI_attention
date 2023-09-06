@@ -114,12 +114,25 @@ end
 % 
 % save(FunctionNowFilename('Offline_EEGdata_', '.mat' ),'TrialData','TrialIndex','ChanLabel');
 
-function Level2task(MotorClasses, MajorPoportion, TrailNum)  % MajorPoportion 每一个session中的主要动作的比例；TrailNum 每一个session中的trial数量 
-    session = [];
-    DiffLevels = [1:MotorClasses];  % 从低到高生成难度的矩阵
+function Level2task(MotorClasses, MajorPoportion, TrialNum, DiffLevels)  % MajorPoportion 每一个session中的主要动作的比例；TrailNum 每一个session中的trial数量, DiffLevels从低到高生成难度的矩阵，矩阵里的数值越高表示难度越高 
     
-    for sessionIndex = 1:MotorClasses
+    for SessionIndex = 1:MotorClasses  % 这里的SessionIndex也是主要难度对应的位置
+        session = [];
+        MotorMain = DiffLevels(1, SessionIndex);  % 主要成分的运动
+        NumMain = round(TrialNum * MajorPoportion);  
+        session = [session, repmat(MotorMain, 1, NumMain)];
         
+        indices = find(DiffLevels==MotorMain);  % 找到MotorMain对应的index
+        DiffLevels_ = DiffLevels;
+        DiffLevels_(indices) = [];  % 去掉MotorMain的剩下的难度矩阵
+        
+        for i_=1:(MotorClasses - 1)
+            MotorMinor = DiffLevels_(1, i_);  % 剩下的几个动作
+            MinorProportion =  (1-MajorPoportion)/(MotorClasses - 1);  % 剩下动作的比重
+            NumMinor = ronud(TrialNum * MinorProportion);
+            session = [session, repmat(MotorMinor, 1, NumMinor)];  % 添加剩下的动作
+        end    
+        save(FunctionNowFilename(['Online_EEGMI_session_', num2str(SessionIndex)], '.mat' ),'session');  % 存储相关数据，后面存储用
     end
     
 end
