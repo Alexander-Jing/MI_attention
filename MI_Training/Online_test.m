@@ -81,6 +81,8 @@ for SessionIndex = 1:MotorClasses  % 这里的SessionIndex也是主要难度对�
         NumMinor = round(TrialNum * MinorProportion);
         session = [session, repmat(MotorMinor, 1, NumMinor)];  % 添加剩下的动作
     end    
-    save(FunctionNowFilename(['Online_EEGMI_session_', num2str(SessionIndex)], '.mat' ),'session');  % 存储相关数据，后面存储用
+    session = [session, repmat(0, 1, NumMinor)];  % 添加和剩下动作一致比例的空想动作
+    %save(FunctionNowFilename(['Online_EEGMI_session_', num2str(SessionIndex)], '.mat' ),'session');  % 存储相关数据，后面存储用
+    save(['Online_EEGMI_session_', num2str(SessionIndex), '_', '.mat'],'session');  % 存储相关数据，后面存储用
 end
     

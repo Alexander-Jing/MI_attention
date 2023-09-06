@@ -34,21 +34,38 @@ pause(3)
 % [~, basicInfo] = ClientGetBasicMessage(con);                               % 获取设备基本信息basicInfo包含 size,eegChan,sampleRate,dataSize
 % [~, infoList] = ClientGetChannelMessage(con,basicInfo.eegChan);            % 获取通道信息
 
-%% 实验相关参数设置
-TrialNum = 10;                                                             % 设置采集的数量
-TrialIndex = randperm(TrialNum);                                           % 根据采集的数量生成随机顺序的数组
-All_data = [];
-Trigger = 0;                                                               % 初始化Trigger，用于后续的数据存储
-AllTrial = 0;
+% %% 实验相关参数设置
+% TrialNum = 10;                                                             % 设置采集的数量
+% TrialIndex = randperm(TrialNum);                                           % 根据采集的数量生成随机顺序的数组
+% All_data = [];
+% Trigger = 0;                                                               % 初始化Trigger，用于后续的数据存储
+% AllTrial = 0;
+% 
+% MotorClasses = 2;                                                          % 运动想象的种类的数量的设置
+% randomindex = [];                                                          % 初始化trials的集合
+% for i= 1:MotorClasses
+%     index_i = ones(TrialNum/MotorClasses,1)*i;                             % size TrialNum/MotorClasses*1，各种任务
+%     randomindex = [randomindex; index_i];                                  % 各个任务整合，最终size TrialNum*1
+% end
+% 
+% RandomTrial = randomindex(TrialIndex);                                     % 随机生成各个Trial对应的任务
 
-MotorClasses = 2;                                                          % 运动想象的种类的数量的设置
-randomindex = [];                                                          % 初始化trials的集合
-for i= 1:MotorClasses
-    index_i = ones(TrialNum/MotorClasses,1)*i;                             % size TrialNum/MotorClasses*1，各种任务
-    randomindex = [randomindex; index_i];                                  % 各个任务整合，最终size TrialNum*1
+%% 生成任务安排调度
+session_idx = 1;
+
+MotorClass = 2; % 注意这里是纯设计的运动想象动作的数量，不包括空想idle状态
+MajorPoportion = 0.6;
+TrialNum = 40;
+DiffLevels = [2,1];
+
+if session_idx == 1
+    Level2task(MotorClass, MajorPoportion, TrialNum, DiffLevels);
+    RandomTrial = load(['Online_EEGMI_session_', num2str(session_idx), '_', '.mat'],'session');
+else
+    RandomTrial = load(['Online_EEGMI_session_', num2str(session_idx), '_', '.mat'],'session');
 end
 
-RandomTrial = randomindex(TrialIndex);                                     % 随机生成各个Trial对应的任务
+
 %% 开始实验，离线采集
 Timer = 0;
 TrialData = [];
@@ -132,7 +149,8 @@ function Level2task(MotorClasses, MajorPoportion, TrialNum, DiffLevels)  % Major
             NumMinor = ronud(TrialNum * MinorProportion);
             session = [session, repmat(MotorMinor, 1, NumMinor)];  % 添加剩下的动作
         end    
-        save(FunctionNowFilename(['Online_EEGMI_session_', num2str(SessionIndex)], '.mat' ),'session');  % 存储相关数据，后面存储用
+        session = [session, repmat(0, 1, NumMinor)];  % 添加和剩下动作一致比例的空想动作
+        save(['Online_EEGMI_session_', num2str(SessionIndex), '_', '.mat'],'session');  % 存储相关数据，后面存储用
     end
     
 end
