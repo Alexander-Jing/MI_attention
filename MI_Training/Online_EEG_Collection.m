@@ -34,21 +34,21 @@ status = CheckNetStreamingVersion(con);                                    % ÅĞ¶
 [~, basicInfo] = ClientGetBasicMessage(con);                               % »ñÈ¡Éè±¸»ù±¾ĞÅÏ¢basicInfo°üº¬ size,eegChan,sampleRate,dataSize
 [~, infoList] = ClientGetChannelMessage(con,basicInfo.eegChan);            % »ñÈ¡Í¨µÀĞÅÏ¢
 
-%% ÊµÑéÏà¹Ø²ÎÊıÉèÖÃ
-TrialNum = 10;                                                             % ÉèÖÃ²É¼¯µÄÊıÁ¿
-TrialIndex = randperm(TrialNum);                                           % ¸ù¾İ²É¼¯µÄÊıÁ¿Éú³ÉËæ»úË³ĞòµÄÊı×é
-All_data = [];
-Trigger = 0;                                                               % ³õÊ¼»¯Trigger£¬ÓÃÓÚºóĞøµÄÊı¾İ´æ´¢
-AllTrial = 0;
+%% Éú³ÉÈÎÎñ°²ÅÅµ÷¶È
+session_idx = 1;
 
-MotorClasses = 2;                                                          % ÔË¶¯ÏëÏóµÄÖÖÀàµÄÊıÁ¿µÄÉèÖÃ
-randomindex = [];                                                          % ³õÊ¼»¯trialsµÄ¼¯ºÏ
-for i= 1:MotorClasses
-    index_i = ones(TrialNum/MotorClasses,1)*i;                             % size TrialNum/MotorClasses*1£¬¸÷ÖÖÈÎÎñ
-    randomindex = [randomindex; index_i];                                  % ¸÷¸öÈÎÎñÕûºÏ£¬×îÖÕsize TrialNum*1
+MotorClass = 2; % ×¢ÒâÕâÀïÊÇ´¿Éè¼ÆµÄÔË¶¯ÏëÏó¶¯×÷µÄÊıÁ¿£¬²»°üÀ¨¿ÕÏëidle×´Ì¬
+MajorPoportion = 0.6;
+TrialNum = 40;
+DiffLevels = [2,1];
+
+if session_idx == 1  % Èç¹ûÊÇµÚÒ»¸ösession£¬ÄÇĞèÒªÉú³ÉÏà¹ØµÄÈÎÎñ¼¯ºÏ
+    Level2task(MotorClass, MajorPoportion, TrialNum, DiffLevels);
+    RandomTrial = load(['Online_EEGMI_session_', num2str(session_idx), '_', '.mat'],'session');
+else
+    RandomTrial = load(['Online_EEGMI_session_', num2str(session_idx), '_', '.mat'],'session');
 end
 
-RandomTrial = randomindex(TrialIndex);                                     % Ëæ»úÉú³É¸÷¸öTrial¶ÔÓ¦µÄÈÎÎñ
 %% ¿ªÊ¼ÊµÑé£¬ÀëÏß²É¼¯
 Timer = 0;
 TrialData = [];
@@ -131,3 +131,29 @@ ip = '172.18.22.21';
 port = 8888;
 config_data = [WindowLength, size(channels, 2), windows_per_session, MotorClasses];
 Offline_Data2Server_Send(DataX, ip, port, subject_name, config_data);
+
+
+%% ÈÎÎñ³õÊ¼Éú³ÉµÄº¯Êı
+function Level2task(MotorClasses, MajorPoportion, TrialNum, DiffLevels)  % MajorPoportion Ã¿Ò»¸ösessionÖĞµÄÖ÷Òª¶¯×÷µÄ±ÈÀı£»TrailNum Ã¿Ò»¸ösessionÖĞµÄtrialÊıÁ¿, DiffLevels´ÓµÍµ½¸ßÉú³ÉÄÑ¶ÈµÄ¾ØÕó£¬¾ØÕóÀïµÄÊıÖµÔ½¸ß±íÊ¾ÄÑ¶ÈÔ½¸ß 
+    
+    for SessionIndex = 1:MotorClasses  % ÕâÀïµÄSessionIndexÒ²ÊÇÖ÷ÒªÄÑ¶È¶ÔÓ¦µÄÎ»ÖÃ
+        session = [];
+        MotorMain = DiffLevels(1, SessionIndex);  % Ö÷Òª³É·ÖµÄÔË¶¯
+        NumMain = round(TrialNum * MajorPoportion);  
+        session = [session, repmat(MotorMain, 1, NumMain)];
+        
+        indices = find(DiffLevels==MotorMain);  % ÕÒµ½MotorMain¶ÔÓ¦µÄindex
+        DiffLevels_ = DiffLevels;
+        DiffLevels_(indices) = [];  % È¥µôMotorMainµÄÊ£ÏÂµÄÄÑ¶È¾ØÕó
+        
+        for i_=1:(MotorClasses - 1)
+            MotorMinor = DiffLevels_(1, i_);  % Ê£ÏÂµÄ¼¸¸ö¶¯×÷
+            MinorProportion =  (1-MajorPoportion)/(MotorClasses - 1);  % Ê£ÏÂ¶¯×÷µÄ±ÈÖØ
+            NumMinor = ronud(TrialNum * MinorProportion);
+            session = [session, repmat(MotorMinor, 1, NumMinor)];  % Ìí¼ÓÊ£ÏÂµÄ¶¯×÷
+        end    
+        session = [session, repmat(0, 1, NumMinor)];  % Ìí¼ÓºÍÊ£ÏÂ¶¯×÷Ò»ÖÂ±ÈÀıµÄ¿ÕÏë¶¯×÷
+        save(['Online_EEGMI_session_', num2str(SessionIndex), '_', '.mat'],'session');  % ´æ´¢Ïà¹ØÊı¾İ£¬ºóÃæ´æ´¢ÓÃ
+    end
+    
+end
