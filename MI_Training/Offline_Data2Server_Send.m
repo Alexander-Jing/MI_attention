@@ -11,7 +11,7 @@ function Offline_Data2Server_Send(data_x, ip, port, subject_name, config_data)
        end
     end
     % 中途保存下要发送的数据
-    save(FunctionNowFilename('Offline_EEG_data2Server_', subject_name, '.mat' ),'data2Server');
+    save(FunctionNowFilename(['Offline_EEG_data2Server_', subject_name], '.mat' ),'data2Server');
     % save('data2Server.mat','data2Server');
     % 
     % data2Server = load('data2Server.mat','data2Server');

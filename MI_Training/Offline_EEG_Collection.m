@@ -37,7 +37,7 @@ status = CheckNetStreamingVersion(con);                                    % ÅĞ¶
 %% ÊµÑéÏà¹Ø²ÎÊıÉèÖÃ
 TrialNum = 10;                                                             % ÉèÖÃ²É¼¯µÄÊıÁ¿
 TrialIndex = randperm(TrialNum);                                           % ¸ù¾İ²É¼¯µÄÊıÁ¿Éú³ÉËæ»úË³ĞòµÄÊı×é
-All_data = [];
+%All_data = [];
 Trigger = 0;                                                               % ³õÊ¼»¯Trigger£¬ÓÃÓÚºóĞøµÄÊı¾İ´æ´¢
 AllTrial = 0;
 
@@ -111,7 +111,7 @@ close all
 TrialData = TrialData(2:end,:);  %È¥µô¾ØÕóµÚÒ»ĞĞ
 ChanLabel = flip({infoList.chanLabel});
 pnet('closeall')   % ½«Á¬½Ó¹Ø±Õ
-subject_name = 'Jyt'
+subject_name = 'Jyt';
 save(FunctionNowFilename(['Offline_EEG_Rawdata_', subject_name],'.mat' ),'TrialData','TrialIndex','ChanLabel');
 
 %% Êı¾İÔ¤´¦Àí

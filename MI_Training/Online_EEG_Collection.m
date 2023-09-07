@@ -35,6 +35,9 @@ status = CheckNetStreamingVersion(con);                                    % ÅĞ¶
 [~, infoList] = ClientGetChannelMessage(con,basicInfo.eegChan);            % »ñÈ¡Í¨µÀĞÅÏ¢
 
 %% Éú³ÉÈÎÎñ°²ÅÅµ÷¶È
+Trigger = 0;                                                               % ³õÊ¼»¯Trigger£¬ÓÃÓÚºóĞøµÄÊı¾İ´æ´¢
+AllTrial = 0;
+
 session_idx = 1;
 
 MotorClass = 3; % ×¢ÒâÕâÀïÊÇ´¿Éè¼ÆµÄÔË¶¯ÏëÏó¶¯×÷µÄÊıÁ¿£¬²»°üÀ¨¿ÕÏëidle×´Ì¬
@@ -56,6 +59,15 @@ MaxMITime = 30; % ÔÚÏßÔË¶¯ÏëÏó×î´óÔÊĞíÊ±¼ä
 sample_frequency = 256; 
 WindowLength = 512;  % Ã¿¸ö´°¿ÚµÄ³¤¶È
 channels = [3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];  % Ñ¡ÔñµÄÍ¨µÀ
+mu_channel = 14;  % ÓÃÓÚ¼ÆËãERD/ERSµÄ¼¸¸öchannels£¬ĞèÒªÈ·¶¨ÏÂÎ»ÖÃµÄ
+EI_channel = 10;  % ÓÃÓÚ¼ÆËãEIÖ¸±êµÄ¼¸¸öchannels£¬ĞèÒªÈ·¶¨ÏÂÎ»ÖÃµÄ
+weight_mu = 0.6;  % ÓÃÓÚ¼ÆËãERD/ERSÖ¸±êºÍEIÖ¸±êµÄ¼ÓÈ¨ºÍ
+scores = [];  % ÓÃÓÚ´æ´¢Ã¿Ò»¸ötrialÀïÃæµÄ·ÖÊıÖµ
+scores_trial = [];  % ÓÃÓÚ´æ´¢Ã¿Ò»¸ötrialµÄÆ½¾ù·ÖÊıÖµ
+ip = '172.18.22.21';
+port = 8888;  % ºÍºó¶Ë·şÎñÆ÷Á¬½ÓµÄÁ½¸ö²ÎÊı
+clsFlag = 0; % ÓÃÓÚÅĞ¶ÏÊµÊ±·ÖÀàÊÇ·ñÕıÈ·µÄflag
+subject_name = 'Jyt';  % ±»ÊÔµÄĞÕÃû  
 
 while(AllTrial <= TrialNum)
     if Timer==0  %ÌáÊ¾×¨×¢ cross
@@ -105,7 +117,7 @@ while(AllTrial <= TrialNum)
     TrialData = [TrialData,data];
     Timer = Timer + 1;
     
-    % È¡512µÄTrigger==6µÄ´°¿Ú£¬Êı¾İ´¦Àí²¢ÇÒ½øĞĞ·ÖÎö
+    % µÚ2sµÄÊ±ºò£¬È¡512µÄTrigger==6µÄ´°¿Ú£¬Êı¾İ´¦Àí²¢ÇÒ½øĞĞ·ÖÎö
     if Timer == 2
         rawdata = TrialData(:,end-512+1:end);  % È¡Ç°Ò»¸ö512µÄ´°¿Ú
         rawdata = rawdata(2:end,:);
@@ -118,13 +130,25 @@ while(AllTrial <= TrialNum)
         rawdata = TrialData(:,end-512+1:end);  % È¡Ç°Ò»¸ö512µÄ´°¿Ú
         rawdata = rawdata(2:end,:);
         [FilteredDataMI, EI_index, mu_power_MI] = Online_DataPreprocess(rawdata, RandomTrial(AllTrial), sample_frequency, WindowLength, channels);
+        mu_suppression = (mu_power_MI(1,mu_channel) - mu_power_(1,mu_channel))/mu_power_(1,mu_channel);
+        score = weight_mu * mu_suppression + (1 - weight_mu) * EI_index;  % ¼ÆËãµÃ·Ö
+        scores = [scores, score];  % ±£´æµÃ·Ö
+        config_data = [WindowLength, size(channels, 2), size(scores, 2), RandomTrial(AllTrial)];
+        resultMI = Online_Data2Server_Communicate(FilteredDataMI, ip, port, subject_name, config_data);  % ´«ÊäÊı¾İ¸øÏßÉÏµÄÄ£ĞÍ£¬¿´·ÖÀàÇé¿ö
+        if resultMI == RandomTrial(AllTrial)
+            clsFlag = 1;  % Ê¶±ğÕıÈ·£¬ÖÃ1
+        else
+            clsFlag = 0;
+        end
         
     end
+    
     
     
     if Timer == 13
         Timer = 0;  % ¼ÆÊ±Æ÷Çå0
         disp(['Trial: ', num2str(AllTrial), ', Task: ', num2str(RandomTrial(AllTrial))]);  % ÏÔÊ¾Ïà¹ØÊı¾İ
+        
     end
     
 end
@@ -133,7 +157,6 @@ close all
 TrialData = TrialData(2:end,:);  %È¥µô¾ØÕóµÚÒ»ĞĞ
 ChanLabel = flip({infoList.chanLabel});
 pnet('closeall')   % ½«Á¬½Ó¹Ø±Õ
-subject_name = 'Jyt'
 save(FunctionNowFilename(['Offline_EEG_Rawdata_', subject_name],'.mat' ),'TrialData','TrialIndex','ChanLabel');
 
 %% Êı¾İÔ¤´¦Àí
@@ -146,8 +169,6 @@ save(FunctionNowFilename(['Offline_EEG_label_', subject_name], '.mat' ),'DataY')
 
 %% Ô¤´¦ÀíÊı¾İ´«Êä
 % ÉèÖÃ´«ÊäµÄ²ÎÊı
-ip = '172.18.22.21';
-port = 8888;
 config_data = [WindowLength, size(channels, 2), windows_per_session, MotorClasses];
 Offline_Data2Server_Send(DataX, ip, port, subject_name, config_data);
 

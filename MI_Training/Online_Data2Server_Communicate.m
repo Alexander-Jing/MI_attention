@@ -1,10 +1,10 @@
-function Online_Data2Server_Communicate(data_x, ip, port, subject_name, config_data)
+function R = Online_Data2Server_Communicate(data_x, ip, port, subject_name, config_data)
     
     % config = whos('data_x');
     data2Server = data_x;
     
     % 中途保存下要发送的数据
-    save(FunctionNowFilename('Online_EEG_data2Server_', subject_name, '_class_', config_data(1,4), '_window_', config_data(1,3), '.mat' ),'data2Server');
+    save(FunctionNowFilename(['Online_EEG_data2Server_', subject_name, '_class_', config_data(1,4), '_window_', config_data(1,3)], '.mat' ),'data2Server');
      
     % data2Server = load('data2Server.mat','data2Server');
     % data2Server = struct2array(data2Server);
@@ -29,7 +29,7 @@ function Online_Data2Server_Communicate(data_x, ip, port, subject_name, config_d
     disp("数据接收")
     recv_data = [];
     %重复多次接收
-    h=waitbar(0,'正在接收数据');
+    % h=waitbar(0,'正在接收数据');
     while isempty(recv_data)
         recv_data=fread(tcpipClient);%读取第一组数据
     end
@@ -50,7 +50,7 @@ function Online_Data2Server_Communicate(data_x, ip, port, subject_name, config_d
         end
         recv_data = vertcat(recv_data,recv_package);
     end
-    close(h)
+    % close(h)
     chararray = native2unicode(recv_data,'utf-8');
     str = convertCharsToStrings(chararray);  % 接收到的数据，为字典格式
     try
