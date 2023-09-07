@@ -70,6 +70,7 @@ clsFlag = 0; % 用于判断实时分类是否正确的flag
 subject_name = 'Jyt';  % 被试的姓名  
 
 while(AllTrial <= TrialNum)
+    %% 提示专注阶段
     if Timer==0  %提示专注 cross
         Trigger = 6;
         sendbuf(1,1) = hex2dec('03') ;
@@ -79,8 +80,10 @@ while(AllTrial <= TrialNum)
         fwrite(UnityControl,sendbuf);       
         AllTrial = AllTrial + 1;
     end
+    
+    %% 运动想象阶段
     if Timer==2
-        if RandomTrial(AllTrial)==1  % 空想任务
+        if RandomTrial(AllTrial)==0  % 空想任务
             Trigger = 1;
             sendbuf(1,1) = hex2dec('01') ;
             sendbuf(1,2) = hex2dec('00') ;
@@ -97,14 +100,6 @@ while(AllTrial <= TrialNum)
             fwrite(UnityControl,sendbuf);  
         end
     end
-    if Timer==10  %开始休息
-        Trigger = 6;
-        sendbuf(1,1) = hex2dec('04') ;
-        sendbuf(1,2) = hex2dec('00') ;
-        sendbuf(1,3) = hex2dec('00') ;
-        sendbuf(1,4) = hex2dec('00') ;
-        fwrite(UnityControl,sendbuf);  
-    end
     
     % 生成标签
     TriggerRepeat = repmat(Trigger,1,256);  % 生成标签
@@ -117,16 +112,17 @@ while(AllTrial <= TrialNum)
     TrialData = [TrialData,data];
     Timer = Timer + 1;
     
+    
     % 第2s的时候，取512的Trigger==6的窗口，数据处理并且进行分析
     if Timer == 2
         rawdata = TrialData(:,end-512+1:end);  % 取前一个512的窗口
         rawdata = rawdata(2:end,:);
         % 这里仅仅提取在MI之前的频带能量
-        [~, ~, mu_power_] = Online_DataPreprocess(rawdata, 6, sample_frequency, WindowLength, channels);
-        
+        [~, ~, mu_power_] = Online_DataPreprocess(rawdata, 6, sample_frequency, WindowLength, channels);       
     end
+    
     % 第4s开始取512的Trigger~=6的MI的窗口，数据处理并且进行分析
-    if Timer > 3
+    if Timer > 3 & RandomTrial(AllTrial)~=0 & clsFlag == 0
         rawdata = TrialData(:,end-512+1:end);  % 取前一个512的窗口
         rawdata = rawdata(2:end,:);
         [FilteredDataMI, EI_index, mu_power_MI] = Online_DataPreprocess(rawdata, RandomTrial(AllTrial), sample_frequency, WindowLength, channels);
@@ -134,23 +130,98 @@ while(AllTrial <= TrialNum)
         score = weight_mu * mu_suppression + (1 - weight_mu) * EI_index;  % 计算得分
         scores = [scores, score];  % 保存得分
         config_data = [WindowLength, size(channels, 2), size(scores, 2), RandomTrial(AllTrial)];
-        resultMI = Online_Data2Server_Communicate(FilteredDataMI, ip, port, subject_name, config_data);  % 传输数据给线上的模型，看分类情况
+        resultMI = Online_Data2Server_Communicate(1.0, FilteredDataMI, ip, port, subject_name, config_data);  % 传输数据给线上的模型，看分类情况
         if resultMI == RandomTrial(AllTrial)
             clsFlag = 1;  % 识别正确，置1
         else
             clsFlag = 0;
+        end        
+    end
+    
+   %% 运动想象给与反馈阶段（想对/时间范围内没有想对）,同时更新模型
+   % 想对了开始播放动作 
+   if clsFlag == 1 
+        clsTime = Timer;  % 这是分类正确的时间
+        if RandomTrial(AllTrial)==2  % 运动想象任务
+            Trigger = 2;
+            sendbuf(1,1) = hex2dec('02') ;
+            sendbuf(1,2) = hex2dec('00') ;
+            sendbuf(1,3) = hex2dec('00') ;
+            sendbuf(1,4) = hex2dec('00') ;
+            fwrite(UnityControl,sendbuf);  
         end
+        % 留足空间用于传输和更新模型
+        
+   end
+    
+    % 想错了开始休息和提醒
+    if clsFlag == 0 & Timer == (MaxMITime + 2)
+        clsTime = Timer;  % 这是分类正确的时间
+        if RandomTrial(AllTrial)==2  % 运动想象任务
+            Trigger = 2;
+            sendbuf(1,1) = hex2dec('02') ;
+            sendbuf(1,2) = hex2dec('00') ;
+            sendbuf(1,3) = hex2dec('00') ;
+            sendbuf(1,4) = hex2dec('00') ;
+            fwrite(UnityControl,sendbuf);  
+        end
+        % 留足空间用于传输和更新模型
         
     end
     
-    
-    
-    if Timer == 13
+   %% 休息阶段，确定下一个动作
+    % 空想只给5s就休息
+    if Timer==7 & RandomTrial(AllTrial)==0  %开始休息
+        Trigger = 6;
+        sendbuf(1,1) = hex2dec('04') ;
+        sendbuf(1,2) = hex2dec('00') ;
+        sendbuf(1,3) = hex2dec('00') ;
+        sendbuf(1,4) = hex2dec('00') ;
+        fwrite(UnityControl,sendbuf);  
+        % 预留空间，准备写更新算法和确定下一个任务的程序
+        
+    end
+    % 运动想象想对了之后，AO结束了之后让人休息
+    if Timer == (clsTime + 5) & clsFlag == 1  %开始休息
+        Trigger = 6;
+        sendbuf(1,1) = hex2dec('04') ;
+        sendbuf(1,2) = hex2dec('00') ;
+        sendbuf(1,3) = hex2dec('00') ;
+        sendbuf(1,4) = hex2dec('00') ;
+        fwrite(UnityControl,sendbuf);  
+        % 预留空间，准备写更新算法和确定下一个任务的程序
+        
+    end
+    % 运动想象没有想对，提醒结束了之后让人休息
+    if clsFlag == 0 & Timer == (MaxMITime + 2 + 5)
+        Trigger = 6;
+        sendbuf(1,1) = hex2dec('04') ;
+        sendbuf(1,2) = hex2dec('00') ;
+        sendbuf(1,3) = hex2dec('00') ;
+        sendbuf(1,4) = hex2dec('00') ;
+        fwrite(UnityControl,sendbuf);  
+        % 预留空间，准备写更新算法和确定下一个任务的程序
+        
+    end
+    %% 最后的各个数值复位
+    % 空想任务想象5s，到第7s之后开始休息，到第10s就结束任务
+    if Timer == 10 & RandomTrial(AllTrial)==0  %结束休息，准备下一个
         Timer = 0;  % 计时器清0
         disp(['Trial: ', num2str(AllTrial), ', Task: ', num2str(RandomTrial(AllTrial))]);  % 显示相关数据
-        
+    end
+    % 想对了之后，AO之后，休息3s之后，结束休息，准备下一个
+    if Timer == (clsTime + 5 + 3) & clsFlag == 1  %结束休息
+        Timer = 0;  % 计时器清0
+        clsFlag = 0;  % 分类flag清0
+        disp(['Trial: ', num2str(AllTrial), ', Task: ', num2str(RandomTrial(AllTrial))]);  % 显示相关数据
     end
     
+    % 运动想象没有想对，提醒之后，休息3s之后，结束休息，准备下一个
+    if clsFlag == 0 & Timer == (MaxMITime + 2 + 5 + 3)
+        Timer = 0;  % 计时器清0
+        clsFlag = 0;  % 分类flag清0
+        disp(['Trial: ', num2str(AllTrial), ', Task: ', num2str(RandomTrial(AllTrial))]);  % 显示相关数据
+    end
 end
 %% 存储原始数据
 close all

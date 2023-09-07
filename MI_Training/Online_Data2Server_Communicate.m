@@ -1,4 +1,4 @@
-function R = Online_Data2Server_Communicate(data_x, ip, port, subject_name, config_data)
+function R = Online_Data2Server_Communicate(send_order, data_x, ip, port, subject_name, config_data)
     
     % config = whos('data_x');
     data2Server = data_x;
@@ -20,7 +20,7 @@ function R = Online_Data2Server_Communicate(data_x, ip, port, subject_name, conf
     disp("连接成功")
     disp("数据发送")
 
-    send_order = 1.0;  % 发送命令控制，用于控制服务器，命令为1是实时交互命令，命令为3是上传数据的命令
+    % send_order = 1.0;  % 发送命令控制，用于控制服务器，命令为1是实时交互命令，命令为3是上传数据的命令
     send_data = [send_order; config_data(:); data2Server(:)];
     config_send = whos('send_data');   % whos('send_data')将返回该变量的名称、大小、字节数、类型等信息
     fwrite(tcpipClient,[config_send.bytes/2; send_data],'float32');  % 这里matlab的double是8个字节，然后这里使用的4字节的float32传输，所以config_send.bytes要除以2，表示使用4字节的float32形式传输用了多少个字节
