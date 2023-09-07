@@ -1,4 +1,4 @@
-function [EI_index, mu_power] = Online_DataPreprocess(rawdata, class, sample_frequency, WindowLength, SlideWindowLength, channels)    
+function [FilteredDataMI, EI_index, mu_power] = Online_DataPreprocess(rawdata, class, sample_frequency, WindowLength, channels)    
     %% 采集参数
     %sample_frequency = 256; 
     
@@ -6,14 +6,14 @@ function [EI_index, mu_power] = Online_DataPreprocess(rawdata, class, sample_fre
     %SlideWindowLength = 256;  % 滑窗间隔
     
     Trigger = double(rawdata(end,:)); %rawdata最后一行
-    RawData = double(rawdata(1:32, Trigger~=6));
+    RawData = double(rawdata(1:32));
     %Labels = double(rawdata(33, Trigger~=6));  % 收集rawdata和label
     %channels = [3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];  % 选择的通道
     
     DataX = [];
     
     
-    RawDataMI = RawData(1:32, Trigger==class);  % 提取这一类的运动想象数据
+    RawDataMI = RawData(1:32, Trigger==class);  % 提取这一类的状态的数据（运动想象，空想，运动想象之前的状态）
     FilteredDataMI = DataFilter(RawDataMI, sample_frequency);  % 滤波去噪
     [EI_index, mu_power] = DataIndex(FilteredDataMI, WindowLength, sample_frequency, channels); 
 
@@ -78,7 +78,7 @@ function [EI_index, mu_power] = Online_DataPreprocess(rawdata, class, sample_fre
         
         % 计算傅里叶变换之后的信号 FFT
         for i = 1:number_of_channels
-            DataPSD(i,:) = abs(fft(FilteredData(i,:)).^2);  % 计算变换之后的频域幅值平方，用于计算能量，注意这里要对于每一个channel计算fft变换之后的频谱图
+            DataPSD(i,:) = abs(fft(FilteredData(i,:))).^2;  % 计算变换之后的频域幅值平方，用于计算能量，注意这里要对于每一个channel计算fft变换之后的频谱图
         end
         
         % 计算频带的相关指标
@@ -97,4 +97,5 @@ function [EI_index, mu_power] = Online_DataPreprocess(rawdata, class, sample_fre
         EI_index = EI_;
         mu_power = E_mu;  
     end
+
 end

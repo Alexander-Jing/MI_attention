@@ -60,29 +60,47 @@
 % 
 % fclose(tcpipClient);
 
-MotorClasses = 3; 
-MajorPoportion = 0.6;
-TrialNum = 40;
-DiffLevels = [2,1,3];  % MajorPoportion 每一个session中的主要动作的比例；TrailNum 每一个session中的trial数量, DiffLevels从低到高生成难度的矩阵，矩阵里的数值越高表示难度越高 
+% MotorClasses = 3; 
+% MajorPoportion = 0.6;
+% TrialNum = 40;
+% DiffLevels = [2,1,3];  % MajorPoportion 每一个session中的主要动作的比例；TrailNum 每一个session中的trial数量, DiffLevels从低到高生成难度的矩阵，矩阵里的数值越高表示难度越高 
+%     
+% for SessionIndex = 1:MotorClasses  % 这里的SessionIndex也是主要难度对应的位置
+%     session = [];
+%     MotorMain = DiffLevels(1, SessionIndex);  % 主要成分的运动
+%     NumMain = round(TrialNum * MajorPoportion);  
+%     session = [session, repmat(MotorMain, 1, NumMain)];
+% 
+%     indices = find(DiffLevels==MotorMain);  % 找到MotorMain对应的index
+%     DiffLevels_ = DiffLevels;
+%     DiffLevels_(indices) = [];  % 去掉MotorMain的剩下的难度矩阵
+% 
+%     for i_=1:(MotorClasses - 1)
+%         MotorMinor = DiffLevels_(1, i_);  % 剩下的几个动作
+%         MinorProportion =  (1-MajorPoportion)/(MotorClasses - 1);  % 剩下动作的比重
+%         NumMinor = round(TrialNum * MinorProportion);
+%         session = [session, repmat(MotorMinor, 1, NumMinor)];  % 添加剩下的动作
+%     end    
+%     session = [session, repmat(0, 1, NumMinor)];  % 添加和剩下动作一致比例的空想动作
+%     %save(FunctionNowFilename(['Online_EEGMI_session_', num2str(SessionIndex)], '.mat' ),'session');  % 存储相关数据，后面存储用
+%     save(['Online_EEGMI_session_', num2str(SessionIndex), '_', '.mat'],'session');  % 存储相关数据，后面存储用
+% end
     
-for SessionIndex = 1:MotorClasses  % 这里的SessionIndex也是主要难度对应的位置
-    session = [];
-    MotorMain = DiffLevels(1, SessionIndex);  % 主要成分的运动
-    NumMain = round(TrialNum * MajorPoportion);  
-    session = [session, repmat(MotorMain, 1, NumMain)];
+% 取单边频谱的测试
+x = randn([1,10]);
+Fs = 20;
+% x: 输入信号
+% Fs: 采样频率
+% f: 频率向量
+% P1: 单侧频谱的功率
 
-    indices = find(DiffLevels==MotorMain);  % 找到MotorMain对应的index
-    DiffLevels_ = DiffLevels;
-    DiffLevels_(indices) = [];  % 去掉MotorMain的剩下的难度矩阵
+L = length(x); % 信号长度
+Y = fft(x); % 计算傅里叶变换
+P2 = abs(Y/L); % 计算双侧频谱
+plot( (1:10), P2,"r");  % 绘制难度变化
+hold on
+P1 = P2(1:L/2+1); % 计算单侧频谱
+P1(2:end-1) = 2*P1(2:end-1); % 计算功率
+f = Fs*(0:(L/2))/L; % 定义频率向量
+plot( (1:6), P1,"r");  % 绘制难度变化
 
-    for i_=1:(MotorClasses - 1)
-        MotorMinor = DiffLevels_(1, i_);  % 剩下的几个动作
-        MinorProportion =  (1-MajorPoportion)/(MotorClasses - 1);  % 剩下动作的比重
-        NumMinor = round(TrialNum * MinorProportion);
-        session = [session, repmat(MotorMinor, 1, NumMinor)];  % 添加剩下的动作
-    end    
-    session = [session, repmat(0, 1, NumMinor)];  % 添加和剩下动作一致比例的空想动作
-    %save(FunctionNowFilename(['Online_EEGMI_session_', num2str(SessionIndex)], '.mat' ),'session');  % 存储相关数据，后面存储用
-    save(['Online_EEGMI_session_', num2str(SessionIndex), '_', '.mat'],'session');  % 存储相关数据，后面存储用
-end
-    
