@@ -150,7 +150,7 @@ while(AllTrial <= TrialNum)
             sendbuf(1,4) = hex2dec('00') ;
             fwrite(UnityControl,sendbuf);  
         end
-        % 留足空间用于传输和更新模型
+        % 留足空间用于传输数据和更新模型
         
    end
     
@@ -165,7 +165,7 @@ while(AllTrial <= TrialNum)
             sendbuf(1,4) = hex2dec('00') ;
             fwrite(UnityControl,sendbuf);  
         end
-        % 留足空间用于传输和更新模型
+        % 留足空间用于传输数据和更新模型
         
     end
     
