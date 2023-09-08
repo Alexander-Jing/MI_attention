@@ -129,8 +129,9 @@ while(AllTrial <= TrialNum)
         mu_suppression = (mu_power_MI(1,mu_channel) - mu_power_(1,mu_channel))/mu_power_(1,mu_channel);
         score = weight_mu * mu_suppression + (1 - weight_mu) * EI_index;  % 计算得分
         scores = [scores, score];  % 保存得分
-        config_data = [WindowLength, size(channels, 2), size(scores, 2), RandomTrial(AllTrial)];
-        resultMI = Online_Data2Server_Communicate(1.0, FilteredDataMI, ip, port, subject_name, config_data);  % 传输数据给线上的模型，看分类情况
+        config_data = [WindowLength;size(channels, 2);RandomTrial(AllTrial);session_idx;AllTrial;size(scores, 2);score;0;0;0;0 ];
+        order = 1.0;
+        resultMI = Online_Data2Server_Communicate(order, FilteredDataMI, ip, port, subject_name, config_data);  % 传输数据给线上的模型，看分类情况
         if resultMI == RandomTrial(AllTrial)
             clsFlag = 1;  % 识别正确，置1
         else
@@ -189,7 +190,7 @@ while(AllTrial <= TrialNum)
         sendbuf(1,3) = hex2dec('00') ;
         sendbuf(1,4) = hex2dec('00') ;
         fwrite(UnityControl,sendbuf);  
-        % 预留空间，准备写更新算法和确定下一个任务的程序
+        % 预留空间，准备写确定下一个任务的程序
         
     end
     % 运动想象没有想对，提醒结束了之后让人休息
@@ -200,7 +201,7 @@ while(AllTrial <= TrialNum)
         sendbuf(1,3) = hex2dec('00') ;
         sendbuf(1,4) = hex2dec('00') ;
         fwrite(UnityControl,sendbuf);  
-        % 预留空间，准备写更新算法和确定下一个任务的程序
+        % 预留空间，准备写确定下一个任务的程序
         
     end
     %% 最后的各个数值复位
