@@ -47,9 +47,9 @@ DiffLevels = [2,1,3];
 
 if session_idx == 1  % 如果是第一个session，那需要生成相关的任务集合
     Level2task(MotorClass, MajorPoportion, TrialNum, DiffLevels);
-    RandomTrial = load(['Online_EEGMI_session_', num2str(session_idx), '_', '.mat'],'session');
+    ChoiceTrial = load(['Online_EEGMI_session_', num2str(session_idx), '_', '.mat'],'session');
 else
-    RandomTrial = load(['Online_EEGMI_session_', num2str(session_idx), '_', '.mat'],'session');
+    ChoiceTrial = load(['Online_EEGMI_session_', num2str(session_idx), '_', '.mat'],'session');
 end
 
 %% 开始实验，离线采集
@@ -69,6 +69,8 @@ port = 8888;  % 和后端服务器连接的两个参数
 clsFlag = 0; % 用于判断实时分类是否正确的flag
 subject_name = 'Jyt';  % 被试的姓名  
 
+Trials = [];
+Trials = [Trials, ChoiceTrial(1,1)];  % 初始化RandomTrial，第一个数值是ChoiceTrial任务集合中的第一个
 while(AllTrial <= TrialNum)
     %% 提示专注阶段
     if Timer==0  %提示专注 cross
@@ -83,7 +85,7 @@ while(AllTrial <= TrialNum)
     
     %% 运动想象阶段
     if Timer==2
-        if RandomTrial(AllTrial)==0  % 空想任务
+        if Trials(AllTrial)==0  % 空想任务
             Trigger = 1;
             sendbuf(1,1) = hex2dec('01') ;
             sendbuf(1,2) = hex2dec('00') ;
@@ -91,7 +93,7 @@ while(AllTrial <= TrialNum)
             sendbuf(1,4) = hex2dec('00') ;
             fwrite(UnityControl,sendbuf);  
         end
-        if RandomTrial(AllTrial)==2  % 运动想象任务
+        if Trials(AllTrial)==2  % 运动想象任务
             Trigger = 2;
             sendbuf(1,1) = hex2dec('02') ;
             sendbuf(1,2) = hex2dec('00') ;
@@ -122,17 +124,17 @@ while(AllTrial <= TrialNum)
     end
     
     % 第4s开始取512的Trigger~=6的MI的窗口，数据处理并且进行分析
-    if Timer > 3 & RandomTrial(AllTrial)~=0 & clsFlag == 0
+    if Timer > 3 & Trials(AllTrial)~=0 & clsFlag == 0
         rawdata = TrialData(:,end-512+1:end);  % 取前一个512的窗口
         rawdata = rawdata(2:end,:);
-        [FilteredDataMI, EI_index, mu_power_MI] = Online_DataPreprocess(rawdata, RandomTrial(AllTrial), sample_frequency, WindowLength, channels);
+        [FilteredDataMI, EI_index, mu_power_MI] = Online_DataPreprocess(rawdata, Trials(AllTrial), sample_frequency, WindowLength, channels);
         mu_suppression = (mu_power_MI(1,mu_channel) - mu_power_(1,mu_channel))/mu_power_(1,mu_channel);
         score = weight_mu * mu_suppression + (1 - weight_mu) * EI_index;  % 计算得分
         scores = [scores, score];  % 保存得分
-        config_data = [WindowLength;size(channels, 2);RandomTrial(AllTrial);session_idx;AllTrial;size(scores, 2);score;0;0;0;0 ];
+        config_data = [WindowLength;size(channels, 2);Trials(AllTrial);session_idx;AllTrial;size(scores, 2);score;0;0;0;0 ];
         order = 1.0;
         resultMI = Online_Data2Server_Communicate(order, FilteredDataMI, ip, port, subject_name, config_data);  % 传输数据给线上的模型，看分类情况
-        if resultMI == RandomTrial(AllTrial)
+        if resultMI == Trials(AllTrial)
             clsFlag = 1;  % 识别正确，置1
         else
             clsFlag = 0;
@@ -143,7 +145,7 @@ while(AllTrial <= TrialNum)
    % 想对了开始播放动作 
    if clsFlag == 1 
         clsTime = Timer;  % 这是分类正确的时间
-        if RandomTrial(AllTrial)==2  % 运动想象任务
+        if Trials(AllTrial)==2  % 运动想象任务
             Trigger = 2;
             sendbuf(1,1) = hex2dec('02') ;
             sendbuf(1,2) = hex2dec('00') ;
@@ -152,7 +154,7 @@ while(AllTrial <= TrialNum)
             fwrite(UnityControl,sendbuf);  
         end
         % 传输数据和更新模型
-        config_data = [WindowLength;size(channels, 2);RandomTrial(AllTrial);session_idx;AllTrial;size(scores, 2);score;0;0;0;0 ];
+        config_data = [WindowLength;size(channels, 2);Trials(AllTrial);session_idx;AllTrial;size(scores, 2);score;0;0;0;0 ];
         order = 2.0;  % 传输数据和训练的命令
         Online_Data2Server_Send(order, [0,0,0,0], ip, port, subject_name, config_data);  % 发送指令，让服务器更新数据，[0,0,0,0]单纯是用于凑下数据，防止应为空集影响传输
    end
@@ -160,7 +162,7 @@ while(AllTrial <= TrialNum)
     % 想错了开始休息和提醒
     if clsFlag == 0 & Timer == (MaxMITime + 2)
         clsTime = Timer;  % 这是分类正确的时间
-        if RandomTrial(AllTrial)==2  % 运动想象任务
+        if Trials(AllTrial)==2  % 运动想象任务
             Trigger = 2;
             sendbuf(1,1) = hex2dec('02') ;
             sendbuf(1,2) = hex2dec('00') ;
@@ -169,14 +171,14 @@ while(AllTrial <= TrialNum)
             fwrite(UnityControl,sendbuf);  
         end
         % 传输数据和更新模型
-        config_data = [WindowLength;size(channels, 2);RandomTrial(AllTrial);session_idx;AllTrial;size(scores, 2);score;0;0;0;0 ];
+        config_data = [WindowLength;size(channels, 2);Trials(AllTrial);session_idx;AllTrial;size(scores, 2);score;0;0;0;0 ];
         order = 2.0;  % 传输数据和训练的命令
         Online_Data2Server_Send(order, [0,0,0,0], ip, port, subject_name, config_data);  % 发送指令，让服务器更新数据，[0,0,0,0]单纯是用于凑下数据，防止应为空集影响传输
     end
     
    %% 休息阶段，确定下一个动作
     % 空想只给5s就休息
-    if Timer==7 & RandomTrial(AllTrial)==0  %开始休息
+    if Timer==7 & Trials(AllTrial)==0  %开始休息
         Trigger = 6;
         sendbuf(1,1) = hex2dec('04') ;
         sendbuf(1,2) = hex2dec('00') ;
@@ -184,10 +186,13 @@ while(AllTrial <= TrialNum)
         sendbuf(1,4) = hex2dec('00') ;
         fwrite(UnityControl,sendbuf);  
         % 更新算法
-        config_data = [WindowLength;size(channels, 2);RandomTrial(AllTrial);session_idx;AllTrial;size(scores, 2);score;0;0;0;0 ];
+        config_data = [WindowLength;size(channels, 2);Trials(AllTrial);session_idx;AllTrial;size(scores, 2);score;0;0;0;0 ];
         order = 2.0;  % 传输数据和训练的命令
         Online_Data2Server_Send(order, [0,0,0,0], ip, port, subject_name, config_data);  % 发送指令，让服务器更新数据，[0,0,0,0]单纯是用于凑下数据，防止应为空集影响传输
         % 进入确定下一个任务
+        average_score = average(scores);
+        scores_trial = [scores_trial, average_score];  % 存储好平均的分数
+        
     end
     
     % 运动想象想对了之后，AO结束了之后让人休息
@@ -214,22 +219,22 @@ while(AllTrial <= TrialNum)
     end
     %% 最后的各个数值复位
     % 空想任务想象5s，到第7s之后开始休息，到第10s就结束任务
-    if Timer == 10 & RandomTrial(AllTrial)==0  %结束休息，准备下一个
+    if Timer == 10 & Trials(AllTrial)==0  %结束休息，准备下一个
         Timer = 0;  % 计时器清0
-        disp(['Trial: ', num2str(AllTrial), ', Task: ', num2str(RandomTrial(AllTrial))]);  % 显示相关数据
+        disp(['Trial: ', num2str(AllTrial), ', Task: ', num2str(Trials(AllTrial))]);  % 显示相关数据
     end
     % 想对了之后，AO之后，休息3s之后，结束休息，准备下一个
     if Timer == (clsTime + 5 + 3) & clsFlag == 1  %结束休息
         Timer = 0;  % 计时器清0
         clsFlag = 0;  % 分类flag清0
-        disp(['Trial: ', num2str(AllTrial), ', Task: ', num2str(RandomTrial(AllTrial))]);  % 显示相关数据
+        disp(['Trial: ', num2str(AllTrial), ', Task: ', num2str(Trials(AllTrial))]);  % 显示相关数据
     end
     
     % 运动想象没有想对，提醒之后，休息3s之后，结束休息，准备下一个
     if clsFlag == 0 & Timer == (MaxMITime + 2 + 5 + 3)
         Timer = 0;  % 计时器清0
         clsFlag = 0;  % 分类flag清0
-        disp(['Trial: ', num2str(AllTrial), ', Task: ', num2str(RandomTrial(AllTrial))]);  % 显示相关数据
+        disp(['Trial: ', num2str(AllTrial), ', Task: ', num2str(Trials(AllTrial))]);  % 显示相关数据
     end
 end
 %% 存储原始数据
@@ -275,5 +280,20 @@ function Level2task(MotorClasses, MajorPoportion, TrialNum, DiffLevels)  % Major
         session = [session, repmat(0, 1, NumMinor)];  % 添加和剩下动作一致比例的空想动作
         save(['Online_EEGMI_session_', num2str(SessionIndex), '_', '.mat'],'session');  % 存储相关数据，后面存储用
     end
+    
+end
+
+function Trials = TaskAdjust(scores_trial, ChoiceTrial, Trials, AllTrial)
+    
+    if AllTrial < 4  % 前4个trial由于无法进行数据采集，所以就先随机挑选
+        n_ = length(ChoiceTrial);
+        idx = randi(n_);  % 随机挑选的数值
+        task_ = ChoiceTrial(1,idx);
+        ChoiceTrial(1,idx) = [];  % 选择task_数值，以及在ChoiceTrial里面去掉这个选中的数值
+        Trials = [Trials, task_];  % 更新Trials
+    else
+        % 接下来要写trial数量大于4的情况，要更具相关的scores分数情况来判定
+    
+    
     
 end
