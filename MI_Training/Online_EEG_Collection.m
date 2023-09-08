@@ -151,8 +151,10 @@ while(AllTrial <= TrialNum)
             sendbuf(1,4) = hex2dec('00') ;
             fwrite(UnityControl,sendbuf);  
         end
-        % 留足空间用于传输数据和更新模型
-        
+        % 传输数据和更新模型
+        config_data = [WindowLength;size(channels, 2);RandomTrial(AllTrial);session_idx;AllTrial;size(scores, 2);score;0;0;0;0 ];
+        order = 2.0;  % 传输数据和训练的命令
+        Online_Data2Server_Send(order, [0,0,0,0], ip, port, subject_name, config_data);  % 发送指令，让服务器更新数据，[0,0,0,0]单纯是用于凑下数据，防止应为空集影响传输
    end
     
     % 想错了开始休息和提醒
@@ -166,8 +168,10 @@ while(AllTrial <= TrialNum)
             sendbuf(1,4) = hex2dec('00') ;
             fwrite(UnityControl,sendbuf);  
         end
-        % 留足空间用于传输数据和更新模型
-        
+        % 传输数据和更新模型
+        config_data = [WindowLength;size(channels, 2);RandomTrial(AllTrial);session_idx;AllTrial;size(scores, 2);score;0;0;0;0 ];
+        order = 2.0;  % 传输数据和训练的命令
+        Online_Data2Server_Send(order, [0,0,0,0], ip, port, subject_name, config_data);  % 发送指令，让服务器更新数据，[0,0,0,0]单纯是用于凑下数据，防止应为空集影响传输
     end
     
    %% 休息阶段，确定下一个动作
@@ -179,9 +183,13 @@ while(AllTrial <= TrialNum)
         sendbuf(1,3) = hex2dec('00') ;
         sendbuf(1,4) = hex2dec('00') ;
         fwrite(UnityControl,sendbuf);  
-        % 预留空间，准备写更新算法和确定下一个任务的程序
-        
+        % 更新算法
+        config_data = [WindowLength;size(channels, 2);RandomTrial(AllTrial);session_idx;AllTrial;size(scores, 2);score;0;0;0;0 ];
+        order = 2.0;  % 传输数据和训练的命令
+        Online_Data2Server_Send(order, [0,0,0,0], ip, port, subject_name, config_data);  % 发送指令，让服务器更新数据，[0,0,0,0]单纯是用于凑下数据，防止应为空集影响传输
+        % 进入确定下一个任务
     end
+    
     % 运动想象想对了之后，AO结束了之后让人休息
     if Timer == (clsTime + 5) & clsFlag == 1  %开始休息
         Trigger = 6;
