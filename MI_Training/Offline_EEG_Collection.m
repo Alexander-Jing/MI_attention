@@ -43,7 +43,7 @@ AllTrial = 0;
 
 MotorClasses = 2;                                                          % 运动想象的种类的数量的设置
 randomindex = [];                                                          % 初始化trials的集合
-for i= 1:MotorClasses
+for i= 0:(MotorClasses-1)
     index_i = ones(TrialNum/MotorClasses,1)*i;                             % size TrialNum/MotorClasses*1，各种任务
     randomindex = [randomindex; index_i];                                  % 各个任务整合，最终size TrialNum*1
 end
@@ -129,5 +129,5 @@ save(FunctionNowFilename(['Offline_EEG_label_', subject_name], '.mat' ),'DataY')
 % 设置传输的参数
 ip = '172.18.22.21';
 port = 8888;
-config_data = [WindowLength, size(channels, 2), windows_per_session, MotorClasses];
+config_data = [WindowLength, size(channels, 2), windows_per_session, classes];
 Offline_Data2Server_Send(DataX, ip, port, subject_name, config_data);

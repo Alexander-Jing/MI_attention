@@ -13,7 +13,7 @@ function [DataX, DataY, windows_per_session] = Offline_DataPreprocess(rawdata, c
     DataX = [];
     DataY = [];  % 初始化整理的X和Y的数据
     
-    for class_index = 1:classes
+    for class_index = 0:(classes-1)
         RawDataMI = RawData(1:32, Trigger==class_index);  % 提取这一类的运动想象数据
         FilteredDataMI = DataFilter(RawDataMI, sample_frequency);  % 滤波去噪
         [windows_per_session, SampleDataPre] = WindowsDataPre(FilteredDataMI, WindowLength, SlideWindowLength);
@@ -64,6 +64,6 @@ function [DataX, DataY, windows_per_session] = Offline_DataPreprocess(rawdata, c
             DataSamplePre{1, i} = FilteredData(channels, PointStart + 1:PointStart + WindowLength );  % 生成划窗的元祖
             LabelWindows = [LabelWindows; class_index];  % 生成装label的数据
         end
-        DataSamlpe = DataSamplePre;
+        DataSample = DataSamplePre;
     end
 end
