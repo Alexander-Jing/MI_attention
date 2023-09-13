@@ -1,4 +1,4 @@
-function Offline_Data2Server_Send(data_x, ip, port, subject_name, config_data)
+function Offline_Data2Server_Send(data_x, ip, port, subject_name, config_data, send_order, foldername)
     
     config = whos('data_x');
     data2Server = [];
@@ -11,7 +11,11 @@ function Offline_Data2Server_Send(data_x, ip, port, subject_name, config_data)
        end
     end
     % 中途保存下要发送的数据
-    save(FunctionNowFilename(['Offline_EEG_data2Server_', subject_name], '.mat' ),'data2Server');
+    foldername = [foldername, '\\Offline_Data2Server_', subject_name]; % 指定文件夹路径和名称
+    if ~exist(foldername, 'dir')
+       mkdir(foldername);
+    end
+    save([foldername, '\\', FunctionNowFilename(['Offline_EEG_data2Server_', subject_name], '.mat' )],'data2Server');
     % save('data2Server.mat','data2Server');
     % 
     % data2Server = load('data2Server.mat','data2Server');
@@ -28,7 +32,7 @@ function Offline_Data2Server_Send(data_x, ip, port, subject_name, config_data)
     disp("连接成功")
     disp("数据发送")
 
-    send_order = 3.0;  % 发送命令控制，用于控制服务器
+    % send_order = 3.0;  % 发送命令控制，用于控制服务器
     send_data = [send_order; config_data(:); data2Server(:)];
     config_send = whos('send_data');   % whos('send_data')将返回该变量的名称、大小、字节数、类型等信息
     fwrite(tcpipClient,[config_send.bytes/2; send_data],'float32');  % 这里matlab的double是8个字节，然后这里使用的4字节的float32传输，所以config_send.bytes要除以2，表示使用4字节的float32形式传输用了多少个字节

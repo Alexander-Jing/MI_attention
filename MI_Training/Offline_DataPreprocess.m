@@ -1,4 +1,4 @@
-function [DataX, DataY, windows_per_session] = Offline_DataPreprocess(rawdata, classes, sample_frequency, WindowLength, SlideWindowLength, channels)    
+function [DataX, DataY, windows_per_session] = Offline_DataPreprocess(rawdata, classes, sample_frequency, WindowLength, SlideWindowLength, channels, subject_name, foldername)    
     %% 采集参数
     %sample_frequency = 256; 
     
@@ -6,23 +6,30 @@ function [DataX, DataY, windows_per_session] = Offline_DataPreprocess(rawdata, c
     %SlideWindowLength = 256;  % 滑窗间隔
     
     Trigger = double(rawdata(end,:)); %rawdata最后一行
-    RawData = double(rawdata(1:32, Trigger~=6));
-    %Labels = double(rawdata(33, Trigger~=6));  % 收集rawdata和label
+    RawData = double(rawdata(1:end-1, Trigger~=6));
     %channels = [3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];  % 选择的通道
     
     DataX = [];
     DataY = [];  % 初始化整理的X和Y的数据
     
     for class_index = 0:(classes-1)
-        RawDataMI = RawData(1:32, Trigger==class_index);  % 提取这一类的运动想象数据
+        RawDataMI = RawData(:, Trigger==class_index);  % 提取这一类的运动想象数据
         FilteredDataMI = DataFilter(RawDataMI, sample_frequency);  % 滤波去噪
         [windows_per_session, SampleDataPre] = WindowsDataPre(FilteredDataMI, WindowLength, SlideWindowLength);
         [DataSample, LabelWindows] = DataWindows(SampleDataPre, FilteredDataMI, channels, class_index, windows_per_session, SlideWindowLength, WindowLength);
         DataX = [DataX; DataSample];
         DataY = [DataY, LabelWindows];
     end
-%     save(FunctionNowFilename('Offline_EEG_data', '.mat' ),'DataX');
-%     save(FunctionNowFilename('Offline_EEG_label', '.mat' ),'DataY');
+    
+    % 中途保存下要发送的数据 
+    foldername = [foldername, '\\Offline_EEGMI_', subject_name]; % 指定文件夹路径和名称
+    if ~exist(foldername, 'dir')
+       mkdir(foldername);
+    end
+    % 预处理之后的数据存储，如果下面传输失败，直接将这两个mat文件送到服务器里
+    save([foldername, '\\', FunctionNowFilename(['Offline_EEG_data_', subject_name], '.mat' )],'DataX');
+    save([foldername, '\\', FunctionNowFilename(['Offline_EEG_label_', subject_name], '.mat' )],'DataY');
+
     
     
     %% 滤波函数

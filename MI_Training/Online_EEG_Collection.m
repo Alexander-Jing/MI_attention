@@ -51,7 +51,7 @@ if session_idx == 1  % 如果是第一个session，那需要生成相关的任务集合
 else
     ChoiceTrial = load(['Online_EEGMI_session_', num2str(session_idx), '_', '.mat'],'session');
 end
-
+ChoiceTrial = ChoiceTrial.session;
 %% 开始实验，离线采集
 Timer = 0;
 TrialData = [];
@@ -278,7 +278,7 @@ function Level2task(MotorClasses, MajorPoportion, TrialNum, DiffLevels)  % Major
         for i_=1:(MotorClasses - 1)
             MotorMinor = DiffLevels_(1, i_);  % 剩下的几个动作
             MinorProportion =  (1-MajorPoportion)/(MotorClasses - 1);  % 剩下动作的比重
-            NumMinor = ronud(TrialNum * MinorProportion);
+            NumMinor = round(TrialNum * MinorProportion);
             session = [session, repmat(MotorMinor, 1, NumMinor)];  % 添加剩下的动作
         end    
         session = [session, repmat(0, 1, NumMinor)];  % 添加和剩下动作一致比例的空想动作

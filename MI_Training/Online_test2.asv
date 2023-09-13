@@ -1,3 +1,12 @@
+%% 准备初始的存储数据的文件夹
+subject_name = 'Jyt';  % 被试的姓名  
+
+foldername = ['.\\', subject_name]; % 指定文件夹路径和名称
+
+if ~exist(foldername, 'dir')
+   mkdir(foldername);
+end
+
 %% 生成任务安排调度
 Trigger = 0;                                                               % 初始化Trigger，用于后续的数据存储
 AllTrial = 0;
@@ -10,12 +19,16 @@ TrialNum = 40;
 DiffLevels = [2,1,3];
 
 if session_idx == 1  % 如果是第一个session，那需要生成相关的任务集合
-    Level2task(MotorClass, MajorPoportion, TrialNum, DiffLevels);
-    ChoiceTrial = load(['Online_EEGMI_session_', num2str(session_idx), '_', '.mat'],'session');
+    Level2task(MotorClass, MajorPoportion, TrialNum, DiffLevels, foldername);
+    path = [foldername, '\\', 'Level2task', '\\', 'Online_EEGMI_session_', num2str(session_idx), '_', '.mat'];
+    ChoiceTrial = load(path,'session');
 else
-    ChoiceTrial = load(['Online_EEGMI_session_', num2str(session_idx), '_', '.mat'],'session');
+    path = [foldername, '\\', 'Level2task', '\\', 'Online_EEGMI_session_', num2str(session_idx), '_', '.mat'];
+    ChoiceTrial = load(path,'session');
 end
 
+ChoiceTrial = ChoiceTrial.session;
+ChoiceTrial = [0,0,0,0,0];
 %% 开始实验，离线采集
 Timer = 0;
 TrialData = [];
@@ -31,7 +44,6 @@ scores_trial = [];  % 用于存储每一个trial的平均分数值
 ip = '172.18.22.21';
 port = 8888;  % 和后端服务器连接的两个参数
 clsFlag = 0; % 用于判断实时分类是否正确的flag
-subject_name = 'Jyt';  % 被试的姓名  
 
 Trials = [];
 Trials = [Trials, ChoiceTrial(1,1)];  % 初始化RandomTrial，第一个数值是ChoiceTrial任务集合中的第一个
@@ -40,11 +52,51 @@ for trial_idx = 1:length(ChoiceTrial)
    for timer = 1:10
        pause(1);
        if rem(timer,5)==0
-           rawdata = rand(31,512);  % 生成原始的数据，以及去掉了trigger==6的部分
-           trigger = [ChoiceTrial(1,trial_idx) * ones(1,512)]; 
-           rawdata = [rawdata; trigger];  % 生成所有数据
-           [FilteredDataMI, EI_index, mu_power_MI] = Online_DataPreprocess(rawdata, Trials(AllTrial), sample_frequency, WindowLength, channels);
+           rawdata = zeros(31,512);  % 生成原始的数据，以及去掉了trigger==6的部分
+           Trigger = [ChoiceTrial(1,trial_idx) * ones(1,512)]; 
+           rawdata = [rawdata; Trigger];  % 生成所有数据
+           [FilteredDataMI, EI_index, mu_power_MI] = Online_DataPreprocess(rawdata, ChoiceTrial(1,trial_idx), sample_frequency, WindowLength, channels);
+           score = weight_mu * sum(mu_power_MI) + (1 - weight_mu) * sum(EI_index);  % 计算得分，这里临时使用求和来表征，后续需要修改
+           config_data = [WindowLength;size(channels, 2);ChoiceTrial(1,trial_idx);session_idx;trial_idx;timer/5;score;0;0;0;0 ];
+           order = 1.0;
+           resultMI = Online_Data2Server_Communicate(order, FilteredDataMI, ip, port, subject_name, config_data, foldername);  % 传输数据给线上的模型，看分类情况
+           disp(['session: ', num2str(session_idx)]);
+           disp(['trial: ', num2str(trial_idx)]);
+           disp(['window: ', num2str(timer/5)]);
+           disp(['moter_class: ', num2str(ChoiceTrial(1,trial_idx))]);
+           disp(['predict_class: ', num2str(resultMI)]);
        end
        
    end
+end
+
+%% 任务初始生成的函数
+function Level2task(MotorClasses, MajorPoportion, TrialNum, DiffLevels, foldername)  % MajorPoportion 每一个session中的主要动作的比例；TrailNum 每一个session中的trial数量, DiffLevels从低到高生成难度的矩阵，矩阵里的数值越高表示难度越高 
+    
+    foldername = [foldername, '\\', 'Level2task']; % 指定文件夹路径和名称
+    if ~exist(foldername, 'dir')
+       mkdir(foldername);
+    end
+    
+    for SessionIndex = 1:MotorClasses  % 这里的SessionIndex也是主要难度对应的位置
+        session = [];
+        MotorMain = DiffLevels(1, SessionIndex);  % 主要成分的运动
+        NumMain = round(TrialNum * MajorPoportion);  
+        session = [session, repmat(MotorMain, 1, NumMain)];
+        
+        indices = find(DiffLevels==MotorMain);  % 找到MotorMain对应的index
+        DiffLevels_ = DiffLevels;
+        DiffLevels_(indices) = [];  % 去掉MotorMain的剩下的难度矩阵
+        
+        for i_=1:(MotorClasses - 1)
+            MotorMinor = DiffLevels_(1, i_);  % 剩下的几个动作
+            MinorProportion =  (1-MajorPoportion)/(MotorClasses - 1);  % 剩下动作的比重
+            NumMinor = round(TrialNum * MinorProportion);
+            session = [session, repmat(MotorMinor, 1, NumMinor)];  % 添加剩下的动作
+        end    
+        session = [session, repmat(0, 1, NumMinor)];  % 添加和剩下动作一致比例的空想动作
+        path = [foldername, '\\', 'Online_EEGMI_session_', num2str(SessionIndex), '_', '.mat'];
+        save(path,'session');  % 存储相关数据，后面存储用
+    end
+    
 end
