@@ -20,15 +20,15 @@ DiffLevels = [2,1,3];
 
 if session_idx == 1  % 如果是第一个session，那需要生成相关的任务集合
     Level2task(MotorClass, MajorPoportion, TrialNum, DiffLevels, foldername, subject_name);
-    path = [foldername, '\\', 'Level2task', '\\', 'Online_EEGMI_session_', subject_name, '_', num2str(session_idx), '_', '.mat'];
+    path = [foldername, '\\', 'Level2task', '_', subject_name, '\\', 'Online_EEGMI_session_', subject_name, '_', num2str(session_idx), '_', '.mat'];
     ChoiceTrial = load(path,'session');
 else
-    path = [foldername, '\\', 'Level2task', '\\', 'Online_EEGMI_session_', subject_name, '_', num2str(session_idx), '_', '.mat'];
+    path = [foldername, '\\', 'Level2task', '_', subject_name, '\\', 'Online_EEGMI_session_', subject_name, '_', num2str(session_idx), '_', '.mat'];
     ChoiceTrial = load(path,'session');
 end
 
 ChoiceTrial = ChoiceTrial.session;
-ChoiceTrial = [0,0,0,0,0];  % 临时使用
+% ChoiceTrial = [0,1,2,3];  % 临时使用
 %% 开始实验，离线采集
 Timer = 0;
 TrialData = [];
@@ -47,11 +47,13 @@ clsFlag = 0; % 用于判断实时分类是否正确的flag
 
 Trials = [];
 Trials = [Trials, ChoiceTrial(1,1)];  % 初始化RandomTrial，第一个数值是ChoiceTrial任务集合中的第一个
+results = [];
 
 for trial_idx = 1:length(ChoiceTrial)
    for timer = 1:10
        pause(1);
        if rem(timer,5)==0
+           disp('*********Online Testing***********');
            rawdata = rand(33,512);  % 生成原始的数据，以及去掉了trigger==6的部分
            Trigger = [ChoiceTrial(1,trial_idx) * ones(1,512)]; 
            rawdata = [rawdata; Trigger];  % 生成所有数据
@@ -60,15 +62,35 @@ for trial_idx = 1:length(ChoiceTrial)
            config_data = [WindowLength;size(channels, 2);ChoiceTrial(1,trial_idx);session_idx;trial_idx;timer/5;score;0;0;0;0 ];
            order = 1.0;
            resultMI = Online_Data2Server_Communicate(order, FilteredDataMI, ip, port, subject_name, config_data, foldername);  % 传输数据给线上的模型，看分类情况
+           
            disp(['session: ', num2str(session_idx)]);
            disp(['trial: ', num2str(trial_idx)]);
            disp(['window: ', num2str(timer/5)]);
            disp(['moter_class: ', num2str(ChoiceTrial(1,trial_idx))]);
            disp(['predict_class: ', num2str(resultMI)]);
        end
-       
+       if timer == 10
+           disp('*********Online Updating');
+           % 传输数据和更新模型
+           config_data = [WindowLength;size(channels, 2);ChoiceTrial(1,trial_idx);session_idx;trial_idx;timer/5;score;0;0;0;0 ];
+           order = 2.0;  % 传输数据和训练的命令
+           Online_Data2Server_Send(order, [0,0,0,0], ip, port, subject_name, config_data);  % 发送指令，让服务器更新数据，[0,0,0,0]单纯是用于凑下数据，防止应为空集影响传输
+           results = [results, resultMI];
+           disp(['session: ', num2str(session_idx)]);
+           disp(['trial: ', num2str(trial_idx)]);
+           disp('training model');
+       end    
    end
 end
+
+s1 = scatter(1:length(results), results(:));
+s1.MarkerFaceColor = '#ff474c';
+s1.MarkerEdgeColor = '#ff474c';
+hold on
+s2 = scatter(1:length(ChoiceTrial), ChoiceTrial(:));
+s2.MarkerFaceColor = '#0485d1';
+s2.MarkerEdgeColor = '#0485d1';
+legend('results', 'ChoiceTrial');  % 添加图例
 
 %% 任务初始生成的函数
 function Level2task(MotorClasses, MajorPoportion, TrialNum, DiffLevels, foldername, subject_name)  % MajorPoportion 每一个session中的主要动作的比例；TrailNum 每一个session中的trial数量, DiffLevels从低到高生成难度的矩阵，矩阵里的数值越高表示难度越高 
