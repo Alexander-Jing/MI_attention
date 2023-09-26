@@ -81,33 +81,13 @@ while(AllTrial <= TrialNum)
         AllTrial = AllTrial + 1;
     end
     if Timer==2
-        if RandomTrial(AllTrial)==0  % 空想任务
-            Trigger = 0;
-            mat2unity = ['0', num2str(Trigger + 3)];
-            sendbuf(1,1) = hex2dec(mat2unity) ;
-            sendbuf(1,2) = hex2dec('01') ;
-            sendbuf(1,3) = hex2dec('00') ;
-            sendbuf(1,4) = hex2dec('00') ;
-            fwrite(UnityControl,sendbuf);  
-        end
-        if RandomTrial(AllTrial)==1  % 运动想象任务1
-            Trigger = 1;
-            mat2unity = ['0', num2str(Trigger + 3)];
-            sendbuf(1,1) = hex2dec(mat2unity) ;
-            sendbuf(1,2) = hex2dec('01') ;
-            sendbuf(1,3) = hex2dec('00') ;
-            sendbuf(1,4) = hex2dec('00') ;
-            fwrite(UnityControl,sendbuf);  
-        end
-        if RandomTrial(AllTrial)==2  % 运动想象任务2
-            Trigger = 2;
-            mat2unity = ['0', num2str(Trigger + 3)];
-            sendbuf(1,1) = hex2dec(mat2unity) ;
-            sendbuf(1,2) = hex2dec('01') ;
-            sendbuf(1,3) = hex2dec('00') ;
-            sendbuf(1,4) = hex2dec('00') ;
-            fwrite(UnityControl,sendbuf);  
-        end
+        Trigger = RandomTrial(AllTrial);  % 播放动作的AO动画（Idle, MI1, MI2）
+        mat2unity = ['0', num2str(Trigger + 3)];
+        sendbuf(1,1) = hex2dec(mat2unity) ;
+        sendbuf(1,2) = hex2dec('01') ;
+        sendbuf(1,3) = hex2dec('00') ;
+        sendbuf(1,4) = hex2dec('00') ;
+        fwrite(UnityControl,sendbuf);  
     end
     
 %     if Timer==6 && (RandomTrial(AllTrial)==1 || RandomTrial(AllTrial)==2) 
@@ -118,7 +98,7 @@ while(AllTrial <= TrialNum)
 %         fwrite(UnityControl,sendbuf); 
 %     end
     
-    if Timer==10  %开始休息
+    if Timer==7  %开始休息
         Trigger = 6;
         sendbuf(1,1) = hex2dec('02') ;
         sendbuf(1,2) = hex2dec('00') ;
@@ -138,7 +118,7 @@ while(AllTrial <= TrialNum)
 %     TrialData = [TrialData,data];
     Timer = Timer + 1;
     
-    if Timer == 13
+    if Timer == 10
         Timer = 0;  % 计时器清0
         disp(['Trial: ', num2str(AllTrial), ', Task: ', num2str(RandomTrial(AllTrial))]);  % 显示相关数据
     end

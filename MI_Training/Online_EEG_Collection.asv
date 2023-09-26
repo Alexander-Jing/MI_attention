@@ -55,9 +55,10 @@ DiffLevels = [2,1];
 if session_idx == 1  % 如果是第一个session，那需要生成相关的任务集合
     Level2task(MotorClass, MajorPoportion, TrialNum, DiffLevels, foldername, subject_name);
     path = [foldername, '\\', 'Level2task', '_', subject_name, '\\', 'Online_EEGMI_session_', num2str(session_idx), '_', subject_name, '.mat'];
+    '\\', 'Online_EEGMI_session_', num2str(SessionIndex), '_', subject_name, '.mat'
     ChoiceTrial = load(path,'session');
 else
-    path = [foldername, '\\', 'Level2task', '_', subject_name, '\\', 'Online_EEGMI_session_', num2str(session_idx), '_', subject_name, '.mat'];
+    path = [foldername, '\\', 'Level2task', '_', subject_name, '\\', 'Online_EEGMI_session_', num2str(SessionIndex), '_', subject_name, '.mat'];
     ChoiceTrial = load(path,'session');
 end
 
@@ -255,12 +256,21 @@ close all
 TrialData = TrialData(2:end,:);  %去掉矩阵第一行
 ChanLabel = flip({infoList.chanLabel});
 pnet('closeall')   % 将连接关闭
-% 存储原始数据
-foldername_rawdata = [foldername, '\\Online_EEGMI_RawData_', subject_name]; % 指定文件夹路径和名称
-if ~exist(foldername_rawdata, 'dir')
-   mkdir(foldername_rawdata);
-end
-save([foldername_rawdata, '\\', FunctionNowFilename(['Online_EEGMI_RawData_',str(session_idx), '_', subject_name], '.mat' )],'TrialData','Trials','ChanLabel');
+save(FunctionNowFilename(['Offline_EEG_Rawdata_', subject_name],'.mat' ),'TrialData','TrialIndex','ChanLabel');
+
+%% 数据预处理
+% 划窗参数设置
+SlideWindowLength = 256;  % 滑窗间隔
+[DataX, DataY, windows_per_session] = Offline_DataPreprocess(rawdata, classes, sample_frequency, WindowLength, SlideWindowLength, channels);
+% 预处理之后的数据存储，如果下面传输失败，直接将这两个mat文件送到服务器里
+save(FunctionNowFilename(['Offline_EEG_data_', subject_name], '.mat' ),'DataX');
+save(FunctionNowFilename(['Offline_EEG_label_', subject_name], '.mat' ),'DataY');
+
+%% 预处理数据传输
+% 设置传输的参数
+config_data = [WindowLength, size(channels, 2), windows_per_session, MotorClasses];
+Offline_Data2Server_Send(DataX, ip, port, subject_name, config_data);
+
 
 %% 任务初始生成的函数
 function Level2task(MotorClasses, MajorPoportion, TrialNum, DiffLevels, foldername, subject_name)  % MajorPoportion 每一个session中的主要动作的比例；TrailNum 每一个session中的trial数量, DiffLevels从低到高生成难度的矩阵，矩阵里的数值越高表示难度越高 

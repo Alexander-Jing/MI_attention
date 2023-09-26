@@ -55,11 +55,7 @@ RandomTrial = randomindex(TrialIndex);                                     % Ëæ»
 % ÉèÖÃÏà¹Ø²ÎÊı
 subject_name = 'Jyt';
 classes = MotorClasses;
-foldername = ['.\\', FunctionNowFilename([subject_name, '_'], '_data')]; % Ö¸¶¨ÎÄ¼ş¼ĞÂ·¾¶ºÍÃû³Æ
-
-if ~exist(foldername, 'dir')
-   mkdir(foldername);
-end
+foldername = ['.\\', subject_name]; % Ö¸¶¨ÎÄ¼ş¼ĞÂ·¾¶ºÍÃû³Æ
 
 %% ¿ªÊ¼ÊµÑé£¬ÀëÏß²É¼¯
 Timer = 0;
@@ -116,7 +112,7 @@ close all
 TrialData = TrialData(2:end,:);  %È¥µô¾ØÕóµÚÒ»ĞĞ
 ChanLabel = flip({infoList.chanLabel});
 pnet('closeall')   % ½«Á¬½Ó¹Ø±Õ
-% ´æ´¢Ô­Ê¼Êı¾İ
+
 foldername_rawdata = [foldername, '\\Offline_EEGMI_RawData_', subject_name]; % Ö¸¶¨ÎÄ¼ş¼ĞÂ·¾¶ºÍÃû³Æ
 if ~exist(foldername_rawdata, 'dir')
    mkdir(foldername_rawdata);
