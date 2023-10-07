@@ -35,14 +35,19 @@ status = CheckNetStreamingVersion(con);                                    % ÅĞ¶
 [~, basicInfo] = ClientGetBasicMessage(con);                               % »ñÈ¡Éè±¸»ù±¾ĞÅÏ¢basicInfo°üº¬ size,eegChan,sampleRate,dataSize
 [~, infoList] = ClientGetChannelMessage(con,basicInfo.eegChan);            % »ñÈ¡Í¨µÀĞÅÏ¢
 
+%% ÔÚÏßÊµÑé²ÎÊıÉèÖÃ²¿·Ö£¬ÓÃÓÚÉèÖÃÃ¿Ò»¸ö±»ÊÔµÄÇé¿ö£¬ÒÀ¾İ±»ÊÔÇé¿ö½øĞĞĞŞ¸Ä
+
+% ÔË¶¯ÏëÏó»ù±¾²ÎÊıÉèÖÃ
+subject_name = 'Jyt';  % ±»ÊÔĞÕÃû
+TrialNum = 10;  % ÉèÖÃ²É¼¯µÄÊıÁ¿
+MotorClasses = 3;  % ÔË¶¯ÏëÏóµÄÖÖÀàµÄÊıÁ¿µÄÉèÖÃ£¬×¢ÒâÕâÀïÊÇ°Ñ¿ÕÏëidle×´Ì¬Ò²Òª·Å½øÈ¥µÄ
+
 %% ÔË¶¯ÏëÏóÄÚÈİ°²ÅÅ
-TrialNum = 10;                                                             % ÉèÖÃ²É¼¯µÄÊıÁ¿
 TrialIndex = randperm(TrialNum);                                           % ¸ù¾İ²É¼¯µÄÊıÁ¿Éú³ÉËæ»úË³ĞòµÄÊı×é
 %All_data = [];
 Trigger = 0;                                                               % ³õÊ¼»¯Trigger£¬ÓÃÓÚºóĞøµÄÊı¾İ´æ´¢
 AllTrial = 0;
 
-MotorClasses = 3;                                                          % ÔË¶¯ÏëÏóµÄÖÖÀàµÄÊıÁ¿µÄÉèÖÃ
 randomindex = [];                                                          % ³õÊ¼»¯trialsµÄ¼¯ºÏ
 for i= 0:(MotorClasses-1)
     index_i = ones(TrialNum/MotorClasses,1)*i;                             % size TrialNum/MotorClasses*1£¬¸÷ÖÖÈÎÎñ
@@ -53,7 +58,6 @@ RandomTrial = randomindex(TrialIndex);                                     % Ëæ»
 
 %% ÊµÑéÊı¾İ²É¼¯´æ´¢ÉèÖÃ
 % ÉèÖÃÏà¹Ø²ÎÊı
-subject_name = 'Jyt';
 classes = MotorClasses;
 foldername = ['.\\', FunctionNowFilename([subject_name, '_'], '_data')]; % Ö¸¶¨ÎÄ¼ş¼ĞÂ·¾¶ºÍÃû³Æ
 

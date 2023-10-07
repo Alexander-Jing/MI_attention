@@ -33,9 +33,30 @@ con = pnet('tcpconnect','127.0.0.1',4455);                                 % ½¨Á
 status = CheckNetStreamingVersion(con);                                    % ÅĞ¶Ï°æ±¾ĞÅÏ¢£¬ÕıÈ··µ»Ø×´Ì¬ÖµÎª1
 [~, basicInfo] = ClientGetBasicMessage(con);                               % »ñÈ¡Éè±¸»ù±¾ĞÅÏ¢basicInfo°üº¬ size,eegChan,sampleRate,dataSize
 [~, infoList] = ClientGetChannelMessage(con,basicInfo.eegChan);            % »ñÈ¡Í¨µÀĞÅÏ¢
-%% ×¼±¸³õÊ¼µÄ´æ´¢Êı¾İµÄÎÄ¼ş¼Ğ
-% ÉèÖÃÏà¹Ø²ÎÊı
+%% ÔÚÏßÊµÑé²ÎÊıÉèÖÃ²¿·Ö£¬ÓÃÓÚÉèÖÃÃ¿Ò»¸ö±»ÊÔµÄÇé¿ö£¬ÒÀ¾İ±»ÊÔÇé¿ö½øĞĞĞŞ¸Ä
+
+% ÔË¶¯ÏëÏó»ù±¾²ÎÊıÉèÖÃ
 subject_name = 'Jyt';  % ±»ÊÔĞÕÃû
+session_idx = 1;  % session indexÊıÁ¿£¬Èç¹ûÊÇ1µÄ»°£¬»á×Ô¶¯Éú³ÉÏà¹ØÅÅ²¼
+MotorClass = 2; % ÔË¶¯ÏëÏó¶¯×÷ÊıÁ¿£¬×¢ÒâÕâÀïÊÇ´¿Éè¼ÆµÄÔË¶¯ÏëÏó¶¯×÷µÄÊıÁ¿£¬²»°üÀ¨¿ÕÏëidle×´Ì¬
+DiffLevels = [2,1];  % ¶ÔÓÚÉÏÃæµÄÔË¶¯ÏëÏóµÄÄÑ¶ÈÅÅ²¼£¬Ô½¿¿ºóÔ½ÄÑ£¬ÆäÖĞµÄ1,2¶ÔÓ¦µÄÊÇÔË¶¯ÏëÏóµÄÀàĞÍ£¬ºÍunity¶ÔÓ¦
+MajorPoportion = 0.6;  % Ã¿Ò»¸ösessionÀïÃæ²»Í¬ÀàĞÍÔË¶¯ÏëÏó×ÜÊıËùÕ¼µÄ±ÈÖµ
+TrialNum = 40;  % Ã¿Ò»¸ösessionÀïÃæµÄtrialµÄÊıÁ¿
+
+% ÔË¶¯ÏëÏóÈÎÎñµ÷ÕûÉèÖÃ
+MaxMITime = 30; % ÔÚÏßÔË¶¯ÏëÏó×î´óÔÊĞíÊ±¼ä 
+sample_frequency = 256; 
+WindowLength = 512;  % Ã¿¸ö´°¿ÚµÄ³¤¶È
+channels = [3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];  % Ñ¡ÔñµÄÍ¨µÀ
+mu_channel = 14;  % ÓÃÓÚ¼ÆËãERD/ERSµÄ¼¸¸öchannels£¬ĞèÒªÈ·¶¨ÏÂÎ»ÖÃµÄ
+EI_channel = 10;  % ÓÃÓÚ¼ÆËãEIÖ¸±êµÄ¼¸¸öchannels£¬ĞèÒªÈ·¶¨ÏÂÎ»ÖÃµÄ
+weight_mu = 0.6;  % ÓÃÓÚ¼ÆËãERD/ERSÖ¸±êºÍEIÖ¸±êµÄ¼ÓÈ¨ºÍ
+
+% Í¨ĞÅÉèÖÃ
+ip = '172.18.22.21';
+port = 8888;  % ºÍºó¶Ë·şÎñÆ÷Á¬½ÓµÄÁ½¸ö²ÎÊı
+
+%% ×¼±¸³õÊ¼µÄ´æ´¢Êı¾İµÄÎÄ¼ş¼Ğ
 foldername = ['.\\', FunctionNowFilename([subject_name, '_'], '_data')]; % Ö¸¶¨ÎÄ¼ş¼ĞÂ·¾¶ºÍÃû³Æ
 if ~exist(foldername, 'dir')
    mkdir(foldername);
@@ -44,13 +65,6 @@ end
 %% Éú³ÉÈÎÎñ°²ÅÅµ÷¶È
 Trigger = 0;                                                               % ³õÊ¼»¯Trigger£¬ÓÃÓÚºóĞøµÄÊı¾İ´æ´¢
 AllTrial = 0;
-
-session_idx = 1;
-
-MotorClass = 3; % ×¢ÒâÕâÀïÊÇ´¿Éè¼ÆµÄÔË¶¯ÏëÏó¶¯×÷µÄÊıÁ¿£¬²»°üÀ¨¿ÕÏëidle×´Ì¬
-MajorPoportion = 0.6;
-TrialNum = 40;
-DiffLevels = [2,1];
 
 if session_idx == 1  % Èç¹ûÊÇµÚÒ»¸ösession£¬ÄÇĞèÒªÉú³ÉÏà¹ØµÄÈÎÎñ¼¯ºÏ
     Level2task(MotorClass, MajorPoportion, TrialNum, DiffLevels, foldername, subject_name);
@@ -65,19 +79,9 @@ ChoiceTrial = ChoiceTrial.session;
 %% ¿ªÊ¼ÊµÑé£¬ÀëÏß²É¼¯
 Timer = 0;
 TrialData = [];
-MaxMITime = 30; % ÔÚÏßÔË¶¯ÏëÏó×î´óÔÊĞíÊ±¼ä 
-sample_frequency = 256; 
-WindowLength = 512;  % Ã¿¸ö´°¿ÚµÄ³¤¶È
-channels = [3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];  % Ñ¡ÔñµÄÍ¨µÀ
-mu_channel = 14;  % ÓÃÓÚ¼ÆËãERD/ERSµÄ¼¸¸öchannels£¬ĞèÒªÈ·¶¨ÏÂÎ»ÖÃµÄ
-EI_channel = 10;  % ÓÃÓÚ¼ÆËãEIÖ¸±êµÄ¼¸¸öchannels£¬ĞèÒªÈ·¶¨ÏÂÎ»ÖÃµÄ
-weight_mu = 0.6;  % ÓÃÓÚ¼ÆËãERD/ERSÖ¸±êºÍEIÖ¸±êµÄ¼ÓÈ¨ºÍ
 scores = [];  % ÓÃÓÚ´æ´¢Ã¿Ò»¸ötrialÀïÃæµÄ·ÖÊıÖµ
 scores_trial = [];  % ÓÃÓÚ´æ´¢Ã¿Ò»¸ötrialµÄÆ½¾ù·ÖÊıÖµ
-ip = '172.18.22.21';
-port = 8888;  % ºÍºó¶Ë·şÎñÆ÷Á¬½ÓµÄÁ½¸ö²ÎÊı
 clsFlag = 0; % ÓÃÓÚÅĞ¶ÏÊµÊ±·ÖÀàÊÇ·ñÕıÈ·µÄflag
-
 Trials = [];
 Trials = [Trials, ChoiceTrial(1,1)];  % ³õÊ¼»¯RandomTrial£¬µÚÒ»¸öÊıÖµÊÇChoiceTrialÈÎÎñ¼¯ºÏÖĞµÄµÚÒ»¸ö
 while(AllTrial <= TrialNum)

@@ -1,20 +1,20 @@
-%% ³õÊ¼»¯£¬¹Ø±ÕËùÓĞÁ¬½Ó
+%% åˆå§‹åŒ–ï¼Œå…³é—­æ‰€æœ‰è¿æ¥
 pnet('closeall');
 clc;
 clear;
 close all;
-%% Æô¶¯Unity³ÌĞò£¬²¢³õÊ¼»¯
-% ³ÌĞòËµÃ÷£º·¢ËÍÃüÁî¹²5×Ö½Ú
-%           Byte1£º»­Ãæ/¶¯×÷ÇĞ»»
-%           Byte2£º¿ØÖÆ»­ÃæÊÇ·ñÔË¶¯
-%           Byte3£º»­ÃæÎÄ×ÖÏÔÊ¾£¨ÀëÏßÑµÁ·ÊµÑéÎŞÎÄ×ÖÌáÊ¾£©
-%           Byte4£º¶¯×÷ÀàĞÍ
-%           Byte5£ºÔ¤Áô
-%system('F:\CASIA\mwl_data_collection\climbstair\ClimbStair3.exe&');      % Unity¶¯»­exeÎÄ¼şµØÖ·
+%% å¯åŠ¨Unityç¨‹åºï¼Œå¹¶åˆå§‹åŒ–
+% ç¨‹åºè¯´æ˜ï¼šå‘é€å‘½ä»¤å…±5å­—èŠ‚
+%           Byte1ï¼šç”»é¢/åŠ¨ä½œåˆ‡æ¢
+%           Byte2ï¼šæ§åˆ¶ç”»é¢æ˜¯å¦è¿åŠ¨
+%           Byte3ï¼šç”»é¢æ–‡å­—æ˜¾ç¤ºï¼ˆç¦»çº¿è®­ç»ƒå®éªŒæ— æ–‡å­—æç¤ºï¼‰
+%           Byte4ï¼šåŠ¨ä½œç±»å‹
+%           Byte5ï¼šé¢„ç•™
+%system('F:\CASIA\mwl_data_collection\climbstair\ClimbStair3.exe&');      % UnityåŠ¨ç”»exeæ–‡ä»¶åœ°å€
 %system('E:\MI_engagement\unity_test\unity_test\build_test\unity_test.exe&');
 system('E:\MI_UpperLimb_AO\UpperLimb_AO\UpperLimb_AO\build_test\unity_test.exe&');
 pause(3)
-UnityControl = tcpip('localhost', 8881, 'NetworkRole', 'client');          % ĞÂµÄ¶Ë¿Ú¸ÄÎª8881
+UnityControl = tcpip('localhost', 8881, 'NetworkRole', 'client');          % æ–°çš„ç«¯å£æ”¹ä¸º8881
 fopen(UnityControl);
 pause(1)
 sendbuf = uint8(1:5);
@@ -26,42 +26,51 @@ sendbuf(1,5) = hex2dec('00') ;
 fwrite(UnityControl,sendbuf);
 pause(3)
 
-%% ÉèÖÃÄÔµç²É¼¯²ÎÊı
+%% è®¾ç½®è„‘ç”µé‡‡é›†å‚æ•°
 init = 0;
 freq = 256;
 startStop = 1;
-con = pnet('tcpconnect','127.0.0.1',4455);                                 % ½¨Á¢Ò»¸öÁ¬½Ó
-status = CheckNetStreamingVersion(con);                                    % ÅĞ¶Ï°æ±¾ĞÅÏ¢£¬ÕıÈ··µ»Ø×´Ì¬ÖµÎª1
-[~, basicInfo] = ClientGetBasicMessage(con);                               % »ñÈ¡Éè±¸»ù±¾ĞÅÏ¢basicInfo°üº¬ size,eegChan,sampleRate,dataSize
-[~, infoList] = ClientGetChannelMessage(con,basicInfo.eegChan);            % »ñÈ¡Í¨µÀĞÅÏ¢
+con = pnet('tcpconnect','127.0.0.1',4455);                                 % å»ºç«‹ä¸€ä¸ªè¿æ¥
+status = CheckNetStreamingVersion(con);                                    % åˆ¤æ–­ç‰ˆæœ¬ä¿¡æ¯ï¼Œæ­£ç¡®è¿”å›çŠ¶æ€å€¼ä¸º1
+[~, basicInfo] = ClientGetBasicMessage(con);                               % è·å–è®¾å¤‡åŸºæœ¬ä¿¡æ¯basicInfoåŒ…å« size,eegChan,sampleRate,dataSize
+[~, infoList] = ClientGetChannelMessage(con,basicInfo.eegChan);            % è·å–é€šé“ä¿¡æ¯
 
-%% ÔË¶¯ÏëÏóÄÚÈİ°²ÅÅ
-TrialNum = 10;                                                             % ÉèÖÃ²É¼¯µÄÊıÁ¿
-TrialIndex = randperm(TrialNum);                                           % ¸ù¾İ²É¼¯µÄÊıÁ¿Éú³ÉËæ»úË³ĞòµÄÊı×é
+%% åœ¨çº¿å®éªŒå‚æ•°è®¾ç½®éƒ¨åˆ†ï¼Œç”¨äºè®¾ç½®æ¯ä¸€ä¸ªè¢«è¯•çš„æƒ…å†µï¼Œä¾æ®è¢«è¯•æƒ…å†µè¿›è¡Œä¿®æ”¹
+
+% è¿åŠ¨æƒ³è±¡åŸºæœ¬å‚æ•°è®¾ç½®
+subject_name = 'Jyt';  % è¢«è¯•å§“å
+TrialNum = 10;  % è®¾ç½®é‡‡é›†çš„æ•°é‡
+MotorClasses = 3;  % è¿åŠ¨æƒ³è±¡çš„ç§ç±»çš„æ•°é‡çš„è®¾ç½®
+
+
+%% è¿åŠ¨æƒ³è±¡å†…å®¹å®‰æ’
+TrialIndex = randperm(TrialNum);                                           % æ ¹æ®é‡‡é›†çš„æ•°é‡ç”Ÿæˆéšæœºé¡ºåºçš„æ•°ç»„
 %All_data = [];
-Trigger = 0;                                                               % ³õÊ¼»¯Trigger£¬ÓÃÓÚºóĞøµÄÊı¾İ´æ´¢
+Trigger = 0;                                                               % åˆå§‹åŒ–Triggerï¼Œç”¨äºåç»­çš„æ•°æ®å­˜å‚¨
 AllTrial = 0;
 
-MotorClasses = 3;                                                          % ÔË¶¯ÏëÏóµÄÖÖÀàµÄÊıÁ¿µÄÉèÖÃ
-randomindex = [];                                                          % ³õÊ¼»¯trialsµÄ¼¯ºÏ
+randomindex = [];                                                          % åˆå§‹åŒ–trialsçš„é›†åˆ
 for i= 0:(MotorClasses-1)
-    index_i = ones(TrialNum/MotorClasses,1)*i;                             % size TrialNum/MotorClasses*1£¬¸÷ÖÖÈÎÎñ
-    randomindex = [randomindex; index_i];                                  % ¸÷¸öÈÎÎñÕûºÏ£¬×îÖÕsize TrialNum*1
+    index_i = ones(TrialNum/MotorClasses,1)*i;                             % size TrialNum/MotorClasses*1ï¼Œå„ç§ä»»åŠ¡
+    randomindex = [randomindex; index_i];                                  % å„ä¸ªä»»åŠ¡æ•´åˆï¼Œæœ€ç»ˆsize TrialNum*1
 end
 
-RandomTrial = randomindex(TrialIndex);                                     % Ëæ»úÉú³É¸÷¸öTrial¶ÔÓ¦µÄÈÎÎñ
+RandomTrial = randomindex(TrialIndex);                                     % éšæœºç”Ÿæˆå„ä¸ªTrialå¯¹åº”çš„ä»»åŠ¡
 
-%% ÊµÑéÊı¾İ²É¼¯´æ´¢ÉèÖÃ
-% ÉèÖÃÏà¹Ø²ÎÊı
-subject_name = 'Jyt';
+%% å®éªŒæ•°æ®é‡‡é›†å­˜å‚¨è®¾ç½®
+% è®¾ç½®ç›¸å…³å‚æ•°
 classes = MotorClasses;
-foldername = ['.\\', subject_name]; % Ö¸¶¨ÎÄ¼ş¼ĞÂ·¾¶ºÍÃû³Æ
+foldername = ['.\\', FunctionNowFilename([subject_name, '_'], '_data')]; % æŒ‡å®šæ–‡ä»¶å¤¹è·¯å¾„å’Œåç§°
 
-%% ¿ªÊ¼ÊµÑé£¬ÀëÏß²É¼¯
+if ~exist(foldername, 'dir')
+   mkdir(foldername);
+end
+
+%% å¼€å§‹å®éªŒï¼Œç¦»çº¿é‡‡é›†
 Timer = 0;
 TrialData = [];
 while(AllTrial <= TrialNum)
-    if Timer==0  %ÌáÊ¾×¨×¢ cross
+    if Timer==0  %æç¤ºä¸“æ³¨ cross
         Trigger = 6;
         sendbuf(1,1) = hex2dec('01') ;
         sendbuf(1,2) = hex2dec('00') ;
@@ -72,7 +81,7 @@ while(AllTrial <= TrialNum)
     end
     
     if Timer==2
-        Trigger = RandomTrial(AllTrial);  % ²¥·Å¶¯×÷µÄAO¶¯»­£¨Idle, MI1, MI2£©
+        Trigger = RandomTrial(AllTrial);  % æ’­æ”¾åŠ¨ä½œçš„AOåŠ¨ç”»ï¼ˆIdle, MI1, MI2ï¼‰
         mat2unity = ['0', num2str(Trigger + 3)];
         sendbuf(1,1) = hex2dec(mat2unity) ;
         sendbuf(1,2) = hex2dec('01') ;
@@ -81,7 +90,7 @@ while(AllTrial <= TrialNum)
         fwrite(UnityControl,sendbuf);  
     end
     
-    if Timer==7  %¿ªÊ¼ĞİÏ¢
+    if Timer==7  %å¼€å§‹ä¼‘æ¯
         Trigger = 6;
         sendbuf(1,1) = hex2dec('04') ;
         sendbuf(1,2) = hex2dec('00') ;
@@ -90,45 +99,45 @@ while(AllTrial <= TrialNum)
         fwrite(UnityControl,sendbuf);  
     end
     
-    % Éú³É±êÇ©
-    TriggerRepeat = repmat(Trigger,1,256);  % Éú³É±êÇ©
-    % ÄÔµçĞÅºÅ²É¼¯
+    % ç”Ÿæˆæ ‡ç­¾
+    TriggerRepeat = repmat(Trigger,1,256);  % ç”Ÿæˆæ ‡ç­¾
+    % è„‘ç”µä¿¡å·é‡‡é›†
     tic
     pause(1);
-    [~, data] = ClientGetDataPacket(con,basicInfo,infoList,startStop,init); % Obtain EEG data, ĞèÒªÔÚClientGetDataPacketÉèÖÃÒª²»ÒªÒÆ³ı»ùÏß
+    [~, data] = ClientGetDataPacket(con,basicInfo,infoList,startStop,init); % Obtain EEG data, éœ€è¦åœ¨ClientGetDataPacketè®¾ç½®è¦ä¸è¦ç§»é™¤åŸºçº¿
     toc
     data = [data;TriggerRepeat];
     TrialData = [TrialData,data];
     Timer = Timer + 1;
     
     if Timer == 10
-        Timer = 0;  % ¼ÆÊ±Æ÷Çå0
-        disp(['Trial: ', num2str(AllTrial), ', Task: ', num2str(RandomTrial(AllTrial))]);  % ÏÔÊ¾Ïà¹ØÊı¾İ
+        Timer = 0;  % è®¡æ—¶å™¨æ¸…0
+        disp(['Trial: ', num2str(AllTrial), ', Task: ', num2str(RandomTrial(AllTrial))]);  % æ˜¾ç¤ºç›¸å…³æ•°æ®
     end
     
 end
-%% ´æ´¢Ô­Ê¼Êı¾İ
+%% å­˜å‚¨åŸå§‹æ•°æ®
 close all
-TrialData = TrialData(2:end,:);  %È¥µô¾ØÕóµÚÒ»ĞĞ
+TrialData = TrialData(2:end,:);  %å»æ‰çŸ©é˜µç¬¬ä¸€è¡Œ
 ChanLabel = flip({infoList.chanLabel});
-pnet('closeall')   % ½«Á¬½Ó¹Ø±Õ
-
-foldername_rawdata = [foldername, '\\Offline_EEGMI_RawData_', subject_name]; % Ö¸¶¨ÎÄ¼ş¼ĞÂ·¾¶ºÍÃû³Æ
+pnet('closeall')   % å°†è¿æ¥å…³é—­
+% å­˜å‚¨åŸå§‹æ•°æ®
+foldername_rawdata = [foldername, '\\Offline_EEGMI_RawData_', subject_name]; % æŒ‡å®šæ–‡ä»¶å¤¹è·¯å¾„å’Œåç§°
 if ~exist(foldername_rawdata, 'dir')
    mkdir(foldername_rawdata);
 end
 save([foldername_rawdata, '\\', FunctionNowFilename(['Offline_EEGMI_RawData_', subject_name], '.mat' )],'TrialData','TrialIndex','ChanLabel');
 
-%% Êı¾İÔ¤´¦Àí
-% »®´°²ÎÊıÉèÖÃ
+%% æ•°æ®é¢„å¤„ç†
+% åˆ’çª—å‚æ•°è®¾ç½®
 sample_frequency = 256; 
-WindowLength = 512;  % Ã¿¸ö´°¿ÚµÄ³¤¶È
-SlideWindowLength = 256;  % »¬´°¼ä¸ô
-channels = [3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];  % Ñ¡ÔñµÄÍ¨µÀ
+WindowLength = 512;  % æ¯ä¸ªçª—å£çš„é•¿åº¦
+SlideWindowLength = 256;  % æ»‘çª—é—´éš”
+channels = [3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];  % é€‰æ‹©çš„é€šé“
 [DataX, DataY, windows_per_session] = Offline_DataPreprocess(rawdata, classes, sample_frequency, WindowLength, SlideWindowLength, channels, subject_name, foldername);
 
-%% Ô¤´¦ÀíÊı¾İ´«Êä
-% ÉèÖÃ´«ÊäµÄ²ÎÊı
+%% é¢„å¤„ç†æ•°æ®ä¼ è¾“
+% è®¾ç½®ä¼ è¾“çš„å‚æ•°
 ip = '172.18.22.21';
 port = 8888;
 config_data = [WindowLength, size(channels, 2), windows_per_session, classes];

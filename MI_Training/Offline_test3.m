@@ -12,7 +12,9 @@ close all;
 %           Byte4：动作类型
 %           Byte5：预留
 %system('F:\CASIA\mwl_data_collection\climbstair\ClimbStair3.exe&');      % Unity动画exe文件地址
-system('E:\MI_UpperLimb_AO\UpperLimb_AO\UpperLimb_AO\build_test\unity_test.exe&');
+%system('E:\MI_UpperLimb_AO\UpperLimb_AO\UpperLimb_AO\build_test\unity_test.exe&');
+%system('F:\MI_UpperLimb_AO\UpperLimb_AO\UpperLimb_AO\build_test\unity_test.exe&');
+system('F:\MI_UpperLimb_AO\UpperLimb_AO\UpperLimb_Animation\unity_test.exe&');
 pause(3)
 UnityControl = tcpip('localhost', 8881, 'NetworkRole', 'client');          % 新的端口改为8881
 fopen(UnityControl);
@@ -36,7 +38,7 @@ pause(3)
 % [~, infoList] = ClientGetChannelMessage(con,basicInfo.eegChan);            % 获取通道信息
 
 %% 实验相关参数设置
-TrialNum = 12;                                                             % 设置采集的数量
+TrialNum = 30;                                                             % 设置采集的数量
 TrialIndex = randperm(TrialNum);                                           % 根据采集的数量生成随机顺序的数组
 All_data = [];
 Trigger = 0;                                                               % 初始化Trigger，用于后续的数据存储
