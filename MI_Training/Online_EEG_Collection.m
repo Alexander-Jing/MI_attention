@@ -11,7 +11,8 @@ close all;
 %           Byte4£º¶¯×÷ÀàĞÍ
 %           Byte5£ºÔ¤Áô
 %system('F:\CASIA\mwl_data_collection\climbstair\ClimbStair3.exe&');       % Unity¶¯»­exeÎÄ¼şµØÖ·
-system('E:\MI_engagement\unity_test\unity_test\build_test\unity_test.exe&');
+%system('E:\MI_engagement\unity_test\unity_test\build_test\unity_test.exe&');
+system('E:\MI_UpperLimb_AO\UpperLimb_AO\UpperLimb_AO\build_test\unity_test.exe&');
 pause(3)
 UnityControl = tcpip('localhost', 8881, 'NetworkRole', 'client');          % ĞÂµÄ¶Ë¿Ú¸ÄÎª8881
 fopen(UnityControl);
@@ -36,10 +37,10 @@ status = CheckNetStreamingVersion(con);                                    % ÅĞ¶
 %% ÔÚÏßÊµÑé²ÎÊıÉèÖÃ²¿·Ö£¬ÓÃÓÚÉèÖÃÃ¿Ò»¸ö±»ÊÔµÄÇé¿ö£¬ÒÀ¾İ±»ÊÔÇé¿ö½øĞĞĞŞ¸Ä
 
 % ÔË¶¯ÏëÏó»ù±¾²ÎÊıÉèÖÃ
-subject_name = 'Jyt';  % ±»ÊÔĞÕÃû
+subject_name = 'Jyt_test';  % ±»ÊÔĞÕÃû
 session_idx = 1;  % session indexÊıÁ¿£¬Èç¹ûÊÇ1µÄ»°£¬»á×Ô¶¯Éú³ÉÏà¹ØÅÅ²¼
 MotorClass = 2; % ÔË¶¯ÏëÏó¶¯×÷ÊıÁ¿£¬×¢ÒâÕâÀïÊÇ´¿Éè¼ÆµÄÔË¶¯ÏëÏó¶¯×÷µÄÊıÁ¿£¬²»°üÀ¨¿ÕÏëidle×´Ì¬
-DiffLevels = [2,1];  % ¶ÔÓÚÉÏÃæµÄÔË¶¯ÏëÏóµÄÄÑ¶ÈÅÅ²¼£¬Ô½¿¿ºóÔ½ÄÑ£¬ÆäÖĞµÄ1,2¶ÔÓ¦µÄÊÇÔË¶¯ÏëÏóµÄÀàĞÍ£¬ºÍunity¶ÔÓ¦
+DiffLevels = [1,2];  % ¶ÔÓÚÉÏÃæµÄÔË¶¯ÏëÏóµÄÄÑ¶ÈÅÅ²¼£¬Ô½¿¿ºóÔ½ÄÑ£¬ÆäÖĞµÄ1,2¶ÔÓ¦µÄÊÇÔË¶¯ÏëÏóµÄÀàĞÍ£¬ºÍunity¶ÔÓ¦
 MajorPoportion = 0.6;  % Ã¿Ò»¸ösessionÀïÃæ²»Í¬ÀàĞÍÔË¶¯ÏëÏó×ÜÊıËùÕ¼µÄ±ÈÖµ
 TrialNum = 40;  % Ã¿Ò»¸ösessionÀïÃæµÄtrialµÄÊıÁ¿
 
@@ -82,6 +83,7 @@ TrialData = [];
 scores = [];  % ÓÃÓÚ´æ´¢Ã¿Ò»¸ötrialÀïÃæµÄ·ÖÊıÖµ
 scores_trial = [];  % ÓÃÓÚ´æ´¢Ã¿Ò»¸ötrialµÄÆ½¾ù·ÖÊıÖµ
 clsFlag = 0; % ÓÃÓÚÅĞ¶ÏÊµÊ±·ÖÀàÊÇ·ñÕıÈ·µÄflag
+clsTime = 100;  % ³õÊ¼»¯·ÖÀàÕıÈ·µÄÊ±¼ä
 Trials = [];
 Trials = [Trials, ChoiceTrial(1,1)];  % ³õÊ¼»¯RandomTrial£¬µÚÒ»¸öÊıÖµÊÇChoiceTrialÈÎÎñ¼¯ºÏÖĞµÄµÚÒ»¸ö
 while(AllTrial <= TrialNum)
@@ -107,7 +109,7 @@ while(AllTrial <= TrialNum)
             fwrite(UnityControl,sendbuf);  
         end
         if Trials(AllTrial)> 0  % ÔË¶¯ÏëÏóÈÎÎñ
-            Trigger = RandomTrial(AllTrial);  % ²¥·Å¶¯×÷µÄAO¶¯»­£¨Idle, MI1, MI2£©
+            Trigger = Trials(AllTrial);  % ²¥·Å¶¯×÷µÄAO¶¯»­£¨Idle, MI1, MI2£©
             mat2unity = ['0', num2str(Trigger + 3)];
             sendbuf(1,1) = hex2dec(mat2unity) ;
             sendbuf(1,2) = hex2dec('00') ;
@@ -130,7 +132,7 @@ while(AllTrial <= TrialNum)
         mu_suppression = (mu_power_MI(1,mu_channel) - mu_power_(1,mu_channel))/mu_power_(1,mu_channel);  % ¼ÆËãmiuÆµ´øË¥¼õÇé¿ö
         score = weight_mu * mu_suppression + (1 - weight_mu) * EI_index;  % ¼ÆËãµÃ·Ö
         scores = [scores, score];  % ±£´æµÃ·Ö
-        config_data = [WindowLength;size(channels, 2);Trials(AllTrial);session_idx;AllTrial;size(scores, 2);score;0;0;0;0 ];
+        config_data = [WindowLength;size(channels, 2);Trials(AllTrial);session_idx;AllTrial;size(scores, 2);score(1,1);0;0;0;0 ];
         order = 1.0;
         resultMI = Online_Data2Server_Communicate(order, FilteredDataMI, ip, port, subject_name, config_data, foldername);  % ´«ÊäÊı¾İ¸øÏßÉÏµÄÄ£ĞÍ£¬¿´·ÖÀàÇé¿ö
         if resultMI == Trials(AllTrial)
@@ -145,7 +147,7 @@ while(AllTrial <= TrialNum)
    if clsFlag == 1 
         clsTime = Timer;  % ÕâÊÇ·ÖÀàÕıÈ·µÄÊ±¼ä
         if Trials(AllTrial) > 0  % ÔË¶¯ÏëÏóÈÎÎñ
-            Trigger = RandomTrial(AllTrial);  % ²¥·Å¶¯×÷µÄAO¶¯»­£¨Idle, MI1, MI2£©
+            Trigger = Trials(AllTrial);  % ²¥·Å¶¯×÷µÄAO¶¯»­£¨Idle, MI1, MI2£©
             mat2unity = ['0', num2str(Trigger + 3)];
             sendbuf(1,1) = hex2dec(mat2unity) ;
             sendbuf(1,2) = hex2dec('01') ;
@@ -171,7 +173,7 @@ while(AllTrial <= TrialNum)
             fwrite(UnityControl,sendbuf);  
         end
         % ´«ÊäÊı¾İºÍ¸üĞÂÄ£ĞÍ
-        config_data = [WindowLength;size(channels, 2);Trials(AllTrial);session_idx;AllTrial;size(scores, 2);score;0;0;0;0 ];
+        config_data = [WindowLength;size(channels, 2);Trials(AllTrial);session_idx;AllTrial;size(scores, 2);score(1,1);0;0;0;0 ];
         order = 2.0;  % ´«ÊäÊı¾İºÍÑµÁ·µÄÃüÁî
         Online_Data2Server_Send(order, [0,0,0,0], ip, port, subject_name, config_data);  % ·¢ËÍÖ¸Áî£¬ÈÃ·şÎñÆ÷¸üĞÂÊı¾İ£¬[0,0,0,0]µ¥´¿ÊÇÓÃÓÚ´ÕÏÂÊı¾İ£¬·ÀÖ¹Ó¦Îª¿Õ¼¯Ó°Ïì´«Êä
     end

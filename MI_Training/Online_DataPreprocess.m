@@ -13,7 +13,7 @@ function [FilteredDataMI, EI_index, mu_power] = Online_DataPreprocess(rawdata, c
     DataX = [];
     
     
-    RawDataMI = rawdata(1:end-1, Trigger==class);  % 提取这一类的状态的数据（运动想象，空想，运动想象之前的状态）
+    RawDataMI = double(rawdata(1:end-1, Trigger==class));  % 提取这一类的状态的数据（运动想象，空想，运动想象之前的状态）
     FilteredDataMI = DataFilter(RawDataMI, sample_frequency);  % 滤波去噪
     FilteredDataMI = FilteredDataMI(channels, :);  % 提取指定的channels
     [EI_index, mu_power] = DataIndex(FilteredDataMI, WindowLength, sample_frequency, channels); 
