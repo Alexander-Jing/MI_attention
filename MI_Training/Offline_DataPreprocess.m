@@ -6,14 +6,14 @@ function [DataX, DataY, windows_per_session] = Offline_DataPreprocess(rawdata, c
     %SlideWindowLength = 256;  % 滑窗间隔
     
     Trigger = double(rawdata(end,:)); %rawdata最后一行
-    RawData = double(rawdata(1:end-1, Trigger~=6));
+    % RawData = double(rawdata(:, Trigger~=6));
     %channels = [3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];  % 选择的通道
     
     DataX = [];
     DataY = [];  % 初始化整理的X和Y的数据
     
     for class_index = 0:(classes-1)
-        RawDataMI = RawData(:, Trigger==class_index);  % 提取这一类的运动想象数据
+        RawDataMI = double(rawdata(1:end-1, Trigger == class_index));  % 提取这一类的运动想象数据
         FilteredDataMI = DataFilter(RawDataMI, sample_frequency);  % 滤波去噪
         [windows_per_session, SampleDataPre] = WindowsDataPre(FilteredDataMI, WindowLength, SlideWindowLength);
         [DataSample, LabelWindows] = DataWindows(SampleDataPre, FilteredDataMI, channels, class_index, windows_per_session, SlideWindowLength, WindowLength);

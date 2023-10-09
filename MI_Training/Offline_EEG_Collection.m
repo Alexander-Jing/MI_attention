@@ -38,8 +38,8 @@ status = CheckNetStreamingVersion(con);                                    % ÅĞ¶
 %% ÔÚÏßÊµÑé²ÎÊıÉèÖÃ²¿·Ö£¬ÓÃÓÚÉèÖÃÃ¿Ò»¸ö±»ÊÔµÄÇé¿ö£¬ÒÀ¾İ±»ÊÔÇé¿ö½øĞĞĞŞ¸Ä
 
 % ÔË¶¯ÏëÏó»ù±¾²ÎÊıÉèÖÃ
-subject_name = 'Jyt';  % ±»ÊÔĞÕÃû
-TrialNum = 10;  % ÉèÖÃ²É¼¯µÄÊıÁ¿
+subject_name = 'FS_test';  % ±»ÊÔĞÕÃû
+TrialNum = 30*3;  % ÉèÖÃ²É¼¯µÄÊıÁ¿
 MotorClasses = 3;  % ÔË¶¯ÏëÏóµÄÖÖÀàµÄÊıÁ¿µÄÉèÖÃ£¬×¢ÒâÕâÀïÊÇ°Ñ¿ÕÏëidle×´Ì¬Ò²Òª·Å½øÈ¥µÄ
 
 %% ÔË¶¯ÏëÏóÄÚÈİ°²ÅÅ
@@ -91,7 +91,7 @@ while(AllTrial <= TrialNum)
     
     if Timer==7  %¿ªÊ¼ĞİÏ¢
         Trigger = 6;
-        sendbuf(1,1) = hex2dec('04') ;
+        sendbuf(1,1) = hex2dec('02') ;
         sendbuf(1,2) = hex2dec('00') ;
         sendbuf(1,3) = hex2dec('00') ;
         sendbuf(1,4) = hex2dec('00') ;
@@ -129,6 +129,7 @@ save([foldername_rawdata, '\\', FunctionNowFilename(['Offline_EEGMI_RawData_', s
 
 %% Êı¾İÔ¤´¦Àí
 % »®´°²ÎÊıÉèÖÃ
+rawdata = TrialData;
 sample_frequency = 256; 
 WindowLength = 512;  % Ã¿¸ö´°¿ÚµÄ³¤¶È
 SlideWindowLength = 256;  % »¬´°¼ä¸ô
@@ -139,5 +140,6 @@ channels = [3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,
 % ÉèÖÃ´«ÊäµÄ²ÎÊı
 ip = '172.18.22.21';
 port = 8888;
+send_order = 3.0;
 config_data = [WindowLength, size(channels, 2), windows_per_session, classes];
-Offline_Data2Server_Send(DataX, ip, port, subject_name, config_data);
+Offline_Data2Server_Send(DataX, ip, port, subject_name, config_data, send_order, foldername);
