@@ -1,5 +1,34 @@
+%% 初始化，关闭所有连接
+pnet('closeall');
+clc;
+clear;
+close all;
+%% 启动Unity程序，并初始化
+% 程序说明：发送命令共5字节
+%           Byte1：画面/动作切换
+%           Byte2：控制画面是否运动
+%           Byte3：画面文字显示（离线训练实验无文字提示）
+%           Byte4：动作类型
+%           Byte5：预留
+%system('F:\CASIA\mwl_data_collection\climbstair\ClimbStair3.exe&');       % Unity动画exe文件地址
+%system('E:\MI_engagement\unity_test\unity_test\build_test\unity_test.exe&');
+%system('E:\MI_UpperLimb_AO\UpperLimb_AO\UpperLimb_AO\build_test\unity_test.exe&');
+system('F:\MI_UpperLimb_AO\UpperLimb_AO\UpperLimb_Animation\unity_test.exe&');
+pause(3)
+UnityControl = tcpip('localhost', 8881, 'NetworkRole', 'client');          % 新的端口改为8881
+fopen(UnityControl);
+pause(1)
+sendbuf = uint8(1:5);
+sendbuf(1,1) = hex2dec('00') ;
+sendbuf(1,2) = hex2dec('00') ;
+sendbuf(1,3) = hex2dec('00') ;
+sendbuf(1,4) = hex2dec('00') ;
+sendbuf(1,5) = hex2dec('00') ;
+fwrite(UnityControl,sendbuf);
+pause(3)
+
 %% 准备初始的存储数据的文件夹
-subject_name = 'Jyt';  % 被试的姓名  
+subject_name = 'Jyt_test_score';  % 被试的姓名  
 
 foldername = ['.\\', subject_name]; % 指定文件夹路径和名称
 
@@ -13,10 +42,10 @@ AllTrial = 0;
 
 session_idx = 1;
 
-MotorClass = 3; % 注意这里是纯设计的运动想象动作的数量，不包括空想idle状态
+MotorClass = 2; % 注意这里是纯设计的运动想象动作的数量，不包括空想idle状态
 MajorPoportion = 0.6;
 TrialNum = 40;
-DiffLevels = [2,1,3];
+DiffLevels = [1,2];
 
 if session_idx == 1  % 如果是第一个session，那需要生成相关的任务集合
     Level2task(MotorClass, MajorPoportion, TrialNum, DiffLevels, foldername, subject_name);
@@ -50,16 +79,28 @@ Trials = [Trials, ChoiceTrial(1,1)];  % 初始化RandomTrial，第一个数值�
 results = [];
 
 for trial_idx = 1:length(ChoiceTrial)
-   for timer = 1:10
+   for timer = 1:15
        pause(1);
-       
-       if rem(timer,5)==0
+       if rem(timer,1)==0 && timer <10
            disp('*********Online Testing***********');
+           Trigger = ChoiceTrial(trial_idx);  % 播放动作的AO动画（Idle, MI1, MI2）
+           mat2unity = ['0', num2str(Trigger + 3)];
+           sendbuf(1,1) = hex2dec(mat2unity);
+           sendbuf(1,2) = hex2dec('00');
+           sendbuf(1,3) = hex2dec('00');
+           sendbuf(1,4) = hex2dec('00');
+           fwrite(UnityControl,sendbuf);  
+
            rawdata = rand(33,512);  % 生成原始的数据，以及去掉了trigger==6的部分
            Trigger = [ChoiceTrial(1,trial_idx) * ones(1,512)]; 
            rawdata = [rawdata; Trigger];  % 生成所有数据
            [FilteredDataMI, EI_index, mu_power_MI] = Online_DataPreprocess(rawdata, ChoiceTrial(1,trial_idx), sample_frequency, WindowLength, channels);
            score = weight_mu * sum(mu_power_MI) + (1 - weight_mu) * sum(EI_index);  % 计算得分，这里临时使用求和来表征，后续需要修改
+           
+           % score 数据传输设置
+           sendbuf(1,5) = uint8((score/100.0));
+           fwrite(UnityControl,sendbuf);
+           
            config_data = [WindowLength;size(channels, 2);ChoiceTrial(1,trial_idx);session_idx;trial_idx;timer/5;score;0;0;0;0 ];
            order = 1.0;
            resultMI = Online_Data2Server_Communicate(order, FilteredDataMI, ip, port, subject_name, config_data, foldername);  % 传输数据给线上的模型，看分类情况
@@ -77,6 +118,10 @@ for trial_idx = 1:length(ChoiceTrial)
            order = 2.0;  % 传输数据和训练的命令
            Online_Data2Server_Send(order, [0,0,0,0], ip, port, subject_name, config_data);  % 发送指令，让服务器更新数据，[0,0,0,0]单纯是用于凑下数据，防止应为空集影响传输
            results = [results, resultMI];
+           
+           sendbuf(1,2) = hex2dec('01');
+           fwrite(UnityControl,sendbuf);
+
            disp(['session: ', num2str(session_idx)]);
            disp(['trial: ', num2str(trial_idx)]);
            disp('training model');
