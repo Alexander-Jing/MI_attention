@@ -44,7 +44,7 @@ session_idx = 1;
 
 MotorClass = 2; % 注意这里是纯设计的运动想象动作的数量，不包括空想idle状态
 MajorPoportion = 0.6;
-TrialNum = 40;
+TrialNum = 6;
 DiffLevels = [1,2];
 
 if session_idx == 1  % 如果是第一个session，那需要生成相关的任务集合
@@ -110,6 +110,7 @@ for trial_idx = 1:length(ChoiceTrial)
            disp(['window: ', num2str(timer/5)]);
            disp(['moter_class: ', num2str(ChoiceTrial(1,trial_idx))]);
            disp(['predict_class: ', num2str(resultMI)]);
+           disp(['score: ', num2str(score)]);
        end
        if timer == 10
            disp('*********Online Updating');
@@ -120,6 +121,7 @@ for trial_idx = 1:length(ChoiceTrial)
            results = [results, resultMI];
            
            sendbuf(1,2) = hex2dec('01');
+           sendbuf(1,3) = hex2dec('02');
            fwrite(UnityControl,sendbuf);
 
            disp(['session: ', num2str(session_idx)]);

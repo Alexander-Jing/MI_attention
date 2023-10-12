@@ -1,4 +1,4 @@
-1. The communication between matlab and unity3D, matlab and server
+1. The communication of motor imagery between matlab and unity3D, matlab and server
 matlab -> unity
 	SceneControl 0
 	SceneCross 1
@@ -52,3 +52,14 @@ MI2 2   -> MI2 2
 -- Online_experiments  # the saved parameters and updated models of the model 
 --- SubName 
 ---- model results of different hyperparameters
+
+4. The text display of Text of unity3D during training and the communication of the display 
+matlab -> unity3D
+progress bar:
+scores (sendbuf(1,5) = uint8((score/100.0))) -> slider (ServerSocket.Instance.data.reserve)
+scores (sendbuf(1,5) = uint8((score/100.0))) -> silder (textMesh[0].text = "Score: " + SliderManager.decNumber.ToString();)
+
+text:
+text (sendbuf(1,3) = hex2dec('00');) -> textMesh[1] (textMesh[1].text = "Motor Imaging";)
+text (sendbuf(1,3) = hex2dec('01');) -> textMesh[1] (textMesh[1].text = "Excellent!";)
+text (sendbuf(1,3) = hex2dec('02');) -> textMesh[1] (textMesh[1].text = "Don’t give up! Keep going!";)

@@ -84,6 +84,7 @@ scores = [];  % 用于存储每一个trial里面的分数值
 scores_trial = [];  % 用于存储每一个trial的平均分数值
 clsFlag = 0; % 用于判断实时分类是否正确的flag
 clsTime = 100;  % 初始化分类正确的时间
+RestTimeLen = 3 + session_idx;  % 休息时间随着session的数量增加
 Trials = [];
 Trials = [Trials, ChoiceTrial(1,1)];  % 初始化RandomTrial，第一个数值是ChoiceTrial任务集合中的第一个
 while(AllTrial <= TrialNum)
@@ -132,6 +133,10 @@ while(AllTrial <= TrialNum)
         mu_suppression = (mu_power_MI(1,mu_channel) - mu_power_(1,mu_channel))/mu_power_(1,mu_channel);  % 计算miu频带衰减情况
         score = weight_mu * mu_suppression + (1 - weight_mu) * EI_index;  % 计算得分
         scores = [scores, score];  % 保存得分
+        % 得分数据实时显示
+        sendbuf(1,5) = uint8((score(1,1)/100.0));
+        fwrite(UnityControl,sendbuf);
+        % 发送得分以及一系列数据
         config_data = [WindowLength;size(channels, 2);Trials(AllTrial);session_idx;AllTrial;size(scores, 2);score(1,1);0;0;0;0 ];
         order = 1.0;
         resultMI = Online_Data2Server_Communicate(order, FilteredDataMI, ip, port, subject_name, config_data, foldername);  % 传输数据给线上的模型，看分类情况
@@ -151,7 +156,7 @@ while(AllTrial <= TrialNum)
             mat2unity = ['0', num2str(Trigger + 3)];
             sendbuf(1,1) = hex2dec(mat2unity);
             sendbuf(1,2) = hex2dec('01') ;
-            sendbuf(1,3) = hex2dec('00') ;
+            sendbuf(1,3) = hex2dec('01') ;  % 给与反馈，显示文字
             sendbuf(1,4) = hex2dec('00') ;
             fwrite(UnityControl,sendbuf);  
         end
@@ -162,13 +167,13 @@ while(AllTrial <= TrialNum)
    end
     
     % 想错了开始休息和提醒
-    if clsFlag == 0 && Timer == (MaxMITime + 2)
+    if clsFlag == 0 && Timer == (MaxMITime)
         clsTime = Timer;  % 这是分类正确的时间
         if Trials(AllTrial)==2  % 运动想象任务
             Trigger = 2;
             sendbuf(1,1) = hex2dec('02') ;
             sendbuf(1,2) = hex2dec('00') ;
-            sendbuf(1,3) = hex2dec('00') ;
+            sendbuf(1,3) = hex2dec('02') ;  % 给与反馈，显示文字
             sendbuf(1,4) = hex2dec('00') ;
             fwrite(UnityControl,sendbuf);  
         end
@@ -194,7 +199,7 @@ while(AllTrial <= TrialNum)
         % 进入确定下一个任务
         average_score = average(scores);
         scores_trial = [scores_trial, average_score];  % 存储好平均的分数
-        [Trials, ChoiceTrial] = TaskAdjust(scores_trial, ChoiceTrial, Trials, AllTrial, DiffLevels);
+        [Trials, ChoiceTrial, RestTimeLen] = TaskAdjust(scores_trial, ChoiceTrial, Trials, AllTrial, DiffLevels, RestTimeLen);
     end
     
     % 运动想象想对了之后，AO结束了之后让人休息
@@ -208,10 +213,10 @@ while(AllTrial <= TrialNum)
         % 进入确定下一个任务
         average_score = average(scores);
         scores_trial = [scores_trial, average_score];  % 存储好平均的分数
-        [Trials, ChoiceTrial] = TaskAdjust(scores_trial, ChoiceTrial, Trials, AllTrial, DiffLevels);
+        [Trials, ChoiceTrial, RestTimeLen] = TaskAdjust(scores_trial, ChoiceTrial, Trials, AllTrial, DiffLevels, RestTimeLen);
     end
     % 运动想象没有想对，提醒结束了之后让人休息
-    if clsFlag == 0 && Timer == (MaxMITime + 2 + 5)
+    if clsFlag == 0 && Timer == (MaxMITime + 3)
         Trigger = 6;
         sendbuf(1,1) = hex2dec('02') ;
         sendbuf(1,2) = hex2dec('00') ;
@@ -221,7 +226,7 @@ while(AllTrial <= TrialNum)
         % 进入确定下一个任务
         average_score = average(scores);
         scores_trial = [scores_trial, average_score];  % 存储好平均的分数
-        [Trials, ChoiceTrial] = TaskAdjust(scores_trial, ChoiceTrial, Trials, AllTrial, DiffLevels);
+        [Trials, ChoiceTrial, RestTimeLen] = TaskAdjust(scores_trial, ChoiceTrial, Trials, AllTrial, DiffLevels, RestTimeLen);
     end
     
     %% 时钟更新
@@ -240,19 +245,22 @@ while(AllTrial <= TrialNum)
     % 空想任务想象5s，到第7s之后开始休息，到第10s就结束任务
     if Timer == 10 && Trials(AllTrial)==0  %结束休息，准备下一个
         Timer = 0;  % 计时器清0
+        RestTimeLen = 3;  % 休息时间还原
         disp(['Trial: ', num2str(AllTrial), ', Task: ', num2str(Trials(AllTrial))]);  % 显示相关数据
     end
     % 想对了之后，AO之后，休息3s之后，结束休息，准备下一个
-    if Timer == (clsTime + 5 + 3) && clsFlag == 1  %结束休息
+    if Timer == (clsTime + 5 + RestTimeLen) && clsFlag == 1  %结束休息
         Timer = 0;  % 计时器清0
         clsFlag = 0;  % 分类flag清0
+        RestTimeLen = 3;  % 休息时间还原
         disp(['Trial: ', num2str(AllTrial), ', Task: ', num2str(Trials(AllTrial))]);  % 显示相关数据
     end
     
     % 运动想象没有想对，提醒之后，休息3s之后，结束休息，准备下一个
-    if clsFlag == 0 && Timer == (MaxMITime + 2 + 5 + 3)
+    if clsFlag == 0 && Timer == (MaxMITime + 3 + RestTimeLen)
         Timer = 0;  % 计时器清0
         clsFlag = 0;  % 分类flag清0
+        RestTimeLen = 3;  % 休息时间还原
         disp(['Trial: ', num2str(AllTrial), ', Task: ', num2str(Trials(AllTrial))]);  % 显示相关数据
     end
 end
@@ -298,8 +306,8 @@ function Level2task(MotorClasses, MajorPoportion, TrialNum, DiffLevels, folderna
     end
     
 end
-%% 实时任务调度的函数
-function [Trials, ChoiceTrial] = TaskAdjust(scores_trial, ChoiceTrial, Trials, AllTrial, DiffLevels)
+%% 实时任务调度以及休息时间调整的函数
+function [Trials, ChoiceTrial, RestTimeLen] = TaskAdjust(scores_trial, ChoiceTrial, Trials, AllTrial, DiffLevels, RestTimeLen)
     
     if AllTrial < 4  % 前4个trial由于无法进行数据采集，所以就先随机挑选
         n_ = length(ChoiceTrial);
@@ -334,7 +342,9 @@ function [Trials, ChoiceTrial] = TaskAdjust(scores_trial, ChoiceTrial, Trials, A
                 end
                 output_ = find_task_choice(task_choice, DiffLevels, 1);
                 task_ = output_(1,1);
-                
+                % 休息时长调整
+                RestTimeLen = RestTimeLen + 2;
+
             case 1
                 % 如果此时是升高多余降低的，那么还是增加任务难度
                 currentTask_ = Trials(1, AllTrial);
@@ -349,7 +359,9 @@ function [Trials, ChoiceTrial] = TaskAdjust(scores_trial, ChoiceTrial, Trials, A
                 task_choice = DiffLevels(diff_choice);
                 output_ = find_task_choice(task_choice, DiffLevels, 0);
                 task_ = output_(1,1);
-                
+                % 休息时长调整
+                RestTimeLen = RestTimeLen - 1;
+
             case -1
                 % 如果此时是降低多余升高的，那么还是增加任务难度
                 currentTask_ = Trials(1, AllTrial);
@@ -364,7 +376,9 @@ function [Trials, ChoiceTrial] = TaskAdjust(scores_trial, ChoiceTrial, Trials, A
                 task_choice = DiffLevels(diff_choice);
                 output_ = find_task_choice(task_choice, DiffLevels, 0);
                 task_ = output_(1,1);
-                
+                % 休息时长调整
+                RestTimeLen = RestTimeLen - 1;
+
             case -3
                 % 如果此时是不断降低的，那么为了防止疲劳，会适当得调低难度
                 currentTask_ = Trials(1, AllTrial);
@@ -384,7 +398,9 @@ function [Trials, ChoiceTrial] = TaskAdjust(scores_trial, ChoiceTrial, Trials, A
                 end
                 output_ = find_task_choice(task_choice, DiffLevels, 1);
                 task_ = output_(1,1);
-                
+                % 休息时长调整
+                RestTimeLen = RestTimeLen + 2;
+
         end
         % Trials里面添加任务
         Trials = [Trials, task_];
