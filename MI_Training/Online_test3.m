@@ -56,8 +56,8 @@ else
     ChoiceTrial = load(path,'session');
 end
 
-ChoiceTrial = ChoiceTrial.session;
-% ChoiceTrial = [0,1,2,3];  % 临时使用
+%ChoiceTrial = ChoiceTrial.session;
+ ChoiceTrial = [0,1,2];  % 临时使用
 %% 开始实验，离线采集
 Timer = 0;
 TrialData = [];
