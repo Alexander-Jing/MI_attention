@@ -95,7 +95,7 @@ while(AllTrial <= TrialNum)
     end
     
     if Timer==7  %¿ªÊ¼ÐÝÏ¢
-        Trigger = 6;
+        Trigger = 7;
         sendbuf(1,1) = hex2dec('02') ;
         sendbuf(1,2) = hex2dec('00') ;
         sendbuf(1,3) = hex2dec('00') ;

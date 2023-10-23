@@ -126,6 +126,7 @@ while(AllTrial <= TrialNum)
         rawdata = rawdata(2:end,:);
         % 这里仅仅提取在MI之前的频带能量
         [~, ~, mu_power_] = Online_DataPreprocess(rawdata, 6, sample_frequency, WindowLength, channels);
+        mu_power_ = [mu_power_; Trigger];
         mu_powers = [mu_powers, mu_power_];  % 添加相关的mu节律能量
     end
     
@@ -135,12 +136,16 @@ while(AllTrial <= TrialNum)
         rawdata = rawdata(2:end,:);
         
         [FilteredDataMI, EI_index, mu_power_MI] = Online_DataPreprocess(rawdata, Trials(AllTrial), sample_frequency, WindowLength, channels);
+        mu_suppression = (mu_power_MI(mu_channel,1) - mu_power_(mu_channel,1))/mu_power_(mu_channel,1);  % 计算miu频带衰减情况
+        score = weight_mu * mu_suppression + (1 - weight_mu) * EI_index(EI_channel,1);  % 计算得分
+        scores = [scores, score];  % 保存得分
+        % 存储这两个指标的数值
+        EI_index = [EI_index; Trigger];
+        mu_power_MI = [mu_power_MI; Trigger];  % 这里添加上Trigger的相关数值，方便存储
+        
         EI_indices = [EI_indices, EI_index];  % 添加相关的EI指标数值  
         mu_powers = [mu_powers, mu_power_MI];  % 添加相关的mu节律能量
 
-        mu_suppression = (mu_power_MI(1,mu_channel) - mu_power_(1,mu_channel))/mu_power_(1,mu_channel);  % 计算miu频带衰减情况
-        score = weight_mu * mu_suppression + (1 - weight_mu) * EI_index(1,EI_channel);  % 计算得分
-        scores = [scores, score];  % 保存得分
         % 得分数据实时显示
         sendbuf(1,5) = uint8((score(1,1)/100.0));
         fwrite(UnityControl,sendbuf);
@@ -176,10 +181,10 @@ while(AllTrial <= TrialNum)
     
     % 想错了开始休息和提醒
     if clsFlag == 0 && Timer == (MaxMITime)
-        clsTime = Timer;  % 这是分类正确的时间
-        if Trials(AllTrial)==2  % 运动想象任务
-            Trigger = 2;
-            sendbuf(1,1) = hex2dec('02') ;
+        if Trials(AllTrial) > 0  % 运动想象任务
+            Trigger = Trials(AllTrial);  % 播放动作的AO动画（Idle, MI1, MI2）
+            mat2unity = ['0', num2str(Trigger + 3)];
+            sendbuf(1,1) = hex2dec(mat2unity);
             sendbuf(1,2) = hex2dec('00') ;
             sendbuf(1,3) = hex2dec('02') ;  % 给与反馈，显示文字
             sendbuf(1,4) = hex2dec('00') ;
@@ -194,7 +199,7 @@ while(AllTrial <= TrialNum)
    %% 休息阶段，确定下一个动作
     % 空想只给5s就休息
     if Timer==7 && Trials(AllTrial)==0  %开始休息
-        Trigger = 6;
+        Trigger = 7;
         sendbuf(1,1) = hex2dec('02') ;
         sendbuf(1,2) = hex2dec('00') ;
         sendbuf(1,3) = hex2dec('00') ;
@@ -212,7 +217,7 @@ while(AllTrial <= TrialNum)
     
     % 运动想象想对了之后，AO结束了之后让人休息
     if Timer == (clsTime + 5) && clsFlag == 1  %开始休息
-        Trigger = 6;
+        Trigger = 7;
         sendbuf(1,1) = hex2dec('02') ;
         sendbuf(1,2) = hex2dec('00') ;
         sendbuf(1,3) = hex2dec('00') ;
@@ -226,7 +231,7 @@ while(AllTrial <= TrialNum)
     
     % 运动想象没有想对，提醒结束了之后让人休息
     if clsFlag == 0 && Timer == (MaxMITime + 3)
-        Trigger = 6;
+        Trigger = 7;
         sendbuf(1,1) = hex2dec('02') ;
         sendbuf(1,2) = hex2dec('00') ;
         sendbuf(1,3) = hex2dec('00') ;
@@ -253,7 +258,8 @@ while(AllTrial <= TrialNum)
     %% 最后的各个数值复位
     % 空想任务想象5s，到第7s之后开始休息，到第10s就结束任务
     if Timer == 10 && Trials(AllTrial)==0  %结束休息，准备下一个
-        
+        % 存储相关的EI指标和mu节律能量的数据
+        SaveMIEngageTrials(EI_indices, mu_powers, subject_name, foldername, config_data);
         %计时器清0
         Timer = 0;  % 计时器清0
         % 每一个trial的数值还原
@@ -265,7 +271,8 @@ while(AllTrial <= TrialNum)
     end
     % 想对了之后，AO之后，休息3s之后，结束休息，准备下一个
     if Timer == (clsTime + 5 + RestTimeLen) && clsFlag == 1  %结束休息
-        
+        % 存储相关的EI指标和mu节律能量的数据
+        SaveMIEngageTrials(EI_indices, mu_powers, subject_name, foldername, config_data);
         % 计时器清0
         Timer = 0;  % 计时器清0
         % clsflag清0
@@ -280,7 +287,8 @@ while(AllTrial <= TrialNum)
     end
     % 运动想象没有想对，提醒之后，休息3s之后，结束休息，准备下一个
     if clsFlag == 0 && Timer == (MaxMITime + 3 + RestTimeLen)
-        
+        % 存储相关的EI指标和mu节律能量的数据
+        SaveMIEngageTrials(EI_indices, mu_powers, subject_name, foldername, config_data);
         % 计时器清0
         Timer = 0;  % 计时器清0
         % clsflag清0

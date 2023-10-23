@@ -92,8 +92,8 @@ function [FilteredDataMI, EI_index, mu_power] = Online_DataPreprocess(rawdata, c
            EI_(1,j) = E_beta(1,j)/(E_alpha(1,j) + E_theta(1,j));  % EI指标的计算 
         end
         % 返回每一个channel对应的EI指标和mu频带的能量
-        EI_index = EI_;
-        mu_power = E_mu;  
+        EI_index = EI_';
+        mu_power = E_mu';  % 注意这里输出的都是转置  
     end
 
 end
