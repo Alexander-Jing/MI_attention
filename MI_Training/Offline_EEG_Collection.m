@@ -42,6 +42,11 @@ subject_name = 'FS_test';  % 被试姓名
 TrialNum = 30*3;  % 设置采集的数量
 MotorClasses = 3;  % 运动想象的种类的数量的设置，注意这里是把空想idle状态也要放进去的
 
+% 参与度评估指标的计算
+mu_channel = 14;  % 用于计算ERD/ERS的几个channels，需要确定下位置的
+EI_channel = 10;  % 用于计算EI指标的几个channels，需要确定下位置的
+weight_mu = 0.6;  % 用于计算ERD/ERS指标和EI指标的加权和
+
 %% 运动想象内容安排
 TrialIndex = randperm(TrialNum);                                           % 根据采集的数量生成随机顺序的数组
 %All_data = [];
@@ -134,7 +139,7 @@ sample_frequency = 256;
 WindowLength = 512;  % 每个窗口的长度
 SlideWindowLength = 256;  % 滑窗间隔
 channels = [3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];  % 选择的通道
-[DataX, DataY, windows_per_session] = Offline_DataPreprocess(rawdata, classes, sample_frequency, WindowLength, SlideWindowLength, channels, subject_name, foldername);
+[DataX, DataY, windows_per_session] = Offline_DataPreprocess(rawdata, classes, sample_frequency, WindowLength, SlideWindowLength, channels, subject_name, foldername, mu_channel, EI_channel, weight_mu);
 
 %% 预处理数据传输
 % 设置传输的参数

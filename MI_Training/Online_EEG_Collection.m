@@ -45,6 +45,7 @@ MajorPoportion = 0.6;  % 每一个session里面不同类型运动想象总数所占的比值
 TrialNum = 40;  % 每一个session里面的trial的数量
 
 % 运动想象任务调整设置
+score_init = 1.0;  % 这是在之前离线时候计算的mu衰减和EI指标的均值
 MaxMITime = 30; % 在线运动想象最大允许时间 
 sample_frequency = 256; 
 WindowLength = 512;  % 每个窗口的长度
@@ -80,7 +81,9 @@ ChoiceTrial = ChoiceTrial.session;
 %% 开始实验，离线采集
 Timer = 0;
 TrialData = [];
-scores = [];  % 用于存储每一个trial里面的分数值
+scores = [];  % 用于存储每一个trial里面的每一个window的分数值
+EI_indices = [];  % 用于存储每一个trial里面的每一个window的EI分数值
+mu_powers = [];  % 用于存储每一个trial里面的每一个window的mu频带的能量数值
 scores_trial = [];  % 用于存储每一个trial的平均分数值
 clsFlag = 0; % 用于判断实时分类是否正确的flag
 clsTime = 100;  % 初始化分类正确的时间
@@ -122,16 +125,21 @@ while(AllTrial <= TrialNum)
         rawdata = TrialData(:,end-512+1:end);  % 取前一个512的窗口
         rawdata = rawdata(2:end,:);
         % 这里仅仅提取在MI之前的频带能量
-        [~, ~, mu_power_] = Online_DataPreprocess(rawdata, 6, sample_frequency, WindowLength, channels);  
+        [~, ~, mu_power_] = Online_DataPreprocess(rawdata, 6, sample_frequency, WindowLength, channels);
+        mu_powers = [mu_powers, mu_power_];  % 添加相关的mu节律能量
     end
     
     % 第4s开始取512的Trigger~=6的MI的窗口，数据处理并且进行分析
     if Timer > 3 && Trials(AllTrial)> 0 && clsFlag == 0
         rawdata = TrialData(:,end-512+1:end);  % 取前一个512的窗口
         rawdata = rawdata(2:end,:);
+        
         [FilteredDataMI, EI_index, mu_power_MI] = Online_DataPreprocess(rawdata, Trials(AllTrial), sample_frequency, WindowLength, channels);
+        EI_indices = [EI_indices, EI_index];  % 添加相关的EI指标数值  
+        mu_powers = [mu_powers, mu_power_MI];  % 添加相关的mu节律能量
+
         mu_suppression = (mu_power_MI(1,mu_channel) - mu_power_(1,mu_channel))/mu_power_(1,mu_channel);  % 计算miu频带衰减情况
-        score = weight_mu * mu_suppression + (1 - weight_mu) * EI_index;  % 计算得分
+        score = weight_mu * mu_suppression + (1 - weight_mu) * EI_index(1,EI_channel);  % 计算得分
         scores = [scores, score];  % 保存得分
         % 得分数据实时显示
         sendbuf(1,5) = uint8((score(1,1)/100.0));
@@ -193,7 +201,7 @@ while(AllTrial <= TrialNum)
         sendbuf(1,4) = hex2dec('00') ;
         fwrite(UnityControl,sendbuf);  
         % 更新算法
-        config_data = [WindowLength;size(channels, 2);Trials(AllTrial);session_idx;AllTrial;size(scores, 2);score;0;0;0;0 ];
+        config_data = [WindowLength;size(channels, 2);Trials(AllTrial);session_idx;AllTrial;size(scores, 2);score(1,1);0;0;0;0 ];
         order = 2.0;  % 传输数据和训练的命令
         Online_Data2Server_Send(order, [0,0,0,0], ip, port, subject_name, config_data);  % 发送指令，让服务器更新数据，[0,0,0,0]单纯是用于凑下数据，防止应为空集影响传输
         % 进入确定下一个任务
@@ -215,6 +223,7 @@ while(AllTrial <= TrialNum)
         scores_trial = [scores_trial, average_score];  % 存储好平均的分数
         [Trials, ChoiceTrial, RestTimeLen] = TaskAdjust(scores_trial, ChoiceTrial, Trials, AllTrial, DiffLevels, RestTimeLen);
     end
+    
     % 运动想象没有想对，提醒结束了之后让人休息
     if clsFlag == 0 && Timer == (MaxMITime + 3)
         Trigger = 6;
@@ -244,22 +253,43 @@ while(AllTrial <= TrialNum)
     %% 最后的各个数值复位
     % 空想任务想象5s，到第7s之后开始休息，到第10s就结束任务
     if Timer == 10 && Trials(AllTrial)==0  %结束休息，准备下一个
+        
+        %计时器清0
         Timer = 0;  % 计时器清0
+        % 每一个trial的数值还原
+        scores = [];  % 分数值还原
+        EI_indices = [];  % EI分数值还原
+        mu_powers = [];  % mu频带的能量数值还原
         RestTimeLen = 3;  % 休息时间还原
         disp(['Trial: ', num2str(AllTrial), ', Task: ', num2str(Trials(AllTrial))]);  % 显示相关数据
     end
     % 想对了之后，AO之后，休息3s之后，结束休息，准备下一个
     if Timer == (clsTime + 5 + RestTimeLen) && clsFlag == 1  %结束休息
+        
+        % 计时器清0
         Timer = 0;  % 计时器清0
+        % clsflag清0
         clsFlag = 0;  % 分类flag清0
+        % 每一个trial的数值还原
+        scores = [];  % 分数值还原
+        EI_indices = [];  % EI分数值还原
+        mu_powers = [];  % mu频带的能量数值还原
+        % 其余设置还原
         RestTimeLen = 3;  % 休息时间还原
         disp(['Trial: ', num2str(AllTrial), ', Task: ', num2str(Trials(AllTrial))]);  % 显示相关数据
     end
-    
     % 运动想象没有想对，提醒之后，休息3s之后，结束休息，准备下一个
     if clsFlag == 0 && Timer == (MaxMITime + 3 + RestTimeLen)
+        
+        % 计时器清0
         Timer = 0;  % 计时器清0
+        % clsflag清0
         clsFlag = 0;  % 分类flag清0
+        % 每一个trial的数值还原
+        scores = [];  % 分数值还原
+        EI_indices = [];  % EI分数值还原
+        mu_powers = [];  % mu频带的能量数值还原
+        % 其余设置还原
         RestTimeLen = 3;  % 休息时间还原
         disp(['Trial: ', num2str(AllTrial), ', Task: ', num2str(Trials(AllTrial))]);  % 显示相关数据
     end
@@ -305,6 +335,18 @@ function Level2task(MotorClasses, MajorPoportion, TrialNum, DiffLevels, folderna
         save(path,'session');  % 存储相关数据，后面存储用
     end
     
+end
+%% 存储在运动想象过程中的参与度指标
+function SaveMIEngageTrials(EI_indices, mu_powers, subject_name, foldername, config_data)
+    
+    foldername = [foldername, '\\Offline_Engagements_', subject_name]; % 检验文件夹是否存在
+    if ~exist(foldername, 'dir')
+       mkdir(foldername);
+    end
+
+    save([foldername, '\\', FunctionNowFilename(['Online_EEG_data2Server_', subject_name, '_class_', num2str(config_data(3,1)),  ...
+        '_session_', num2str(config_data(4,1)), '_trial_', num2str(config_data(5,1)), ...
+        '_window_', num2str(config_data(6,1)), 'EI_mu' ], '.mat' )],'EI_indices',' mu_powers');  % 存储相关的数值
 end
 %% 实时任务调度以及休息时间调整的函数
 function [Trials, ChoiceTrial, RestTimeLen] = TaskAdjust(scores_trial, ChoiceTrial, Trials, AllTrial, DiffLevels, RestTimeLen)
@@ -411,6 +453,7 @@ function [Trials, ChoiceTrial, RestTimeLen] = TaskAdjust(scores_trial, ChoiceTri
         end
     end
 end
+
 
 
 % 在DiffLevels中寻找特定任务的函数

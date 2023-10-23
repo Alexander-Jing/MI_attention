@@ -29,7 +29,6 @@ function [DataX, DataY, windows_per_session] = Offline_DataPreprocess(rawdata, c
     % 预处理之后的数据存储，如果下面传输失败，直接将这两个mat文件送到服务器里
     save([foldername, '\\', FunctionNowFilename(['Offline_EEG_data_', subject_name], '.mat' )],'DataX');
     save([foldername, '\\', FunctionNowFilename(['Offline_EEG_label_', subject_name], '.mat' )],'DataY');
-
     
     
     %% 滤波函数
@@ -72,5 +71,42 @@ function [DataX, DataY, windows_per_session] = Offline_DataPreprocess(rawdata, c
             LabelWindows = [LabelWindows; class_index];  % 生成装label的数据
         end
         DataSample = DataSamplePre;
+    end
+    %% 计算相关频带指标的函数
+    function [EI_index, mu_power] = DataIndex(FilteredData, WindowLength, sample_frequency, channels)
+        % 对滤波后的数据计算相关频带的能量指标
+        k_ = WindowLength/sample_frequency;  % 由于使用的是离散傅里叶变换FFT，这里需要计算频率f和离散k之间的关系，参考DFT离散傅里叶变换的相关资料
+        number_of_channels = size(channels, 2);
+        alpha_band = [8:12]*k_;
+        theta_band = [4:8]*k_;
+        beta_band = [12:25]*k_;
+        mu_band = [8:13]*k_; 
+        DataPSD = FilteredData;
+        E_beta = ones([1, number_of_channels]);
+        E_alpha = ones([1, number_of_channels]);
+        E_theta = ones([1, number_of_channels]);
+        E_mu = ones([1, number_of_channels]);
+        EI_ = ones([1, number_of_channels]); 
+        
+        % 计算傅里叶变换之后的信号的PSD图
+        for i = 1:number_of_channels
+            DataPSD(i,:) = abs(fft(FilteredData(i,:))).^2;  % 计算变换之后的频域幅值平方，用于计算能量，注意这里要对于每一个channel计算fft变换之后的频谱图
+        end
+        
+        % 计算频带的相关指标
+        for j = 1:number_of_channels
+            E_beta(1,j) = sum(DataPSD(j,beta_band));
+            E_alpha(1,j) = sum(DataPSD(j,alpha_band));
+            E_theta(1,j) = sum(DataPSD(j,theta_band));
+            E_mu(1,j) = sum(DataPSD(j,mu_band));
+        end
+        
+        % 计算相关的指标数值
+        for j = 1:number_of_channels
+           EI_(1,j) = E_beta(1,j)/(E_alpha(1,j) + E_theta(1,j));  % EI指标的计算 
+        end
+        % 返回每一个channel对应的EI指标和mu频带的能量
+        EI_index = EI_;
+        mu_power = E_mu;  
     end
 end

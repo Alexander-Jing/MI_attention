@@ -10,9 +10,6 @@ function [FilteredDataMI, EI_index, mu_power] = Online_DataPreprocess(rawdata, c
     %Labels = double(rawdata(33, Trigger~=6));  % 收集rawdata和label
     %channels = [3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];  % 选择的通道
     
-    DataX = [];
-    
-    
     RawDataMI = double(rawdata(1:end-1, Trigger==class));  % 提取这一类的状态的数据（运动想象，空想，运动想象之前的状态）
     FilteredDataMI = DataFilter(RawDataMI, sample_frequency);  % 滤波去噪
     FilteredDataMI = FilteredDataMI(channels, :);  % 提取指定的channels
@@ -24,8 +21,8 @@ function [FilteredDataMI, EI_index, mu_power] = Online_DataPreprocess(rawdata, c
     function FilteredData = DataFilter(RawData, sample_frequency) 
         FilterOrder = 4;  % 设置带通滤波器的阶数
         NotchFilterOrder = 2;  % 设置陷波滤波器的阶数（这里使用巴特沃斯带阻滤波器）
-        Wband = [3,50];  % 滤波器这边需要参考相关的文献进行修改，这里参考佳星师姐的论文中的滤波器设置
-        Wband_notch = [49,51];
+        Wband = [3,50];  % 带通滤波器，滤波器这边需要参考相关的文献进行修改，这里参考佳星师姐的论文中的滤波器设置
+        Wband_notch = [49,51];  % 陷波滤波器
         FilterType = 'bandpass';
         FilterTypeNotch = 'stop';  % matlab的butter函数里面，设置'stop'会自动设置成2阶滤波器
 
@@ -77,7 +74,7 @@ function [FilteredDataMI, EI_index, mu_power] = Online_DataPreprocess(rawdata, c
         E_mu = ones([1, number_of_channels]);
         EI_ = ones([1, number_of_channels]); 
         
-        % 计算傅里叶变换之后的信号 FFT
+        % 计算傅里叶变换之后的信号的PSD图
         for i = 1:number_of_channels
             DataPSD(i,:) = abs(fft(FilteredData(i,:))).^2;  % 计算变换之后的频域幅值平方，用于计算能量，注意这里要对于每一个channel计算fft变换之后的频谱图
         end
