@@ -50,8 +50,8 @@ MaxMITime = 30; % 在线运动想象最大允许时间
 sample_frequency = 256; 
 WindowLength = 512;  % 每个窗口的长度
 channels = [3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];  % 选择的通道
-mu_channel = 14;  % 用于计算ERD/ERS的几个channels，需要确定下位置的
-EI_channel = 10;  % 用于计算EI指标的几个channels，需要确定下位置的
+mu_channels = struct('C3',1, 'C4',2);  % 用于计算ERD/ERS的几个channels，是C3和C4两个通道,需要设定位置
+EI_channels = struct('Fp1', 1, 'Fp2', 2, 'F7', 3, 'F3', 4, 'Fz', 5, 'F4', 6, 'F8', 7);  % 用于计算EI指标的几个channels，需要确定下位置的
 weight_mu = 0.6;  % 用于计算ERD/ERS指标和EI指标的加权和
 
 % 通信设置
@@ -136,9 +136,14 @@ while(AllTrial <= TrialNum)
         rawdata = rawdata(2:end,:);
         
         [FilteredDataMI, EI_index, mu_power_MI] = Online_DataPreprocess(rawdata, Trials(AllTrial), sample_frequency, WindowLength, channels);
-        mu_suppression = (mu_power_MI(mu_channel,1) - mu_power_(mu_channel,1))/mu_power_(mu_channel,1);  % 计算miu频带衰减情况
-        score = weight_mu * mu_suppression + (1 - weight_mu) * EI_index(EI_channel,1);  % 计算得分
+        % mu_suppression = (mu_power_MI(mu_channel,1) - mu_power_(mu_channel,1))/mu_power_(mu_channel,1);  % 计算miu频带衰减情况
+        % 计算两个指标
+        mu_suppression = MI_MuSuperesion(mu_power_, mu_power_MI, mu_channels);  
+        EI_index_score = EI_index_Caculation(EI_index, EI_channels);
+        
+        score = weight_mu * mu_suppression + (1 - weight_mu) * EI_index_score;  % 计算得分
         scores = [scores, score];  % 保存得分
+        
         % 存储这两个指标的数值
         EI_index = [EI_index; Trigger];
         mu_power_MI = [mu_power_MI; Trigger];  % 这里添加上Trigger的相关数值，方便存储
@@ -355,6 +360,19 @@ function SaveMIEngageTrials(EI_indices, mu_powers, subject_name, foldername, con
     save([foldername, '\\', FunctionNowFilename(['Online_EEG_data2Server_', subject_name, '_class_', num2str(config_data(3,1)),  ...
         '_session_', num2str(config_data(4,1)), '_trial_', num2str(config_data(5,1)), ...
         '_window_', num2str(config_data(6,1)), 'EI_mu' ], '.mat' )],'EI_indices',' mu_powers');  % 存储相关的数值
+end
+%% 计算相关mu频带衰减指标
+function mu_suppresion = MI_MuSuperesion(mu_power_, mu_power, mu_channels)
+    ERD_C3 = (mu_power(mu_channels.C3, 1) - mu_power_(mu_channels.C3, 1))/mu_power_(mu_channels.C3, 1); 
+    ERD_C4 = (mu_power(mu_channels.C4, 1) - mu_power_(mu_channels.C4, 1))/mu_power_(mu_channels.C4, 1);  % 计算两个脑电位置的相关的指标 
+    mu_suppresion = abs(ERD_C4 - ERD_C3);
+end
+
+%% 计算相关的EI指标的函数
+function EI_index_score = EI_index_Caculation(EI_index, EI_channels)
+    channels_ = [EI_channels.Fp1,EI_channels.Fp2, EI_channels.F7, EI_channels.F3, EI_channels.Fz, EI_channels.F4, EI_channels.F8'];
+    EI_index_score = mean(EI_index(channels_, 1));
+    
 end
 %% 实时任务调度以及休息时间调整的函数
 function [Trials, ChoiceTrial, RestTimeLen] = TaskAdjust(scores_trial, ChoiceTrial, Trials, AllTrial, DiffLevels, RestTimeLen)
