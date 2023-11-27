@@ -1,5 +1,5 @@
 %% 准备初始的存储数据的文件夹
-subject_name = 'Jyt';  % 被试的姓名  
+subject_name = 'FS_test';  % 被试的姓名  
 
 foldername = ['.\\', subject_name]; % 指定文件夹路径和名称
 
@@ -16,7 +16,7 @@ session_idx = 1;
 MotorClass = 3; % 注意这里是纯设计的运动想象动作的数量，不包括空想idle状态
 MajorPoportion = 0.6;
 TrialNum = 40;
-DiffLevels = [2,1,3];
+DiffLevels = [2,1,0];
 
 if session_idx == 1  % 如果是第一个session，那需要生成相关的任务集合
     Level2task(MotorClass, MajorPoportion, TrialNum, DiffLevels, foldername, subject_name);
@@ -55,7 +55,7 @@ for trial_idx = 1:length(ChoiceTrial)
        
        if rem(timer,5)==0
            disp('*********Online Testing***********');
-           rawdata = rand(33,512);  % 生成原始的数据，以及去掉了trigger==6的部分
+           rawdata = rand(32,512);  % 生成原始的数据，以及去掉了trigger==6的部分
            Trigger = [ChoiceTrial(1,trial_idx) * ones(1,512)]; 
            rawdata = [rawdata; Trigger];  % 生成所有数据
            [FilteredDataMI, EI_index, mu_power_MI] = Online_DataPreprocess(rawdata, ChoiceTrial(1,trial_idx), sample_frequency, WindowLength, channels);

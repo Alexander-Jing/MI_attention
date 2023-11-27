@@ -40,12 +40,19 @@ status = CheckNetStreamingVersion(con);                                    % ÅĞ¶
 % ÔË¶¯ÏëÏó»ù±¾²ÎÊıÉèÖÃ
 subject_name = 'FS_test';  % ±»ÊÔĞÕÃû
 TrialNum = 30*3;  % ÉèÖÃ²É¼¯µÄÊıÁ¿
-MotorClasses = 3;  % ÔË¶¯ÏëÏóµÄÖÖÀàµÄÊıÁ¿µÄÉèÖÃ£¬×¢ÒâÕâÀïÊÇ°Ñ¿ÕÏëidle×´Ì¬Ò²Òª·Å½øÈ¥µÄ
+MotorClasses = 3;  % ÔË¶¯ÏëÏóµÄÖÖÀàµÄÊıÁ¿µÄÉèÖÃ£¬×¢ÒâÕâÀïÊÇ°Ñ¿ÕÏëidle×´Ì¬Ò²Òª·Å½øÈ¥µÄ£¬×¢ÒâÕâÀïµÄÈÎÎñÊÇ[0,1,2]£¬ºÍreadme.txtÀïÃæµÄ¶ÔÓ¦
 
-% ²ÎÓë¶ÈÆÀ¹ÀÖ¸±êµÄ¼ÆËã
-mu_channel = 14;  % ÓÃÓÚ¼ÆËãERD/ERSµÄ¼¸¸öchannels£¬ĞèÒªÈ·¶¨ÏÂÎ»ÖÃµÄ
-EI_channel = 10;  % ÓÃÓÚ¼ÆËãEIÖ¸±êµÄ¼¸¸öchannels£¬ĞèÒªÈ·¶¨ÏÂÎ»ÖÃµÄ
+% ÄÔµçÉè±¸µÄÊı¾İ²É¼¯
+sample_frequency = 256; 
+WindowLength = 512;  % Ã¿¸ö´°¿ÚµÄ³¤¶È
+channels = [3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];  % Ñ¡ÔñµÄÍ¨µÀ
+mu_channels = struct('C3',1, 'C4',2);  % ÓÃÓÚ¼ÆËãERD/ERSµÄ¼¸¸öchannels£¬ÊÇC3ºÍC4Á½¸öÍ¨µÀ,ĞèÒªÉè¶¨Î»ÖÃ
+EI_channels = struct('Fp1', 1, 'Fp2', 2, 'F7', 3, 'F3', 4, 'Fz', 5, 'F4', 6, 'F8', 7);  % ÓÃÓÚ¼ÆËãEIÖ¸±êµÄ¼¸¸öchannels£¬ĞèÒªÈ·¶¨ÏÂÎ»ÖÃµÄ
 weight_mu = 0.6;  % ÓÃÓÚ¼ÆËãERD/ERSÖ¸±êºÍEIÖ¸±êµÄ¼ÓÈ¨ºÍ
+
+% Í¨ĞÅÉèÖÃ
+ip = '172.18.22.21';
+port = 8888;  % ºÍºó¶Ë·şÎñÆ÷Á¬½ÓµÄÁ½¸ö²ÎÊı
 
 %% ÔË¶¯ÏëÏóÄÚÈİ°²ÅÅ
 TrialIndex = randperm(TrialNum);                                           % ¸ù¾İ²É¼¯µÄÊıÁ¿Éú³ÉËæ»úË³ĞòµÄÊı×é
@@ -69,6 +76,11 @@ foldername = ['.\\', FunctionNowFilename([subject_name, '_'], '_data')]; % Ö¸¶¨Î
 if ~exist(foldername, 'dir')
    mkdir(foldername);
 end
+% ÉèÖÃ´æ´¢scoreµÄÊı×é
+scores = [];  % ÓÃÓÚ´æ´¢Ã¿Ò»¸ötrialÀïÃæµÄÃ¿Ò»¸öwindowµÄ·ÖÊıÖµ
+EI_indices = [];  % ÓÃÓÚ´æ´¢Ã¿Ò»¸ötrialÀïÃæµÄÃ¿Ò»¸öwindowµÄEI·ÖÊıÖµ
+mu_powers = [];  % ÓÃÓÚ´æ´¢Ã¿Ò»¸ötrialÀïÃæµÄÃ¿Ò»¸öwindowµÄmuÆµ´øµÄÄÜÁ¿ÊıÖµ
+scores_task = [];  % ÓÃÓÚ´æ´¢scoreºÍtask
 
 %% ¿ªÊ¼ÊµÑé£¬ÀëÏß²É¼¯
 Timer = 0;
@@ -91,7 +103,37 @@ while(AllTrial <= TrialNum)
         sendbuf(1,2) = hex2dec('01') ;
         sendbuf(1,3) = hex2dec('00') ;
         sendbuf(1,4) = hex2dec('00') ;
-        fwrite(UnityControl,sendbuf);  
+        fwrite(UnityControl,sendbuf);
+        rawdata = TrialData(:,end-512+1:end);  % È¡Ç°Ò»¸ö512µÄ´°¿Ú
+        rawdata = rawdata(2:end,:);
+        % ÕâÀï½ö½öÌáÈ¡ÔÚMIÖ®Ç°µÄÆµ´øÄÜÁ¿
+        [~, ~, mu_power_] = Online_DataPreprocess(rawdata, 6, sample_frequency, WindowLength, channels);
+        mu_power_ = [mu_power_; Trigger];
+        mu_powers = [mu_powers, mu_power_];  % Ìí¼ÓÏà¹ØµÄmu½ÚÂÉÄÜÁ¿
+    end
+    
+    % µÚ4s¿ªÊ¼È¡512µÄTrigger~=6µÄMIµÄ´°¿Ú£¬Êı¾İ´¦Àí²¢ÇÒ½øĞĞ·ÖÎö
+    if Timer > 3 && Timer <= 7
+        rawdata = TrialData(:,end-512+1:end);  % È¡Ç°Ò»¸ö512µÄ´°¿Ú
+        rawdata = rawdata(2:end,:);
+        
+        [FilteredDataMI, EI_index, mu_power_MI] = Online_DataPreprocess(rawdata, Trials(AllTrial), sample_frequency, WindowLength, channels);
+        % mu_suppression = (mu_power_MI(mu_channel,1) - mu_power_(mu_channel,1))/mu_power_(mu_channel,1);  % ¼ÆËãmiuÆµ´øË¥¼õÇé¿ö
+        % ¼ÆËãÁ½¸öÖ¸±ê
+        mu_suppression = MI_MuSuperesion(mu_power_, mu_power_MI, mu_channels);  
+        EI_index_score = EI_index_Caculation(EI_index, EI_channels);
+        
+        score = weight_mu * mu_suppression + (1 - weight_mu) * EI_index_score;  % ¼ÆËãµÃ·Ö
+        scores = [scores, score];  % ±£´æµÃ·Ö
+        scores_task_ = [score; Trigger];
+        scores_task = [scores_task, scores_task_];  % ±£´æ·ÖÊı-ÈÎÎñ¶Ô£¬ÓÃÓÚºóĞøµÄ·ÖÎöÈÎÎñÄÑ¶ÈÓÃµÄ
+        % ´æ´¢ÕâÁ½¸öÖ¸±êµÄÊıÖµ
+        EI_index = [EI_index; Trigger];
+        mu_power_MI = [mu_power_MI; Trigger];  % ÕâÀïÌí¼ÓÉÏTriggerµÄÏà¹ØÊıÖµ£¬·½±ã´æ´¢
+        
+        EI_indices = [EI_indices, EI_index];  % Ìí¼ÓÏà¹ØµÄEIÖ¸±êÊıÖµ  
+        mu_powers = [mu_powers, mu_power_MI];  % Ìí¼ÓÏà¹ØµÄmu½ÚÂÉÄÜÁ¿
+
     end
     
     if Timer==7  %¿ªÊ¼ĞİÏ¢
@@ -117,6 +159,7 @@ while(AllTrial <= TrialNum)
     if Timer == 10
         Timer = 0;  % ¼ÆÊ±Æ÷Çå0
         disp(['Trial: ', num2str(AllTrial), ', Task: ', num2str(RandomTrial(AllTrial))]);  % ÏÔÊ¾Ïà¹ØÊı¾İ
+        score = weight_mu * mu_suppression + (1 - weight_mu) * EI_index_score;  % ¼ÆËãµÃ·Ö
     end
     
 end
@@ -138,13 +181,37 @@ rawdata = TrialData;
 sample_frequency = 256; 
 WindowLength = 512;  % Ã¿¸ö´°¿ÚµÄ³¤¶È
 SlideWindowLength = 256;  % »¬´°¼ä¸ô
-channels = [3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];  % Ñ¡ÔñµÄÍ¨µÀ
 [DataX, DataY, windows_per_session] = Offline_DataPreprocess(rawdata, classes, sample_frequency, WindowLength, SlideWindowLength, channels, subject_name, foldername, mu_channel, EI_channel, weight_mu);
 
 %% Ô¤´¦ÀíÊı¾İ´«Êä
 % ÉèÖÃ´«ÊäµÄ²ÎÊı
-ip = '172.18.22.21';
-port = 8888;
 send_order = 3.0;
 config_data = [WindowLength, size(channels, 2), windows_per_session, classes];
 Offline_Data2Server_Send(DataX, ip, port, subject_name, config_data, send_order, foldername);
+
+%% Ã¿Ò»ÖÖÈÎÎñ¶ÔÓ¦µÄscoresÆ½¾ù·ÖÊıÈ·¶¨
+compute_mean_scores(scores_task);
+
+function mean_scores = compute_mean_scores(scores_task)
+    % »ñÈ¡scoresºÍtriggers
+    scores = scores_task(1,:);
+    triggers = scores_task(2,:);
+
+    % »ñÈ¡ËùÓĞ²»Í¬µÄtriggers
+    unique_triggers = unique(triggers);
+
+    % ³õÊ¼»¯Êä³ö
+    mean_scores = zeros(size(unique_triggers));
+
+    % ¶ÔÓÚÃ¿Ò»¸ötrigger£¬¼ÆËã¶ÔÓ¦µÄscoreµÄ¾ùÖµ
+    for i = 1:length(unique_triggers)
+        trigger = unique_triggers(i);
+        mean_scores(i) = mean(scores(triggers == trigger));
+    end
+
+    % Êä³ö½á¹û
+    disp('TriggerµÄÆ½¾ù·ÖÊıÊÇ£º');
+    for i = 1:length(unique_triggers)
+        disp(['Trigger ' num2str(unique_triggers(i)) ' µÄÆ½¾ù·ÖÊıÊÇ ' num2str(mean_scores(i))]);
+    end
+end

@@ -58,11 +58,12 @@ function [DataX, DataY, windows_per_session] = Offline_DataPreprocess(rawdata, c
     end
 
     %% 划窗函数
-    function [DataSample, LabelWindows] = DataWindows(DataSamplePre, FilteredData, channels, class_index, windows_per_session, SlideWindowLength, WindowLength)
+    function [DataSample, LabelWindows] = DataWindows(DataSamplePre, FilteredData, channels, class_index, windows_per_session, SlideWindowLength, WindowLength, sample_frequency)
         % channels = [3:32]; 
         % channels = [3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32]; 
         % channels = [3,8,27,28,30,31,32,33]-1;  % 确定前额叶的通道，由于记录的信号CH-1是Trigger，所以所有的索引减去1
         LabelWindows = [];
+        % scores = [];  % 用于存储scores分数的数组
 
         % 生成划窗的数据
         for i = 1:windows_per_session
@@ -108,5 +109,18 @@ function [DataX, DataY, windows_per_session] = Offline_DataPreprocess(rawdata, c
         % 返回每一个channel对应的EI指标和mu频带的能量
         EI_index = EI_;
         mu_power = E_mu;  
+    end
+%% 计算相关mu频带衰减指标
+    function mu_suppresion = MI_MuSuperesion(mu_power_, mu_power, mu_channels)
+        ERD_C3 = (mu_power(mu_channels.C3, 1) - mu_power_(mu_channels.C3, 1))/mu_power_(mu_channels.C3, 1); 
+        ERD_C4 = (mu_power(mu_channels.C4, 1) - mu_power_(mu_channels.C4, 1))/mu_power_(mu_channels.C4, 1);  % 计算两个脑电位置的相关的指标 
+        mu_suppresion = abs(ERD_C4 - ERD_C3);
+    end
+    
+    %% 计算相关的EI指标的函数
+    function EI_index_score = EI_index_Caculation(EI_index, EI_channels)
+        channels_ = [EI_channels.Fp1,EI_channels.Fp2, EI_channels.F7, EI_channels.F3, EI_channels.Fz, EI_channels.F4, EI_channels.F8'];
+        EI_index_score = mean(EI_index(channels_, 1));
+        
     end
 end
