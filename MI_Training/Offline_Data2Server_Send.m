@@ -2,7 +2,7 @@ function Offline_Data2Server_Send(data_x, ip, port, subject_name, config_data, s
     
     config = whos('data_x');
     data2Server = [];
-    h = waitbar(0, '数据转换');
+    h = waitbar(0, 'data preparing');
     for class_type = 1:config.size(1,1)
        for windows_num = 1:config.size(1,2)
            size_ = size(data2Server);
@@ -29,8 +29,8 @@ function Offline_Data2Server_Send(data_x, ip, port, subject_name, config_data, s
     tcpipClient.InputBufferSize = 8388608;%8M
     tcpipClient.ByteOrder = 'bigEndian';
     fopen(tcpipClient);
-    disp("连接成功")
-    disp("数据发�??")
+    disp("data sending")
+    disp("data sent")
 
     % send_order = 3.0;  % 发�?�命令控制，用于控制服务�?
     send_data = [send_order; config_data(:); data2Server(:)];

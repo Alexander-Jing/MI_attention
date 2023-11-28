@@ -110,17 +110,4 @@ function [DataX, DataY, windows_per_session] = Offline_DataPreprocess(rawdata, c
         EI_index = EI_;
         mu_power = E_mu;  
     end
-%% 计算相关mu频带衰减指标
-    function mu_suppresion = MI_MuSuperesion(mu_power_, mu_power, mu_channels)
-        ERD_C3 = (mu_power(mu_channels.C3, 1) - mu_power_(mu_channels.C3, 1))/mu_power_(mu_channels.C3, 1); 
-        ERD_C4 = (mu_power(mu_channels.C4, 1) - mu_power_(mu_channels.C4, 1))/mu_power_(mu_channels.C4, 1);  % 计算两个脑电位置的相关的指标 
-        mu_suppresion = abs(ERD_C4 - ERD_C3);
-    end
-    
-    %% 计算相关的EI指标的函数
-    function EI_index_score = EI_index_Caculation(EI_index, EI_channels)
-        channels_ = [EI_channels.Fp1,EI_channels.Fp2, EI_channels.F7, EI_channels.F3, EI_channels.Fz, EI_channels.F4, EI_channels.F8'];
-        EI_index_score = mean(EI_index(channels_, 1));
-        
-    end
 end
