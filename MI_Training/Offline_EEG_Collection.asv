@@ -12,7 +12,7 @@ close all;
 %           Byte5£ºÔ¤Áô
 %system('F:\CASIA\mwl_data_collection\climbstair\ClimbStair3.exe&');      % Unity¶¯»­exeÎÄ¼şµØÖ·
 %system('E:\MI_engagement\unity_test\unity_test\build_test\unity_test.exe&');
-system('E:\MI_UpperLimb_AO\UpperLimb_AO\UpperLimb_AO\build_test\unity_test.exe&');
+system('E:\UpperLimb_Animation\unity_test.exe&');
 pause(3)
 UnityControl = tcpip('localhost', 8881, 'NetworkRole', 'client');          % ĞÂµÄ¶Ë¿Ú¸ÄÎª8881
 fopen(UnityControl);
@@ -40,6 +40,7 @@ status = CheckNetStreamingVersion(con);                                    % ÅĞ¶
 % ÔË¶¯ÏëÏó»ù±¾²ÎÊıÉèÖÃ
 subject_name = 'FS_test';  % ±»ÊÔĞÕÃû
 TrialNum = 30*3;  % ÉèÖÃ²É¼¯µÄÊıÁ¿
+%TrialNum = 3*3;
 MotorClasses = 3;  % ÔË¶¯ÏëÏóµÄÖÖÀàµÄÊıÁ¿µÄÉèÖÃ£¬×¢ÒâÕâÀïÊÇ°Ñ¿ÕÏëidle×´Ì¬Ò²Òª·Å½øÈ¥µÄ£¬×¢ÒâÕâÀïµÄÈÎÎñÊÇ[0,1,2]£¬ºÍreadme.txtÀïÃæµÄ¶ÔÓ¦
 
 % ÄÔµçÉè±¸µÄÊı¾İ²É¼¯
@@ -117,7 +118,7 @@ while(AllTrial <= TrialNum)
         rawdata = TrialData(:,end-512+1:end);  % È¡Ç°Ò»¸ö512µÄ´°¿Ú
         rawdata = rawdata(2:end,:);
         
-        [FilteredDataMI, EI_index, mu_power_MI] = Online_DataPreprocess(rawdata, Trials(AllTrial), sample_frequency, WindowLength, channels);
+        [FilteredDataMI, EI_index, mu_power_MI] = Online_DataPreprocess(rawdata, Trigger, sample_frequency, WindowLength, channels);
         % mu_suppression = (mu_power_MI(mu_channel,1) - mu_power_(mu_channel,1))/mu_power_(mu_channel,1);  % ¼ÆËãmiuÆµ´øË¥¼õÇé¿ö
         % ¼ÆËãÁ½¸öÖ¸±ê
         mu_suppression = MI_MuSuperesion(mu_power_, mu_power_MI, mu_channels);  
@@ -131,8 +132,8 @@ while(AllTrial <= TrialNum)
         EI_index = [EI_index; Trigger];
         mu_power_MI = [mu_power_MI; Trigger];  % ÕâÀïÌí¼ÓÉÏTriggerµÄÏà¹ØÊıÖµ£¬·½±ã´æ´¢
         
-        EI_indices = [EI_indices, EI_index];  % Ìí¼ÓÏà¹ØµÄEIÖ¸±êÊıÖµ  
-        mu_powers = [mu_powers, mu_power_MI];  % Ìí¼ÓÏà¹ØµÄmu½ÚÂÉÄÜÁ¿
+        EI_indices = [EI_indices, EI_index];  % Ìí¼ÓÏà¹ØµÄEIÖ¸±êÊıÖµ£¬ÓÃÓÚºóĞøµÄ·ÖÎö  
+        mu_powers = [mu_powers, mu_power_MI];  % Ìí¼ÓÏà¹ØµÄmu½ÚÂÉÄÜÁ¿£¬ÓÃÓÚºóĞøµÄ·ÖÎö
 
     end
     
@@ -181,22 +182,22 @@ rawdata = TrialData;
 sample_frequency = 256; 
 WindowLength = 512;  % Ã¿¸ö´°¿ÚµÄ³¤¶È
 SlideWindowLength = 256;  % »¬´°¼ä¸ô
-[DataX, DataY, windows_per_session] = Offline_DataPreprocess(rawdata, classes, sample_frequency, WindowLength, SlideWindowLength, channels, subject_name, foldername, mu_channel, EI_channel, weight_mu);
+[DataX, DataY, windows_per_session] = Offline_DataPreprocess(rawdata, classes, sample_frequency, WindowLength, SlideWindowLength, channels, subject_name, foldername);
 
 %% Ô¤´¦ÀíÊı¾İ´«Êä
 % ÉèÖÃ´«ÊäµÄ²ÎÊı
-%send_order = 3.0;
-%config_data = [WindowLength, size(channels, 2), windows_per_session, classes];
+send_order = 3.0;
+config_data = [WindowLength, size(channels, 2), windows_per_session, classes];
 %Offline_Data2Server_Send(DataX, ip, port, subject_name, config_data, send_order, foldername);
+classaccuracies = Offline_Data2Server_Communication(DataX, ip, port, subject_name, config_data, send_order, foldername);
 
 %% Ã¿Ò»ÖÖÈÎÎñ¶ÔÓ¦µÄscoresÆ½¾ù·ÖÊıÈ·¶¨£¬²¢ÇÒ´æ´¢Ïà¹ØÖ¸±ê
 foldername_Scores = [foldername, '\\Offline_EEGMI_Scores_', subject_name]; % Ö¸¶¨ÎÄ¼ş¼ĞÂ·¾¶ºÍÃû³Æ
 if ~exist(foldername_Scores, 'dir')
    mkdir(foldername_Scores);
 end
-save([foldername_Scores, '\\', FunctionNowFilename(['Offline_EEGMI_RawData_', subject_name], '.mat' )],'TrialData','TrialIndex','ChanLabel');
-
-compute_mean_scores(scores_task);
+save([foldername_Scores, '\\', FunctionNowFilename(['Offline_EEGMI_Scores_', subject_name], '.mat' )],'scores_task','EI_indices','mu_powers');  
+compute_mean_scores(scores_task, );  % ¼ÆËã²¢ÇÒÏÔÊ¾ÄÑ¶È
 
 function mean_scores = compute_mean_scores(scores_task)
     % »ñÈ¡scoresºÍtriggers
@@ -221,3 +222,16 @@ function mean_scores = compute_mean_scores(scores_task)
         disp(['Trigger ' num2str(unique_triggers(i)) ' µÄÆ½¾ù·ÖÊıÊÇ ' num2str(mean_scores(i))]);
     end
 end
+%% ¼ÆËãÏà¹ØmuÆµ´øË¥¼õÖ¸±ê
+    function mu_suppresion = MI_MuSuperesion(mu_power_, mu_power, mu_channels)
+        ERD_C3 = (mu_power(mu_channels.C3, 1) - mu_power_(mu_channels.C3, 1))/mu_power_(mu_channels.C3, 1); 
+        ERD_C4 = (mu_power(mu_channels.C4, 1) - mu_power_(mu_channels.C4, 1))/mu_power_(mu_channels.C4, 1);  % ¼ÆËãÁ½¸öÄÔµçÎ»ÖÃµÄÏà¹ØµÄÖ¸±ê 
+        mu_suppresion = abs(ERD_C4 - ERD_C3);
+    end
+    
+    %% ¼ÆËãÏà¹ØµÄEIÖ¸±êµÄº¯Êı
+    function EI_index_score = EI_index_Caculation(EI_index, EI_channels)
+        channels_ = [EI_channels.Fp1,EI_channels.Fp2, EI_channels.F7, EI_channels.F3, EI_channels.Fz, EI_channels.F4, EI_channels.F8'];
+        EI_index_score = mean(EI_index(channels_, 1));
+        
+    end

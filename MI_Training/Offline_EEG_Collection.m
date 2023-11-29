@@ -38,9 +38,9 @@ status = CheckNetStreamingVersion(con);                                    % ÅĞ¶
 %% ÔÚÏßÊµÑé²ÎÊıÉèÖÃ²¿·Ö£¬ÓÃÓÚÉèÖÃÃ¿Ò»¸ö±»ÊÔµÄÇé¿ö£¬ÒÀ¾İ±»ÊÔÇé¿ö½øĞĞĞŞ¸Ä
 
 % ÔË¶¯ÏëÏó»ù±¾²ÎÊıÉèÖÃ
-subject_name = 'FS_test';  % ±»ÊÔĞÕÃû
-TrialNum = 30*3;  % ÉèÖÃ²É¼¯µÄÊıÁ¿
-%TrialNum = 3*3;
+subject_name = 'LFS_test';  % ±»ÊÔĞÕÃû
+%TrialNum = 30*3;  % ÉèÖÃ²É¼¯µÄÊıÁ¿
+TrialNum = 3*3;
 MotorClasses = 3;  % ÔË¶¯ÏëÏóµÄÖÖÀàµÄÊıÁ¿µÄÉèÖÃ£¬×¢ÒâÕâÀïÊÇ°Ñ¿ÕÏëidle×´Ì¬Ò²Òª·Å½øÈ¥µÄ£¬×¢ÒâÕâÀïµÄÈÎÎñÊÇ[0,1,2]£¬ºÍreadme.txtÀïÃæµÄ¶ÔÓ¦
 
 % ÄÔµçÉè±¸µÄÊı¾İ²É¼¯
@@ -174,7 +174,7 @@ foldername_rawdata = [foldername, '\\Offline_EEGMI_RawData_', subject_name]; % Ö
 if ~exist(foldername_rawdata, 'dir')
    mkdir(foldername_rawdata);
 end
-save([foldername_rawdata, '\\', FunctionNowFilename(['Offline_EEGMI_RawData_', subject_name], '.mat' )],'scores_task','EI_indices','mu_powers');
+save([foldername_rawdata, '\\', FunctionNowFilename(['Offline_EEGMI_RawData_', subject_name], '.mat' )],'TrialData','TrialIndex','ChanLabel');
 
 %% Êı¾İÔ¤´¦Àí
 % »®´°²ÎÊıÉèÖÃ
@@ -188,15 +188,17 @@ SlideWindowLength = 256;  % »¬´°¼ä¸ô
 % ÉèÖÃ´«ÊäµÄ²ÎÊı
 send_order = 3.0;
 config_data = [WindowLength, size(channels, 2), windows_per_session, classes];
-Offline_Data2Server_Send(DataX, ip, port, subject_name, config_data, send_order, foldername);
+%Offline_Data2Server_Send(DataX, ip, port, subject_name, config_data, send_order, foldername);
+class_accuracies = Offline_Data2Server_Communicate(DataX, ip, port, subject_name, config_data, send_order, foldername);
 
 %% Ã¿Ò»ÖÖÈÎÎñ¶ÔÓ¦µÄscoresÆ½¾ù·ÖÊıÈ·¶¨£¬²¢ÇÒ´æ´¢Ïà¹ØÖ¸±ê
 foldername_Scores = [foldername, '\\Offline_EEGMI_Scores_', subject_name]; % Ö¸¶¨ÎÄ¼ş¼ĞÂ·¾¶ºÍÃû³Æ
 if ~exist(foldername_Scores, 'dir')
    mkdir(foldername_Scores);
 end
-save([foldername_Scores, '\\', FunctionNowFilename(['Offline_EEGMI_Scores_', subject_name], '.mat' )],'TrialData','TrialIndex','ChanLabel');
-compute_mean_scores(scores_task);  % ¼ÆËã²¢ÇÒÏÔÊ¾ÄÑ¶È
+save([foldername_Scores, '\\', FunctionNowFilename(['Offline_EEGMI_Scores_', subject_name], '.mat' )],'scores_task','EI_indices','mu_powers');  
+mean_scores = compute_mean_scores(scores_task);  % ¼ÆËã²¢ÇÒÏÔÊ¾ÄÑ¶È
+
 
 function mean_scores = compute_mean_scores(scores_task)
     % »ñÈ¡scoresºÍtriggers
