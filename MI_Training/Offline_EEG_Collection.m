@@ -212,9 +212,10 @@ mean_scores = compute_mean_scores(scores_task);  % 计算并且显示难度
 
 %% 制作一个UI界面，用于帮助确认难度
 % 创建一个输入对话框
-prompt = cell(n, 1);
-for i = 1:n
-    prompt{i} = ['Enter the difficulty level of task ', task_dict(i-1), ', from 0 to ', num2str(n-1)];
+UI_n = MotorClasses;
+prompt = cell(UI_n, 1);
+for i = 1:UI_n
+    prompt{i} = ['Enter the difficulty level of task ', task_dict(i-1), ', from 0 to ', num2str(UI_n-1)];
 end
 dlgtitle = 'Input';
 dims = [1 80];
@@ -225,8 +226,15 @@ user_input = inputdlg(prompt,dlgtitle,dims);
 % 将用户输入的字符数组转换为数值
 difficulty_levels = cellfun(@str2double, user_input);
 
-%% 计算综合难度并且显示
+%% 计算综合难度并且显示以及存储相关指标
 [sum_result, sorted_indices] = difficulty_weighted_sum(1.0 - class_accuracies', mean_scores, difficulty_levels', task_weights);
+
+foldername_TaskDifficulty = [foldername, '\\Offline_EEGMI_TaskDifficulty_', subject_name]; % 指定文件夹路径和名称
+if ~exist(foldername_TaskDifficulty, 'dir')
+   mkdir(foldername_TaskDifficulty);
+end
+save([foldername_TaskDifficulty, '\\', FunctionNowFilename(['Offline_EEGMI_TaskDifficulty_', subject_name], '.mat' )],'sum_result','sorted_indices');  
+
 disp('任务难度综合加权难度评分是：');
 for i = 1:length(sum_result)
     disp(['任务 ', task_dict(i-1), ' 的平均分数是 ' num2str(sum_result(i))]);

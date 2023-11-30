@@ -1,4 +1,5 @@
-%% 其余两个指标
+%% 如果主程序出问题，这个可以作为备用程序
+%% 其余两个指标(需要手工填入)
 mean_scores = [1.90526284707639,0.785029282805970,0.580458876670467];
 class_accuracies = [0;1;0.333333333333333];
 
@@ -20,12 +21,13 @@ difficulty_levels = cellfun(@str2double, user_input);
 
 %% 计算综合难度并且显示
 [sum_result, sorted_indices] = difficulty_weighted_sum(1.0 - class_accuracies', mean_scores, difficulty_levels', task_weights);
+
 disp('任务难度综合加权难度评分是：');
-for i = 1:size(sum_result))
+for i = 1:length(sum_result)
     disp(['任务 ', task_dict(i-1), ' 的平均分数是 ' num2str(sum_result(i))]);
 end
 disp('综合排序是(由易到难)：');
-for i = 1:length(size(sorted_indices))
+for i = 1:length(sorted_indices)
     disp(['任务 ', task_dict(sorted_indices(i)-1)]);
 end
 
