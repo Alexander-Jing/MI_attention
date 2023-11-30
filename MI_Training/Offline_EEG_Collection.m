@@ -42,6 +42,14 @@ subject_name = 'LFS_test';  % 被试姓名
 %TrialNum = 30*3;  % 设置采集的数量
 TrialNum = 3*3;
 MotorClasses = 3;  % 运动想象的种类的数量的设置，注意这里是把空想idle状态也要放进去的，注意这里的任务是[0,1,2]，和readme.txt里面的对应
+% 当前设置的任务
+% Idle 0   -> SceneIdle 
+% MI1 1   -> SceneMI_Drinking 
+% MI2 2   -> Scene_Milk 
+% 由此设置任务用的字典
+task_keys = {0, 1, 2};
+task_values = {'SceneIdle', 'SceneMI_Drinking', 'Scene_Milk'};
+task_dict = containers.Map(task_keys, task_values);
 
 % 脑电设备的数据采集
 sample_frequency = 256; 
@@ -54,6 +62,9 @@ weight_mu = 0.6;  % 用于计算ERD/ERS指标和EI指标的加权和
 % 通信设置
 ip = '172.18.22.21';
 port = 8888;  % 和后端服务器连接的两个参数
+
+% 难度计算与划分设置
+task_weights = [3,5,2];
 
 %% 运动想象内容安排
 TrialIndex = randperm(TrialNum);                                           % 根据采集的数量生成随机顺序的数组
@@ -199,7 +210,51 @@ end
 save([foldername_Scores, '\\', FunctionNowFilename(['Offline_EEGMI_Scores_', subject_name], '.mat' )],'scores_task','EI_indices','mu_powers');  
 mean_scores = compute_mean_scores(scores_task);  % 计算并且显示难度
 
+%% 制作一个UI界面，用于帮助确认难度
+% 创建一个输入对话框
+prompt = cell(n, 1);
+for i = 1:n
+    prompt{i} = ['Enter the difficulty level of task ', task_dict(i-1), ', from 0 to ', num2str(n-1)];
+end
+dlgtitle = 'Input';
+dims = [1 80];
 
+% 显示对话框并获取用户输入
+user_input = inputdlg(prompt,dlgtitle,dims);
+
+% 将用户输入的字符数组转换为数值
+difficulty_levels = cellfun(@str2double, user_input);
+
+%% 计算综合难度并且显示
+[sum_result, sorted_indices] = difficulty_weighted_sum(1.0 - class_accuracies', mean_scores, difficulty_levels', task_weights);
+disp('任务难度综合加权难度评分是：');
+for i = 1:length(sum_result)
+    disp(['任务 ', task_dict(i-1), ' 的平均分数是 ' num2str(sum_result(i))]);
+end
+disp('综合排序是(由易到难)：');
+for i = 1:length(sorted_indices)
+    disp(['任务 ', task_dict(sorted_indices(i)-1)]);
+end
+
+%% 计算综合加权难度的函数
+function [sum_result, sorted_indices] = difficulty_weighted_sum(class_accuracies, mean_scores, difficulty_levels, weights)
+    % 对于不同的变量进行归一化，然后计算加权和，最后显示出计算结果
+    % 归一化变量
+    class_accuracies = class_accuracies / sum(class_accuracies);
+    mean_scores = mean_scores / sum(mean_scores);
+    difficulty_levels = difficulty_levels / sum(difficulty_levels);
+
+    % 归一化权重
+    weights = weights / sum(weights);
+
+    % 加权求和
+    sum_result = weights(1) * class_accuracies + weights(2) * mean_scores + weights(3) * difficulty_levels;
+
+    % 按照从小到大的顺序显示结果的序号
+    [~, sorted_indices] = sort(sum_result);
+end
+
+%% 获取平均参与度分数的函数
 function mean_scores = compute_mean_scores(scores_task)
     % 获取scores和triggers
     scores = scores_task(1,:);

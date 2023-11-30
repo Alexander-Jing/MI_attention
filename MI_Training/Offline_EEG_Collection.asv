@@ -38,10 +38,18 @@ status = CheckNetStreamingVersion(con);                                    % ÅĞ¶
 %% ÔÚÏßÊµÑé²ÎÊıÉèÖÃ²¿·Ö£¬ÓÃÓÚÉèÖÃÃ¿Ò»¸ö±»ÊÔµÄÇé¿ö£¬ÒÀ¾İ±»ÊÔÇé¿ö½øĞĞĞŞ¸Ä
 
 % ÔË¶¯ÏëÏó»ù±¾²ÎÊıÉèÖÃ
-subject_name = 'FS_test';  % ±»ÊÔĞÕÃû
-TrialNum = 30*3;  % ÉèÖÃ²É¼¯µÄÊıÁ¿
-%TrialNum = 3*3;
+subject_name = 'LFS_test';  % ±»ÊÔĞÕÃû
+%TrialNum = 30*3;  % ÉèÖÃ²É¼¯µÄÊıÁ¿
+TrialNum = 3*3;
 MotorClasses = 3;  % ÔË¶¯ÏëÏóµÄÖÖÀàµÄÊıÁ¿µÄÉèÖÃ£¬×¢ÒâÕâÀïÊÇ°Ñ¿ÕÏëidle×´Ì¬Ò²Òª·Å½øÈ¥µÄ£¬×¢ÒâÕâÀïµÄÈÎÎñÊÇ[0,1,2]£¬ºÍreadme.txtÀïÃæµÄ¶ÔÓ¦
+% µ±Ç°ÉèÖÃµÄÈÎÎñ
+% Idle 0   -> SceneIdle 
+% MI1 1   -> SceneMI_Drinking 
+% MI2 2   -> Scene_Milk 
+% ÓÉ´ËÉèÖÃÈÎÎñÓÃµÄ×Öµä
+task_keys = {0, 1, 2};
+task_values = {'SceneIdle', 'SceneMI_Drinking', 'Scene_Milk'};
+task_dict = containers.Map(task_keys, task_values);
 
 % ÄÔµçÉè±¸µÄÊı¾İ²É¼¯
 sample_frequency = 256; 
@@ -54,6 +62,9 @@ weight_mu = 0.6;  % ÓÃÓÚ¼ÆËãERD/ERSÖ¸±êºÍEIÖ¸±êµÄ¼ÓÈ¨ºÍ
 % Í¨ĞÅÉèÖÃ
 ip = '172.18.22.21';
 port = 8888;  % ºÍºó¶Ë·şÎñÆ÷Á¬½ÓµÄÁ½¸ö²ÎÊı
+
+% ÄÑ¶È¼ÆËãÓë»®·ÖÉèÖÃ
+task_weights = [3,5,2];
 
 %% ÔË¶¯ÏëÏóÄÚÈİ°²ÅÅ
 TrialIndex = randperm(TrialNum);                                           % ¸ù¾İ²É¼¯µÄÊıÁ¿Éú³ÉËæ»úË³ĞòµÄÊı×é
@@ -189,7 +200,7 @@ SlideWindowLength = 256;  % »¬´°¼ä¸ô
 send_order = 3.0;
 config_data = [WindowLength, size(channels, 2), windows_per_session, classes];
 %Offline_Data2Server_Send(DataX, ip, port, subject_name, config_data, send_order, foldername);
-classaccuracies = Offline_Data2Server_Communication(DataX, ip, port, subject_name, config_data, send_order, foldername);
+class_accuracies = Offline_Data2Server_Communicate(DataX, ip, port, subject_name, config_data, send_order, foldername);
 
 %% Ã¿Ò»ÖÖÈÎÎñ¶ÔÓ¦µÄscoresÆ½¾ù·ÖÊıÈ·¶¨£¬²¢ÇÒ´æ´¢Ïà¹ØÖ¸±ê
 foldername_Scores = [foldername, '\\Offline_EEGMI_Scores_', subject_name]; % Ö¸¶¨ÎÄ¼ş¼ĞÂ·¾¶ºÍÃû³Æ
@@ -197,7 +208,48 @@ if ~exist(foldername_Scores, 'dir')
    mkdir(foldername_Scores);
 end
 save([foldername_Scores, '\\', FunctionNowFilename(['Offline_EEGMI_Scores_', subject_name], '.mat' )],'scores_task','EI_indices','mu_powers');  
-compute_mean_scores(scores_task, );  % ¼ÆËã²¢ÇÒÏÔÊ¾ÄÑ¶È
+mean_scores = compute_mean_scores(scores_task);  % ¼ÆËã²¢ÇÒÏÔÊ¾ÄÑ¶È
+
+%% ÖÆ×÷Ò»¸öUI½çÃæ£¬ÓÃÓÚ°ïÖúÈ·ÈÏÄÑ¶È
+% ´´½¨Ò»¸öÊäÈë¶Ô»°¿ò
+prompt = cell(n, 1);
+for i = 1:n
+    prompt{i} = ['Enter the difficulty level of task ', task_dict(i-1), ', from 0 to ', num2str(n-1)];
+end
+dlgtitle = 'Input';
+dims = [1 80];
+
+% ÏÔÊ¾¶Ô»°¿ò²¢»ñÈ¡ÓÃ»§ÊäÈë
+user_input = inputdlg(prompt,dlgtitle,dims);
+
+% ½«ÓÃ»§ÊäÈëµÄ×Ö·ûÊı×é×ª»»ÎªÊıÖµ
+difficulty_levels = cellfun(@str2double, user_input);
+
+[sum_result, sorted_indices] = difficulty_weighted_sum(1.0 - class_accuracies', mean_scores, difficulty_levels', task_weights);
+disp('ÈÎÎñÄÑ¶È×ÛºÏ¼ÓÈ¨ÆÀ·ÖÊÇ£º');
+for i = 1:length(size(sum_result))
+    disp(['ÈÎÎñ ', task_dict(i-1), ' µÄÆ½¾ù·ÖÊıÊÇ ' num2str(sum_result(i))]);
+end
+disp('×ÛºÏÅÅĞòÊÇ£º');
+
+
+
+function [sum_result, sorted_indices] = difficulty_weighted_sum(class_accuracies, mean_scores, difficulty_levels, weights)
+    % ¶ÔÓÚ²»Í¬µÄ±äÁ¿½øĞĞ¹éÒ»»¯£¬È»ºó¼ÆËã¼ÓÈ¨ºÍ£¬×îºóÏÔÊ¾³ö¼ÆËã½á¹û
+    % ¹éÒ»»¯±äÁ¿
+    class_accuracies = class_accuracies / sum(class_accuracies);
+    mean_scores = mean_scores / sum(mean_scores);
+    difficulty_levels = difficulty_levels / sum(difficulty_levels);
+
+    % ¹éÒ»»¯È¨ÖØ
+    weights = weights / sum(weights);
+
+    % ¼ÓÈ¨ÇóºÍ
+    sum_result = weights(1) * class_accuracies + weights(2) * mean_scores + weights(3) * difficulty_levels;
+
+    % °´ÕÕ´ÓĞ¡µ½´óµÄË³ĞòÏÔÊ¾½á¹ûµÄĞòºÅ
+    [~, sorted_indices] = sort(sum_result);
+end
 
 function mean_scores = compute_mean_scores(scores_task)
     % »ñÈ¡scoresºÍtriggers

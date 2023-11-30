@@ -38,7 +38,7 @@ function R = Offline_Data2Server_Communicate(data_x, ip, port, subject_name, con
     fwrite(tcpipClient,[config_send.bytes/2; send_data],'float32');  % 杩欓噷matlab鐨刣ouble鏄?8涓瓧鑺傦紝鐒跺悗杩欓噷浣跨敤鐨?4瀛楄妭鐨刦loat32浼犺緭锛屾墍浠onfig_send.bytes瑕侀櫎浠?2锛岃〃绀轰娇鐢?4瀛楄妭鐨刦loat32褰㈠紡浼犺緭鐢ㄤ簡澶氬皯涓瓧鑺?
     
     % 鎺ユ敹鏁版嵁
-    disp("数据接收")
+    disp("数据接收中")
     recv_data = [];
     %閲嶅澶氭鎺ユ敹
     % h=waitbar(0,'姝ｅ湪鎺ユ敹鏁版嵁');
