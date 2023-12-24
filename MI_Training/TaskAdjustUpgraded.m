@@ -1,5 +1,5 @@
 %% 实时任务调度以及休息时间调整的函数
-function [Trials, ChoiceTrial, RestTimeLen] = TaskAdjustRL(scores_trial, ChoiceTrial, Trials, AllTrial, DiffLevels, RestTimeLen)
+function [Trials, ChoiceTrial, RestTimeLen] = TaskAdjustUpgraded(scores_trial, ChoiceTrial, Trials, AllTrial, DiffLevels, RestTimeLen)
     
     if AllTrial < 4  % 前4个trial由于无法进行数据采集，所以就先随机挑选
         n_ = length(ChoiceTrial);
@@ -12,7 +12,7 @@ function [Trials, ChoiceTrial, RestTimeLen] = TaskAdjustRL(scores_trial, ChoiceT
         delta_score = scores_trial(end-2:end) - scores_trial(end-3,end-1);  % 计算出过去3个trial的分数变化
         delta_score(delta_score<=0) = -1;
         delta_score(delta_score>0) = 1;  % 对于delta_score的数值进行映射，映射的结果将方便后面的判断
-        
+         
         deltaSum_ = sum(delta_score);
         switch deltaSum_
             case 3

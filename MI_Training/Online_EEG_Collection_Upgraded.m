@@ -217,7 +217,7 @@ while(AllTrial <= TrialNum)
         % 进入确定下一个任务
         average_score = average(scores);
         scores_trial = [scores_trial, average_score];  % 存储好平均的分数
-        [Trials, ChoiceTrial, RestTimeLen] = TaskAdjustRL(scores_trial, ChoiceTrial, Trials, AllTrial, DiffLevels, RestTimeLen);
+        [Trials, ChoiceTrial, RestTimeLen] = TaskAdjustUpgraded(scores_trial, ChoiceTrial, Trials, AllTrial, DiffLevels, RestTimeLen);
     end
     
     % 运动想象想对了之后，AO结束了之后让人休息
@@ -231,7 +231,7 @@ while(AllTrial <= TrialNum)
         % 进入确定下一个任务
         average_score = average(scores);
         scores_trial = [scores_trial, average_score];  % 存储好平均的分数
-        [Trials, ChoiceTrial, RestTimeLen] = TaskAdjustRL(scores_trial, ChoiceTrial, Trials, AllTrial, DiffLevels, RestTimeLen);
+        [Trials, ChoiceTrial, RestTimeLen] = TaskAdjustUpgraded(scores_trial, ChoiceTrial, Trials, AllTrial, DiffLevels, RestTimeLen);
     end
     
     % 运动想象没有想对，提醒结束了之后让人休息
@@ -245,7 +245,7 @@ while(AllTrial <= TrialNum)
         % 进入确定下一个任务
         average_score = average(scores);
         scores_trial = [scores_trial, average_score];  % 存储好平均的分数
-        [Trials, ChoiceTrial, RestTimeLen] = TaskAdjustRL(scores_trial, ChoiceTrial, Trials, AllTrial, DiffLevels, RestTimeLen);
+        [Trials, ChoiceTrial, RestTimeLen] = TaskAdjustUpgraded(scores_trial, ChoiceTrial, Trials, AllTrial, DiffLevels, RestTimeLen);
     end
     
     %% 时钟更新
