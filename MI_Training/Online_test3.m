@@ -28,7 +28,7 @@ fwrite(UnityControl,sendbuf);
 pause(3)
 
 %% 准备初始的存储数据的文件夹
-subject_name = 'Jyt_test_score';  % 被试的姓名  
+subject_name = 'Jyt_test_score_thre';  % 被试的姓名  
 
 foldername = ['.\\', subject_name]; % 指定文件夹路径和名称
 
@@ -47,17 +47,17 @@ MajorPoportion = 0.6;
 TrialNum = 6;
 DiffLevels = [1,2];
 
-if session_idx == 1  % 如果是第一个session，那需要生成相关的任务集合
-    Level2task(MotorClass, MajorPoportion, TrialNum, DiffLevels, foldername, subject_name);
-    path = [foldername, '\\', 'Level2task', '_', subject_name, '\\', 'Online_EEGMI_session_', subject_name, '_', num2str(session_idx), '_', '.mat'];
-    ChoiceTrial = load(path,'session');
-else
-    path = [foldername, '\\', 'Level2task', '_', subject_name, '\\', 'Online_EEGMI_session_', subject_name, '_', num2str(session_idx), '_', '.mat'];
-    ChoiceTrial = load(path,'session');
-end
+% if session_idx == 1  % 如果是第一个session，那需要生成相关的任务集合
+%     Level2task(MotorClass, MajorPoportion, TrialNum, DiffLevels, foldername, subject_name);
+%     path = [foldername, '\\', 'Level2task', '_', subject_name, '\\', 'Online_EEGMI_session_', subject_name, '_', num2str(session_idx), '_', '.mat'];
+%     ChoiceTrial = load(path,'session');
+% else
+%     path = [foldername, '\\', 'Level2task', '_', subject_name, '\\', 'Online_EEGMI_session_', subject_name, '_', num2str(session_idx), '_', '.mat'];
+%     ChoiceTrial = load(path,'session');
+% end
 
 %ChoiceTrial = ChoiceTrial.session;
- ChoiceTrial = [0,1,2];  % 临时使用
+ ChoiceTrial = [1,2,0,1,2,0];  % 临时使用
 %% 开始实验，离线采集
 Timer = 0;
 TrialData = [];
@@ -77,9 +77,11 @@ clsFlag = 0; % 用于判断实时分类是否正确的flag
 Trials = [];
 Trials = [Trials, ChoiceTrial(1,1)];  % 初始化RandomTrial，第一个数值是ChoiceTrial任务集合中的第一个
 results = [];
+resultMI = Trigger;
 
 for trial_idx = 1:length(ChoiceTrial)
-   for timer = 1:15
+    score_thre = trial_idx * 25;
+    for timer = 1:15
        pause(1);
        if rem(timer,1)==0 && timer <= 10
            disp('*********Online Testing***********');
@@ -89,6 +91,8 @@ for trial_idx = 1:length(ChoiceTrial)
            sendbuf(1,2) = hex2dec('00');
            sendbuf(1,3) = hex2dec('00');
            sendbuf(1,4) = hex2dec('00');
+           % threshold 数据传输设置以及显示
+           sendbuf(1,6) = uint8((score_thre));
            fwrite(UnityControl,sendbuf);  
 
            rawdata = rand(33,512);  % 生成原始的数据，以及去掉了trigger==6的部分
@@ -103,7 +107,8 @@ for trial_idx = 1:length(ChoiceTrial)
            
            config_data = [WindowLength;size(channels, 2);ChoiceTrial(1,trial_idx);session_idx;trial_idx;timer/5;score;0;0;0;0 ];
            order = 1.0;
-           resultMI = Online_Data2Server_Communicate(order, FilteredDataMI, ip, port, subject_name, config_data, foldername);  % 传输数据给线上的模型，看分类情况
+           
+           %resultMI = Online_Data2Server_Communicate(order, FilteredDataMI, ip, port, subject_name, config_data, foldername);  % 传输数据给线上的模型，看分类情况
            
            disp(['session: ', num2str(session_idx)]);
            disp(['trial: ', num2str(trial_idx)]);
@@ -117,7 +122,7 @@ for trial_idx = 1:length(ChoiceTrial)
            % 传输数据和更新模型
            config_data = [WindowLength;size(channels, 2);ChoiceTrial(1,trial_idx);session_idx;trial_idx;timer/5;score;0;0;0;0 ];
            order = 2.0;  % 传输数据和训练的命令
-           Online_Data2Server_Send(order, [0,0,0,0], ip, port, subject_name, config_data);  % 发送指令，让服务器更新数据，[0,0,0,0]单纯是用于凑下数据，防止应为空集影响传输
+           %Online_Data2Server_Send(order, [0,0,0,0], ip, port, subject_name, config_data);  % 发送指令，让服务器更新数据，[0,0,0,0]单纯是用于凑下数据，防止应为空集影响传输
            results = [results, resultMI];
            
            sendbuf(1,2) = hex2dec('01');

@@ -213,7 +213,7 @@ end
 mean_std_EI = compute_mean_std(EI_indices);  
 mean_std_muSup = compute_mean_std(mu_suppressions);  % 计算并且显示难度
 % 存储相关数据
-save([foldername_Scores, '\\', FunctionNowFilename(['Offline_EEGMI_Scores_', subject_name], '.mat' )],'scores_task','EI_indices','mu_powers', ...
+save([foldername_Scores, '\\', ['Offline_EEGMI_Scores_', subject_name], '.mat' ],'scores_task','EI_indices','mu_powers', ...
     'mu_suppressions','mean_std_EI','mean_std_muSup',"class_accuracies");  
 
 %% 获取平均参与度分数的函数

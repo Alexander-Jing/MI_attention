@@ -16,8 +16,7 @@ function [Trials, MI_MUSup_thre_weight, RestTimeLen] = TaskAdjustUpgraded(scores
                 MI_MUSup_thre_weight = MI_MUSup_thre_weight_baseline * 0.707;
                 % 休息时长调整
                 RestTimeLen = RestTimeLenBaseline + 2;
-                % 加入静息任务，作为休息
-                Trials = [Trials(1:AllTrial), 0, Trials(AllTrial+1:end)];
+
             case 1
                 % 如果此时是升高多余降低的，那么还是增加任务难度
                 MI_MUSup_thre_weight = MI_MUSup_thre_weight_baseline * 1.414;
@@ -35,6 +34,7 @@ function [Trials, MI_MUSup_thre_weight, RestTimeLen] = TaskAdjustUpgraded(scores
                 MI_MUSup_thre_weight = MI_MUSup_thre_weight_baseline * 0.707;
                 % 休息时长调整
                 RestTimeLen = RestTimeLenBaseline + 2;
+                
         end
     end
 end
