@@ -17,7 +17,7 @@ function R = Online_Data2Server_Communicate(send_order, data_x, ip, port, subjec
     %tcpipClient = tcpip('172.18.22.21', 8888,'NetworkRole','Client');
     set(tcpipClient,'OutputBufferSize',4*999*30*256*8*10);%2048*4096 67108880+64
     set(tcpipClient,'Timeout',time_out);
-    tcpipClient.InputBufferSize = 8388608/2;%8M
+    tcpipClient.InputBufferSize = 8388608/256;%8M
     tcpipClient.ByteOrder = 'bigEndian';
     fopen(tcpipClient);
     disp("连接成功")
