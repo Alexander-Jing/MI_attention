@@ -12,6 +12,7 @@ close all;
 %           Byte5£ºÔ¤Áô
 %system('F:\CASIA\mwl_data_collection\climbstair\ClimbStair3.exe&');      % Unity¶¯»­exeÎÄ¼şµØÖ·
 %system('E:\MI_engagement\unity_test\unity_test\build_test\unity_test.exe&');
+%system('E:\UpperLimb_Animation\unity_test.exe&');
 system('E:\UpperLimb_Animation\unity_test.exe&');
 pause(3)
 UnityControl = tcpip('localhost', 8881, 'NetworkRole', 'client');          % ĞÂµÄ¶Ë¿Ú¸ÄÎª8881
@@ -38,9 +39,9 @@ status = CheckNetStreamingVersion(con);                                    % ÅĞ¶
 %% ÔÚÏßÊµÑé²ÎÊıÉèÖÃ²¿·Ö£¬ÓÃÓÚÉèÖÃÃ¿Ò»¸ö±»ÊÔµÄÇé¿ö£¬ÒÀ¾İ±»ÊÔÇé¿ö½øĞĞĞŞ¸Ä
 
 % ÔË¶¯ÏëÏó»ù±¾²ÎÊıÉèÖÃ
-subject_name = 'LFS_test';  % ±»ÊÔĞÕÃû
-%TrialNum = 30*3;  % ÉèÖÃ²É¼¯µÄÊıÁ¿
-TrialNum = 3*3;
+subject_name = 'Jyt_online_test_offline1';  % ±»ÊÔĞÕÃû
+TrialNum = 30*3;  % ÉèÖÃ²É¼¯µÄÊıÁ¿
+%TrialNum = 3*3;
 MotorClasses = 3;  % ÔË¶¯ÏëÏóµÄÖÖÀàµÄÊıÁ¿µÄÉèÖÃ£¬×¢ÒâÕâÀïÊÇ°Ñ¿ÕÏëidle×´Ì¬Ò²Òª·Å½øÈ¥µÄ£¬×¢ÒâÕâÀïµÄÈÎÎñÊÇ[0,1,2]£¬ºÍreadme.txtÀïÃæµÄ¶ÔÓ¦
 % µ±Ç°ÉèÖÃµÄÈÎÎñ
 % Idle 0   -> SceneIdle 
@@ -91,6 +92,7 @@ end
 % ÉèÖÃ´æ´¢scoreµÄÊı×é
 scores = [];  % ÓÃÓÚ´æ´¢Ã¿Ò»¸ötrialÀïÃæµÄÃ¿Ò»¸öwindowµÄ·ÖÊıÖµ
 EI_indices = [];  % ÓÃÓÚ´æ´¢Ã¿Ò»¸ötrialÀïÃæµÄÃ¿Ò»¸öwindowµÄEI·ÖÊıÖµ
+EI_index_scores = [];  % ÓÃÓÚ´æ´¢EI_index_Caculation(EI_index, EI_channels)¼ÆËã³öÀ´µÄEI_index_scoreÊıÖµ
 mu_powers = [];  % ÓÃÓÚ´æ´¢Ã¿Ò»¸ötrialÀïÃæµÄÃ¿Ò»¸öwindowµÄmuÆµ´øµÄÄÜÁ¿ÊıÖµ
 scores_task = [];  % ÓÃÓÚ´æ´¢scoreºÍtask
 mu_suppressions = [];  % ÓÃÓÚ´æ´¢mu_suppression
@@ -141,11 +143,13 @@ while(AllTrial <= TrialNum)
         scores_task_ = [score; Trigger];
         scores_task = [scores_task, scores_task_];  % ±£´æ·ÖÊı-ÈÎÎñ¶Ô£¬ÓÃÓÚºóĞøµÄ·ÖÎöÈÎÎñÄÑ¶ÈÓÃµÄ
         
-        % ´æ´¢ÕâÁ½¸öÖ¸±êµÄÊıÖµ
+        % ´æ´¢Õâ¼¸¸öÖ¸±êµÄÊıÖµ
+        EI_index_score = [EI_index_score; Trigger];
         EI_index = [EI_index; Trigger];
         mu_power_MI = [mu_power_MI; Trigger];  
         mu_suppression = [mu_suppression; Trigger]; % ÕâÀïÌí¼ÓÉÏTriggerµÄÏà¹ØÊıÖµ£¬·½±ã´æ´¢
 
+        EI_index_scores = [EI_index_scores, EI_index_score];  % Ìí¼ÓÏà¹ØµÄEI_index_scoresÊıÖµ£¬×¢ÒâÕâ¸öÊÇ¼ÆËãÁË¼¸¸öchannelsÍ¨µÀµÄÆ½¾ùÊıÖµ£¬ÏÂÃæÄÇ¸öEI_indicesÊÇ´æ´¢ÁËËùÓĞÊıÖµ
         EI_indices = [EI_indices, EI_index];  % Ìí¼ÓÏà¹ØµÄEIÖ¸±êÊıÖµ£¬ÓÃÓÚºóĞøµÄ·ÖÎö  
         mu_powers = [mu_powers, mu_power_MI];  % Ìí¼ÓÏà¹ØµÄmu½ÚÂÉÄÜÁ¿£¬ÓÃÓÚºóĞøµÄ·ÖÎö
         mu_suppressions = [mu_suppressions, mu_suppression];  % Ìí¼ÓÏà¹ØµÄmuË¥¼õÇé¿ö£¬ÓÃÓÚºóĞøµÄ·ÖÎö
@@ -198,6 +202,19 @@ WindowLength = 512;  % Ã¿¸ö´°¿ÚµÄ³¤¶È
 SlideWindowLength = 256;  % »¬´°¼ä¸ô
 [DataX, DataY, windows_per_session] = Offline_DataPreprocess(rawdata, classes, sample_frequency, WindowLength, SlideWindowLength, channels, subject_name, foldername);
 
+%% Ã¿Ò»ÖÖÈÎÎñ¶ÔÓ¦µÄ¸÷ÏîÖ¸±êµÄÆ½¾ù·ÖÊıÈ·¶¨£¬²¢ÇÒ´æ´¢Ïà¹ØÖ¸±ê
+foldername_Scores = [foldername, '\\Offline_EEGMI_Scores_', subject_name]; % Ö¸¶¨ÎÄ¼ş¼ĞÂ·¾¶ºÍÃû³Æ
+if ~exist(foldername_Scores, 'dir')
+   mkdir(foldername_Scores);
+end
+% ¼ÆËã¸÷¸ö±äÁ¿Ö¸±êµÄ¾ùÖµºÍ·½²î
+%mean_std_EI = compute_mean_std(EI_indices);  
+mean_std_muSup = compute_mean_std(mu_suppressions, 'mu_suppressions');  
+mean_std_EI_score = compute_mean_std(EI_index_scores, 'EI_index_scores');
+% ´æ´¢Ïà¹ØÊı¾İ
+save([foldername_Scores, '\\', ['Offline_EEGMI_Scores_', subject_name], '.mat' ],'scores_task','EI_indices','mu_powers', ...
+    'mu_suppressions','mean_std_EI_score','mean_std_muSup'); 
+
 %% Ô¤´¦ÀíÊı¾İ´«Êä
 % ÉèÖÃ´«ÊäµÄ²ÎÊı
 send_order = 3.0;
@@ -205,19 +222,10 @@ config_data = [WindowLength, size(channels, 2), windows_per_session, classes];
 %Offline_Data2Server_Send(DataX, ip, port, subject_name, config_data, send_order, foldername);
 class_accuracies = Offline_Data2Server_Communicate(DataX, ip, port, subject_name, config_data, send_order, foldername);
 
-%% Ã¿Ò»ÖÖÈÎÎñ¶ÔÓ¦µÄ¸÷ÏîÖ¸±êµÄÆ½¾ù·ÖÊıÈ·¶¨£¬²¢ÇÒ´æ´¢Ïà¹ØÖ¸±ê
-foldername_Scores = [foldername, '\\Offline_EEGMI_Scores_', subject_name]; % Ö¸¶¨ÎÄ¼ş¼ĞÂ·¾¶ºÍÃû³Æ
-if ~exist(foldername_Scores, 'dir')
-   mkdir(foldername_Scores);
-end
-mean_std_EI = compute_mean_std(EI_indices);  
-mean_std_muSup = compute_mean_std(mu_suppressions);  % ¼ÆËã²¢ÇÒÏÔÊ¾ÄÑ¶È
-% ´æ´¢Ïà¹ØÊı¾İ
-save([foldername_Scores, '\\', ['Offline_EEGMI_Scores_', subject_name], '.mat' ],'scores_task','EI_indices','mu_powers', ...
-    'mu_suppressions','mean_std_EI','mean_std_muSup',"class_accuracies");  
+
 
 %% »ñÈ¡Æ½¾ù²ÎÓë¶È·ÖÊıµÄº¯Êı
-function mean_std_scores = compute_mean_std(scores_task)
+function mean_std_scores = compute_mean_std(scores_task, scores_name)
     % »ñÈ¡scoresºÍtriggers
     scores = scores_task(1,:);
     triggers = scores_task(2,:);
@@ -238,7 +246,7 @@ function mean_std_scores = compute_mean_std(scores_task)
     mean_std_scores = [mean_scores; std_scores];
 
     % Êä³ö½á¹û
-    disp(['Ã¿Ò»¸öTriggerµÄÆ½¾ù'  '·ÖÊıÊÇ£º']);
+    disp(['Ã¿Ò»¸öTriggerµÄÆ½¾ù', scores_name, '·ÖÊıÊÇ£º']);
     for i = 1:length(unique_triggers)
         disp(['Trigger ' num2str(unique_triggers(i)) ' µÄÆ½¾ù·ÖÊıÊÇ ' num2str(mean_scores(i))]);
         disp(['Trigger ' num2str(unique_triggers(i)) ' µÄ±ê×¼²îÊÇ ' num2str(std_scores(i))]);

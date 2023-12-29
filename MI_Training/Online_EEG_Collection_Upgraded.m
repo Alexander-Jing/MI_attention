@@ -37,8 +37,8 @@ status = CheckNetStreamingVersion(con);                                    % ÅĞ¶
 %% ÔÚÏßÊµÑé²ÎÊıÉèÖÃ²¿·Ö£¬ÓÃÓÚÉèÖÃÃ¿Ò»¸ö±»ÊÔµÄÇé¿ö£¬ÒÀ¾İ±»ÊÔÇé¿ö½øĞĞĞŞ¸Ä
 
 % ÔË¶¯ÏëÏó»ù±¾²ÎÊıÉèÖÃ
-subject_name = 'Jyt_test';  % ±»ÊÔĞÕÃû
-sub_offline_collection_folder = 'Jyt_test_data';  % ±»ÊÔµÄÀëÏß²É¼¯Êı¾İ
+subject_name = 'Jyt_online_test';  % ±»ÊÔĞÕÃû
+sub_offline_collection_folder = 'Jyt_online_test_offline';  % ±»ÊÔµÄÀëÏß²É¼¯Êı¾İ
 session_idx = 1;  % session indexÊıÁ¿£¬Èç¹ûÊÇ1µÄ»°£¬»á×Ô¶¯Éú³ÉÏà¹ØÅÅ²¼
 MotorClass = 2; % ÔË¶¯ÏëÏó¶¯×÷ÊıÁ¿£¬×¢ÒâÕâÀïÊÇ´¿Éè¼ÆµÄÔË¶¯ÏëÏó¶¯×÷µÄÊıÁ¿£¬²»°üÀ¨¿ÕÏëidle×´Ì¬
 DiffLevels = [1,2];  % ¶ÔÓÚÉÏÃæµÄÔË¶¯ÏëÏóµÄÄÑ¶ÈÅÅ²¼£¬Ô½¿¿ºóÔ½ÄÑ£¬ÆäÖĞµÄ1,2¶ÔÓ¦µÄÊÇÔË¶¯ÏëÏóµÄÀàĞÍ£¬ºÍunity¶ÔÓ¦
@@ -70,7 +70,7 @@ end
 
 %% Éú³ÉmuË¥¼õµÄ×·×Ù¹ì¼£
 % ¶ÁÈ¡Ö®Ç°µÄÀëÏß²É¼¯µÄÊı¾İ
-foldername_Scores = [foldername, '\\Offline_EEGMI_Scores_', subject_name]; % Ö¸¶¨Ö®Ç°´æ´¢µÄÀëÏßÎÄ¼ş¼ĞÂ·¾¶ºÍÃû³Æ
+foldername_Scores = [sub_offline_collection_folder, '\\Offline_EEGMI_Scores_', subject_name]; % Ö¸¶¨Ö®Ç°´æ´¢µÄÀëÏßÎÄ¼ş¼ĞÂ·¾¶ºÍÃû³Æ
 mean_std_EI = load([foldername_Scores, '\\', ['Offline_EEGMI_Scores_', subject_name], '.mat' ], 'mean_std_EI');
 mean_std_muSup = load([foldername_Scores, '\\', ['Offline_EEGMI_Scores_', subject_name], '.mat' ], 'mean_std_muSup');
 

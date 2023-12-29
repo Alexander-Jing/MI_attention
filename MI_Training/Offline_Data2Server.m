@@ -1,57 +1,100 @@
-close all;clear;clc;
-data = double(rand(2048,2048));
-config = whos('data');
-time_out = 60; % æŠ•é€æ•°æ®åŒ…çš„ç­‰å¾…æ—¶é—´
-tcpipClient = tcpip('172.18.22.21', 8888,'NetworkRole','Client');
-set(tcpipClient,'OutputBufferSize',67108880+64);%2048*4096
-set(tcpipClient,'Timeout',time_out);
-tcpipClient.InputBufferSize = 8388608;%8M
-tcpipClient.ByteOrder = 'bigEndian';
-fopen(tcpipClient);
-disp("è¿æ¥æˆåŠŸ")
-disp("æ•°æ®å‘é€")
+%% ÔÚÏßÊµÑé²ÎÊıÉèÖÃ²¿·Ö£¬ÓÃÓÚÉèÖÃÃ¿Ò»¸ö±»ÊÔµÄÇé¿ö£¬ÒÀ¾İ±»ÊÔÇé¿ö½øĞĞĞŞ¸Ä
 
-send_order = 1.0;  % å‘é€å‘½ä»¤æ§åˆ¶ï¼Œç”¨äºæ§åˆ¶æœåŠ¡å™¨
-send_data = [send_order; config.size(:); data(:)];
-config_send = whos('send_data');   % whos('send_data')å°†è¿”å›è¯¥å˜é‡çš„åç§°ã€å¤§å°ã€å­—èŠ‚æ•°ã€ç±»å‹ç­‰ä¿¡æ¯
-fwrite(tcpipClient,[config_send.bytes/2;send_data],'float32');  % è¿™é‡Œmatlabçš„doubleæ˜¯8ä¸ªå­—èŠ‚ï¼Œç„¶åè¿™é‡Œä½¿ç”¨çš„4å­—èŠ‚çš„float32ä¼ è¾“ï¼Œæ‰€ä»¥config_send.bytesè¦é™¤ä»¥2ï¼Œè¡¨ç¤ºä½¿ç”¨4å­—èŠ‚çš„float32å½¢å¼ä¼ è¾“ç”¨äº†å¤šå°‘ä¸ªå­—èŠ‚
+% ÔË¶¯ÏëÏó»ù±¾²ÎÊıÉèÖÃ
+subject_name = 'Jyt_online_test_offline';  % ±»ÊÔĞÕÃû
+TrialNum = 30*3;  % ÉèÖÃ²É¼¯µÄÊıÁ¿
+%TrialNum = 3*3;
+MotorClasses = 3;  % ÔË¶¯ÏëÏóµÄÖÖÀàµÄÊıÁ¿µÄÉèÖÃ£¬×¢ÒâÕâÀïÊÇ°Ñ¿ÕÏëidle×´Ì¬Ò²Òª·Å½øÈ¥µÄ£¬×¢ÒâÕâÀïµÄÈÎÎñÊÇ[0,1,2]£¬ºÍreadme.txtÀïÃæµÄ¶ÔÓ¦
+% µ±Ç°ÉèÖÃµÄÈÎÎñ
+% Idle 0   -> SceneIdle 
+% MI1 1   -> SceneMI_Drinking 
+% MI2 2   -> Scene_Milk 
+% ÓÉ´ËÉèÖÃÈÎÎñÓÃµÄ×Öµä
+task_keys = {0, 1, 2};
+task_values = {'SceneIdle', 'SceneMI_Drinking', 'Scene_Milk'};
+task_dict = containers.Map(task_keys, task_values);
 
-disp("æ•°æ®æ¥æ”¶")
-recv_data = [];
+% ÄÔµçÉè±¸µÄÊı¾İ²É¼¯
+sample_frequency = 256; 
+WindowLength = 512;  % Ã¿¸ö´°¿ÚµÄ³¤¶È
+channels = [3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];  % Ñ¡ÔñµÄÍ¨µÀ
+mu_channels = struct('C3',1, 'C4',2);  % ÓÃÓÚ¼ÆËãERD/ERSµÄ¼¸¸öchannels£¬ÊÇC3ºÍC4Á½¸öÍ¨µÀ,ĞèÒªÉè¶¨Î»ÖÃ
+EI_channels = struct('Fp1', 1, 'Fp2', 2, 'F7', 3, 'F3', 4, 'Fz', 5, 'F4', 6, 'F8', 7);  % ÓÃÓÚ¼ÆËãEIÖ¸±êµÄ¼¸¸öchannels£¬ĞèÒªÈ·¶¨ÏÂÎ»ÖÃµÄ
+weight_mu = 0.6;  % ÓÃÓÚ¼ÆËãERD/ERSÖ¸±êºÍEIÖ¸±êµÄ¼ÓÈ¨ºÍ
 
-%é‡å¤å¤šæ¬¡æ¥æ”¶
-h=waitbar(0,'æ­£åœ¨æ¥æ”¶æ•°æ®');
-while isempty(recv_data)
-    recv_data=fread(tcpipClient);%è¯»å–ç¬¬ä¸€ç»„æ•°æ®
-end
-header = convertCharsToStrings(native2unicode(recv_data,'utf-8'));
-recv_bytes = str2double(regexp(header,'(?<=(L": )).*?(?=(,|$))','match'))-2;%æ­£åˆ™åŒ–æå–æ•°æ®å¤§å°
-while length(recv_data)<recv_bytes
-    if recv_data(end)==125
-        break
-    end
-    waitbar(length(recv_data)/recv_bytes)
-    recv_package = [];
-    while isempty(recv_package)
-        try
-            recv_package=fread(tcpipClient);
-        catch
-            continue
-        end
-    end
-    recv_data = vertcat(recv_data,recv_package);
-end
-close(h)
-chararray = native2unicode(recv_data,'utf-8');
-str = convertCharsToStrings(chararray);  % æ¥æ”¶åˆ°çš„æ•°æ®ï¼Œä¸ºå­—å…¸æ ¼å¼
-try
-    dic = jsondecode(str);%å°†jsonå½¢å¼çš„å­—å…¸æ•°æ®é‡Œé¢çš„çŸ©é˜µæ•°æ®æå–
-    U = dic.U;
-    S = dic.S;
-    V = dic.V;
-    re = U*diag(S)*V;
-catch
-    disp('WARNNING:æ¥æ”¶ä¸å®Œå…¨')
-end
-disp('è¿æ¥æ–­å¼€')
-fclose(tcpipClient);
+% Í¨ĞÅÉèÖÃ
+ip = '172.18.22.21';
+port = 8888;  % ºÍºó¶Ë·şÎñÆ÷Á¬½ÓµÄÁ½¸ö²ÎÊı
+
+% ´«ÊäÊı¾İµÄÎÄ¼ş¼ĞÎ»ÖÃÉèÖÃ
+foldername = 'Jyt_online_test_offline_20231229_143547195_data';
+windows_per_session = 149;
+classes = MotorClasses;
+%% ¶ÁÈ¡´ı´«ÊäµÄÊı¾İ
+DataX = load([foldername, '\\', 'Offline_EEGMI_Jyt_online_test_offline', '\\', 'Offline_EEG_data_Jyt_online_test_offline20231229_145104540.mat' ],'DataX');
+
+%% Ô¤´¦ÀíÊı¾İ´«Êä
+% ÉèÖÃ´«ÊäµÄ²ÎÊı
+send_order = 3.0;
+config_data = [WindowLength, size(channels, 2), windows_per_session, classes];
+%Offline_Data2Server_Send(DataX, ip, port, subject_name, config_data, send_order, foldername);
+class_accuracies = Offline_Data2Server_Communicate(DataX.DataX, ip, port, subject_name, config_data, send_order, foldername);
+
+
+
+
+% config = whos('data');
+% time_out = 60; % æŠ•é?æ•°æ®åŒ…çš„ç­‰å¾…æ—¶é—?
+% tcpipClient = tcpip('172.18.22.21', 8888,'NetworkRole','Client');
+% set(tcpipClient,'OutputBufferSize',67108880+64);%2048*4096
+% set(tcpipClient,'Timeout',time_out);
+% tcpipClient.InputBufferSize = 8388608;%8M
+% tcpipClient.ByteOrder = 'bigEndian';
+% fopen(tcpipClient);
+% disp("è¿æ¥æˆåŠŸ")
+% disp("æ•°æ®å‘é??")
+% 
+% send_order = 1.0;  % å‘é?å‘½ä»¤æ§åˆ¶ï¼Œç”¨äºæ§åˆ¶æœåŠ¡å™?
+% send_data = [send_order; config.size(:); data(:)];
+% config_send = whos('send_data');   % whos('send_data')å°†è¿”å›è¯¥å˜é‡çš„åç§°ã?å¤§å°ã?å­—èŠ‚æ•°ã€ç±»å‹ç­‰ä¿¡æ¯
+% fwrite(tcpipClient,[config_send.bytes/2;send_data],'float32');  % è¿™é‡Œmatlabçš„doubleæ˜?8ä¸ªå­—èŠ‚ï¼Œç„¶åè¿™é‡Œä½¿ç”¨çš?4å­—èŠ‚çš„float32ä¼ è¾“ï¼Œæ‰€ä»¥config_send.bytesè¦é™¤ä»?2ï¼Œè¡¨ç¤ºä½¿ç”?4å­—èŠ‚çš„float32å½¢å¼ä¼ è¾“ç”¨äº†å¤šå°‘ä¸ªå­—èŠ?
+% 
+% disp("æ•°æ®æ¥æ”¶")
+% recv_data = [];
+% 
+% %é‡å¤å¤šæ¬¡æ¥æ”¶
+% h=waitbar(0,'æ­£åœ¨æ¥æ”¶æ•°æ®');
+% while isempty(recv_data)
+%     recv_data=fread(tcpipClient);%è¯»å–ç¬¬ä¸€ç»„æ•°æ?
+% end
+% header = convertCharsToStrings(native2unicode(recv_data,'utf-8'));
+% recv_bytes = str2double(regexp(header,'(?<=(L": )).*?(?=(,|$))','match'))-2;%æ­£åˆ™åŒ–æå–æ•°æ®å¤§å°?
+% while length(recv_data)<recv_bytes
+%     if recv_data(end)==125
+%         break
+%     end
+%     waitbar(length(recv_data)/recv_bytes)
+%     recv_package = [];
+%     while isempty(recv_package)
+%         try
+%             recv_package=fread(tcpipClient);
+%         catch
+%             continue
+%         end
+%     end
+%     recv_data = vertcat(recv_data,recv_package);
+% end
+% close(h)
+% chararray = native2unicode(recv_data,'utf-8');
+% str = convertCharsToStrings(chararray);  % æ¥æ”¶åˆ°çš„æ•°æ®ï¼Œä¸ºå­—å…¸æ ¼å¼
+% try
+%     dic = jsondecode(str);%å°†jsonå½¢å¼çš„å­—å…¸æ•°æ®é‡Œé¢çš„çŸ©é˜µæ•°æ®æå–
+%     U = dic.U;
+%     S = dic.S;
+%     V = dic.V;
+%     re = U*diag(S)*V;
+% catch
+%     disp('WARNNING:æ¥æ”¶ä¸å®Œå…?')
+% end
+% disp('è¿æ¥æ–­å¼€')
+% fclose(tcpipClient);
