@@ -39,7 +39,7 @@ status = CheckNetStreamingVersion(con);                                    % ÅĞ¶
 %% ÔÚÏßÊµÑé²ÎÊıÉèÖÃ²¿·Ö£¬ÓÃÓÚÉèÖÃÃ¿Ò»¸ö±»ÊÔµÄÇé¿ö£¬ÒÀ¾İ±»ÊÔÇé¿ö½øĞĞĞŞ¸Ä
 
 % ÔË¶¯ÏëÏó»ù±¾²ÎÊıÉèÖÃ
-subject_name = 'Jyt_online_test_offline1';  % ±»ÊÔĞÕÃû
+subject_name = 'Jyt_test_1230_offline';  % ±»ÊÔĞÕÃû
 TrialNum = 30*3;  % ÉèÖÃ²É¼¯µÄÊıÁ¿
 %TrialNum = 3*3;
 MotorClasses = 3;  % ÔË¶¯ÏëÏóµÄÖÖÀàµÄÊıÁ¿µÄÉèÖÃ£¬×¢ÒâÕâÀïÊÇ°Ñ¿ÕÏëidle×´Ì¬Ò²Òª·Å½øÈ¥µÄ£¬×¢ÒâÕâÀïµÄÈÎÎñÊÇ[0,1,2]£¬ºÍreadme.txtÀïÃæµÄ¶ÔÓ¦
@@ -55,9 +55,9 @@ task_dict = containers.Map(task_keys, task_values);
 % ÄÔµçÉè±¸µÄÊı¾İ²É¼¯
 sample_frequency = 256; 
 WindowLength = 512;  % Ã¿¸ö´°¿ÚµÄ³¤¶È
-channels = [3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];  % Ñ¡ÔñµÄÍ¨µÀ
-mu_channels = struct('C3',1, 'C4',2);  % ÓÃÓÚ¼ÆËãERD/ERSµÄ¼¸¸öchannels£¬ÊÇC3ºÍC4Á½¸öÍ¨µÀ,ĞèÒªÉè¶¨Î»ÖÃ
-EI_channels = struct('Fp1', 1, 'Fp2', 2, 'F7', 3, 'F3', 4, 'Fz', 5, 'F4', 6, 'F8', 7);  % ÓÃÓÚ¼ÆËãEIÖ¸±êµÄ¼¸¸öchannels£¬ĞèÒªÈ·¶¨ÏÂÎ»ÖÃµÄ
+channels = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];  % Ñ¡ÔñµÄÍ¨µÀ,
+mu_channels = struct('C3',24, 'C4',22);  % ÓÃÓÚ¼ÆËãERD/ERSµÄ¼¸¸öchannels£¬ÊÇC3ºÍC4Á½¸öÍ¨µÀ,ĞèÒªÉè¶¨Î»ÖÃ
+EI_channels = struct('Fp1', 32, 'Fp2', 31, 'F7', 30, 'F3', 29, 'Fz', 28, 'F4', 27, 'F8', 26);  % ÓÃÓÚ¼ÆËãEIÖ¸±êµÄ¼¸¸öchannels£¬ĞèÒªÈ·¶¨ÏÂÎ»ÖÃµÄ
 weight_mu = 0.6;  % ÓÃÓÚ¼ÆËãERD/ERSÖ¸±êºÍEIÖ¸±êµÄ¼ÓÈ¨ºÍ
 
 % Í¨ĞÅÉèÖÃ
@@ -65,7 +65,7 @@ ip = '172.18.22.21';
 port = 8888;  % ºÍºó¶Ë·şÎñÆ÷Á¬½ÓµÄÁ½¸ö²ÎÊı
 
 % ÄÑ¶È¼ÆËãÓë»®·ÖÉèÖÃ
-task_weights = [3,5,2];
+%task_weights = [3,5,2];
 
 %% ÔË¶¯ÏëÏóÄÚÈİ°²ÅÅ
 TrialIndex = randperm(TrialNum);                                           % ¸ù¾İ²É¼¯µÄÊıÁ¿Éú³ÉËæ»úË³ĞòµÄÊı×é
@@ -123,7 +123,7 @@ while(AllTrial <= TrialNum)
         rawdata = rawdata(2:end,:);
         % ÕâÀï½ö½öÌáÈ¡ÔÚMIÖ®Ç°µÄÆµ´øÄÜÁ¿
         [~, ~, mu_power_] = Online_DataPreprocess(rawdata, 6, sample_frequency, WindowLength, channels);
-        mu_power_ = [mu_power_; Trigger];
+        mu_power_ = [mu_power_; 6];
         mu_powers = [mu_powers, mu_power_];  % Ìí¼ÓÏà¹ØµÄmu½ÚÂÉÄÜÁ¿
     end
     
@@ -253,15 +253,15 @@ function mean_std_scores = compute_mean_std(scores_task, scores_name)
     end
 end
 %% ¼ÆËãÏà¹ØmuÆµ´øË¥¼õÖ¸±ê
-    function mu_suppresion = MI_MuSuperesion(mu_power_, mu_power, mu_channels)
+function mu_suppresion = MI_MuSuperesion(mu_power_, mu_power, mu_channels)
         ERD_C3 = (mu_power(mu_channels.C3, 1) - mu_power_(mu_channels.C3, 1))/mu_power_(mu_channels.C3, 1); 
         ERD_C4 = (mu_power(mu_channels.C4, 1) - mu_power_(mu_channels.C4, 1))/mu_power_(mu_channels.C4, 1);  % ¼ÆËãÁ½¸öÄÔµçÎ»ÖÃµÄÏà¹ØµÄÖ¸±ê 
         mu_suppresion = abs(ERD_C4 - ERD_C3);
-    end
+end
     
     %% ¼ÆËãÏà¹ØµÄEIÖ¸±êµÄº¯Êı
-    function EI_index_score = EI_index_Caculation(EI_index, EI_channels)
-        channels_ = [EI_channels.Fp1,EI_channels.Fp2, EI_channels.F7, EI_channels.F3, EI_channels.Fz, EI_channels.F4, EI_channels.F8'];
-        EI_index_score = mean(EI_index(channels_, 1));
-        
-    end
+function EI_index_score = EI_index_Caculation(EI_index, EI_channels)
+    channels_ = [EI_channels.Fp1,EI_channels.Fp2, EI_channels.F7, EI_channels.F3, EI_channels.Fz, EI_channels.F4, EI_channels.F8'];
+    EI_index_score = mean(EI_index(channels_, 1));
+
+end

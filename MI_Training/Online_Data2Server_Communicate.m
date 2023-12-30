@@ -20,8 +20,8 @@ function R = Online_Data2Server_Communicate(send_order, data_x, ip, port, subjec
     tcpipClient.InputBufferSize = 8388608/256;%8M
     tcpipClient.ByteOrder = 'bigEndian';
     fopen(tcpipClient);
-    disp("连接成功")
-    disp("数据发送")
+    %disp("连接成功")
+    %disp("数据发送")
 
     % send_order = 1.0;  % 鍙戦?佸懡浠ゆ帶鍒讹紝鐢ㄤ簬鎺у埗鏈嶅姟鍣紝鍛戒护1鏄疄鏃朵氦浜掑懡浠わ紝鍛戒护3鏄笂浼犳暟鎹殑鍛戒护
     send_data = [send_order; config_data(:); data2Server(:)];
@@ -29,7 +29,7 @@ function R = Online_Data2Server_Communicate(send_order, data_x, ip, port, subjec
     fwrite(tcpipClient,[config_send.bytes/2; send_data],'float32');  % 杩欓噷matlab鐨刣ouble8涓瓧鑺傦紝鐒跺悗杩欓噷浣跨敤4瀛楄妭鐨刦loat32浼犺緭锛屾墍浠onfig_send.bytes瑕侀櫎2锛岃〃绀轰娇4瀛楄妭鐨刦loat32褰㈠紡浼犺緭鐢ㄤ簡澶氬皯涓瓧
 
     % 鎺ユ敹鏁版嵁
-    disp("数据接收")
+    %disp("数据接收")
     recv_data = [];
     %閲嶅澶氭鎺ユ敹
     % h=waitbar(0,'姝ｅ湪鎺ユ敹鏁版嵁');
@@ -59,12 +59,12 @@ function R = Online_Data2Server_Communicate(send_order, data_x, ip, port, subjec
     try
         dic = jsondecode(str);%灏唈son褰㈠紡鐨勫瓧鍏告暟鎹噷闈㈢殑鐭╅樀鏁版嵁鎻愬彇
         R = dic.R;
-        disp('接收到数据: ')
-        disp(R)
+        %disp('接收到数据: ')
+        %disp(R)
     catch
         disp('WARNNING:接受不完全')
     end
-    disp('连接断开')
+    %disp('连接断开')
 
     fclose(tcpipClient);
 end

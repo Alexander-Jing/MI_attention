@@ -17,9 +17,9 @@ task_dict = containers.Map(task_keys, task_values);
 % 脑电设备的数据采集
 sample_frequency = 256; 
 WindowLength = 512;  % 每个窗口的长度
-channels = [3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];  % 选择的通道
-mu_channels = struct('C3',1, 'C4',2);  % 用于计算ERD/ERS的几个channels，是C3和C4两个通道,需要设定位置
-EI_channels = struct('Fp1', 1, 'Fp2', 2, 'F7', 3, 'F3', 4, 'Fz', 5, 'F4', 6, 'F8', 7);  % 用于计算EI指标的几个channels，需要确定下位置的
+channels = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];  % 选择的通道,
+mu_channels = struct('C3',24, 'C4',22);  % 用于计算ERD/ERS的几个channels，是C3和C4两个通道,需要设定位置
+EI_channels = struct('Fp1', 32, 'Fp2', 31, 'F7', 30, 'F3', 29, 'Fz', 28, 'F4', 27, 'F8', 26);  % 用于计算EI指标的几个channels，需要确定下位置的
 weight_mu = 0.6;  % 用于计算ERD/ERS指标和EI指标的加权和
 
 % 通信设置
@@ -27,11 +27,11 @@ ip = '172.18.22.21';
 port = 8888;  % 和后端服务器连接的两个参数
 
 % 传输数据的文件夹位置设置
-foldername = 'Jyt_online_test_offline_20231229_143547195_data';
+foldername = 'Jyt_test_1230_offline_20231230_160726526_data';
 windows_per_session = 149;
 classes = MotorClasses;
 %% 读取待传输的数据
-DataX = load([foldername, '\\', 'Offline_EEGMI_Jyt_online_test_offline', '\\', 'Offline_EEG_data_Jyt_online_test_offline20231229_145104540.mat' ],'DataX');
+DataX = load([foldername, '\\', 'Offline_EEGMI_Jyt_test_1230_offline', '\\', 'Offline_EEG_data_Jyt_test_1230_offline20231230_162258275.mat' ],'DataX');
 
 %% 预处理数据传输
 % 设置传输的参数

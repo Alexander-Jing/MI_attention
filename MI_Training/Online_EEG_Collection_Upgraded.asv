@@ -103,8 +103,8 @@ EI_indices = [];  % 用于存储每一个trial里面的每一个window的EI分数值
 EI_index_scores = [];  % 用于存储EI_index_Caculation(EI_index, EI_channels)计算出来的EI_index_score数值
 mu_powers = [];  % 用于存储每一个trial里面的每一个window的mu频带的能量数值
 scores_trial = [];  % 用于存储每一个trial的平均分数值
-mu_suppressions = [];  % 用于存储每一个trial的mu_suppression
-resultsMI = [];  % 用于存储每一个trial的results
+mu_suppressions = [];  % 用于存储mu_suppression
+results = []
 clsFlag = 0; % 用于判断实时分类是否正确的flag
 clsTime = 100;  % 初始化分类正确的时间
 clsControl = 0;  % 用于相对之后判断是否休息的flag
@@ -130,7 +130,7 @@ while(AllTrial <= TrialNum)
     %% 运动想象阶段
     if Timer==2
         if Trials(AllTrial)==0  % 空想任务
-            Trigger = 0;
+            Trigger = 1;
             sendbuf(1,1) = hex2dec('03') ;
             sendbuf(1,2) = hex2dec('00') ;
             sendbuf(1,3) = hex2dec('00') ;
@@ -208,9 +208,7 @@ while(AllTrial <= TrialNum)
         mu_power_MI = [mu_power_MI; Trigger];  % 这里添加上Trigger的相关数值，方便存储
         mu_suppression = [mu_suppression; Trigger]; % 这里添加上Trigger的相关数值，方便存储
         EI_index_score = [EI_index_score; Trigger];
-        resultMI_ = [resultMI; Trigger];
         
-        resultsMI = [resultsMI, resultMI_];
         EI_index_scores = [EI_index_scores, EI_index_score];
         EI_indices = [EI_indices, EI_index];  % 添加相关的EI指标数值  
         mu_powers = [mu_powers, mu_power_MI];  % 添加相关的mu节律能量
@@ -220,8 +218,7 @@ while(AllTrial <= TrialNum)
    %% 运动想象给与反馈阶段（想对/时间范围内没有想对）,同时更新模型
    % 想对了开始播放动作 
    if clsFlag == 1 && clsControl == 0
-       Trigger = 7; 
-       clsTime = Timer;  % 这是分类正确的时间
+        clsTime = Timer;  % 这是分类正确的时间
         if Trials(AllTrial) > 0  % 运动想象任务
             Trigger = Trials(AllTrial);  % 播放动作的AO动画（Idle, MI1, MI2）
             mat2unity = ['0', num2str(Trigger + 3)];
@@ -242,7 +239,6 @@ while(AllTrial <= TrialNum)
     
     % 想错了开始休息和提醒
     if clsFlag == 0 && Timer == (MaxMITime) && clsControl == 0
-        Trigger = 7;
         if Trials(AllTrial) > 0  % 运动想象任务
             Trigger = Trials(AllTrial);  % 播放动作的AO动画（Idle, MI1, MI2）
             mat2unity = ['0', num2str(Trigger + 3)];
@@ -322,7 +318,7 @@ while(AllTrial <= TrialNum)
     % 空想任务想象5s，到第7s之后开始休息，到第10s就结束任务
     if Timer == 10 && Trials(AllTrial)==0 && clsControl == 0 %结束休息，准备下一个
         % 存储相关的EI指标和mu节律能量的数据
-        SaveMIEngageTrials(EI_indices, mu_powers, mu_suppressions, subject_name, foldername, config_data, EI_index_scores, resultsMI);
+        SaveMIEngageTrials(EI_indices, mu_powers, mu_suppressions, subject_name, foldername, config_data, EI_index_scores);
         %计时器清0
         Timer = 0;  % 计时器清0
         % 每一个trial的数值还原
@@ -335,7 +331,7 @@ while(AllTrial <= TrialNum)
     % 想对了之后，AO之后，休息3s之后，结束休息，准备下一个
     if Trials(AllTrial)>0 && Timer == (clsTime + 5 + RestTimeLen) && clsControl == 1  %结束休息
         % 存储相关的EI指标和mu节律能量的数据
-        SaveMIEngageTrials(EI_indices, mu_powers, mu_suppressions, subject_name, foldername, config_data, EI_index_scores, resultsMI);
+        SaveMIEngageTrials(EI_indices, mu_powers, mu_suppressions, subject_name, foldername, config_data, EI_index_scores);
         % 计时器清0
         Timer = 0;  % 计时器清0
         % cls的两个flag清0
@@ -352,7 +348,7 @@ while(AllTrial <= TrialNum)
     % 运动想象没有想对，提醒之后，休息3s之后，结束休息，准备下一个
     if Trials(AllTrial)>0 && clsFlag == 0 && Timer == (MaxMITime + 3 + RestTimeLen) && clsControl == 2
         % 存储相关的EI指标和mu节律能量的数据
-        SaveMIEngageTrials(EI_indices, mu_powers, mu_suppressions, subject_name, foldername, config_data, EI_index_scores, resultsMI);
+        SaveMIEngageTrials(EI_indices, mu_powers, mu_suppressions, subject_name, foldername, config_data, EI_index_scores);
         % 计时器清0
         Timer = 0;  % 计时器清0
         % clsflag清0
@@ -380,7 +376,7 @@ end
 save([foldername_rawdata, '\\', FunctionNowFilename(['Online_EEGMI_RawData_',num2str(session_idx), '_', subject_name], '.mat' )],'TrialData','Trials','ChanLabel');
 
 %% 存储在运动想象过程中的参与度指标
-function SaveMIEngageTrials(EI_indices, mu_powers, mu_suppressions, subject_name, foldername, config_data, EI_index_scores, resultsMI)
+function SaveMIEngageTrials(EI_indices, mu_powers, mu_suppressions, subject_name, foldername, config_data, EI_index_scores)
     
     foldername = [foldername, '\\Offline_Engagements_', subject_name]; % 检验文件夹是否存在
     if ~exist(foldername, 'dir')
@@ -389,7 +385,7 @@ function SaveMIEngageTrials(EI_indices, mu_powers, mu_suppressions, subject_name
 
     save([foldername, '\\', FunctionNowFilename(['Online_EEG_data2Server_', subject_name, '_class_', num2str(config_data(3,1)),  ...
         '_session_', num2str(config_data(4,1)), '_trial_', num2str(config_data(5,1)), ...
-        '_window_', num2str(config_data(6,1)), 'EI_mu' ], '.mat' )],'EI_indices','mu_powers','mu_suppressions', 'EI_index_scores','resultsMI');  % 存储相关的数值
+        '_window_', num2str(config_data(6,1)), 'EI_mu' ], '.mat' )],'EI_indices','mu_powers','mu_suppressions', 'EI_index_scores');  % 存储相关的数值
 end
 %% 计算相关mu频带衰减指标
 function mu_suppresion = MI_MuSuperesion(mu_power_, mu_power, mu_channels)
