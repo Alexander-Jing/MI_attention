@@ -13,7 +13,7 @@ close all;
 %system('F:\CASIA\mwl_data_collection\climbstair\ClimbStair3.exe&');       % Unity动画exe文件地址
 %system('E:\MI_engagement\unity_test\unity_test\build_test\unity_test.exe&');
 %system('E:\UpperLimb_Animation\unity_test.exe&');
-% system('E:\MI_AO_Animation\UpperLimb_Animation\unity_test.exe&');
+%system('E:\MI_AO_Animation\UpperLimb_Animation\unity_test.exe&');
 system('E:\MI_AO_Animation\UpperLimb_Animation_modified\unity_test.exe&');
 %system('F:\MI_UpperLimb_AO\UpperLimb_AO\UpperLimb_Animation\unity_test.exe&');
 pause(3)
@@ -30,13 +30,13 @@ fwrite(UnityControl,sendbuf);
 pause(3)
 
 %% 准备初始的存储数据的文件�?
-subject_name = 'Jyt_test_score_thre';  % 被试的姓�?  
+subject_name = 'Jyt_test_online';  % 被试的姓�?  
 
-% foldername = ['.\\', subject_name]; % 指定文件夹路径和名称
-% 
-% if ~exist(foldername, 'dir')
-%    mkdir(foldername);
-% end
+foldername = ['.\\', subject_name]; % 指定文件夹路径和名称
+
+if ~exist(foldername, 'dir')
+   mkdir(foldername);
+end
 
 %% 生成任务安排调度
 Trigger = 0;                                                               % 初始化Trigger，用于后续的数据存储
@@ -59,16 +59,16 @@ DiffLevels = [1,2];
 % end
 
 %ChoiceTrial = ChoiceTrial.session;
- ChoiceTrial = [1,2,0,1,2,0];  % 临时使用
+ ChoiceTrial = [1,2,0,1,2,0,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2];  % 临时使用
 %% �?始实验，离线采集
 Timer = 0;
 TrialData = [];
 MaxMITime = 30; % 在线运动想象�?大允许时�? 
 sample_frequency = 256; 
 WindowLength = 512;  % 每个窗口的长�?
-channels = [3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];  % 选择的�?�道
-mu_channel = 14;  % 用于计算ERD/ERS的几个channels，需要确定下位置�?
-EI_channel = 10;  % 用于计算EI指标的几个channels，需要确定下位置�?
+channels = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];  % ѡ���ͨ��,
+mu_channels = struct('C3',24, 'C4',22);  % ���ڼ���ERD/ERS�ļ���channels����C3��C4����ͨ��,��Ҫ�趨λ��
+EI_channels = struct('Fp1', 32, 'Fp2', 31, 'F7', 30, 'F3', 29, 'Fz', 28, 'F4', 27, 'F8', 26);  % ���ڼ���EIָ��ļ���channels����Ҫȷ����λ�õ�
 weight_mu = 0.6;  % 用于计算ERD/ERS指标和EI指标的加权和
 scores = [];  % 用于存储每一个trial里面的分数�??
 scores_trial = [];  % 用于存储每一个trial的平均分数�??
@@ -105,10 +105,10 @@ for trial_idx = 1:length(ChoiceTrial)
            
            
            
-           config_data = [WindowLength;size(channels, 2);ChoiceTrial(1,trial_idx);session_idx;trial_idx;timer/5;score;0;0;0;0 ];
+           config_data = [WindowLength;size(channels, 2);ChoiceTrial(1,trial_idx);session_idx;trial_idx;timer;score;0;0;0;0 ];
            order = 1.0;
            
-           %resultMI = Online_Data2Server_Communicate(order, FilteredDataMI, ip, port, subject_name, config_data, foldername);  % 传输数据给线上的模型，看分类情况
+           resultMI = Online_Data2Server_Communicate(order, FilteredDataMI, ip, port, subject_name, config_data, foldername);  % 传输数据给线上的模型，看分类情况
            % score 数据传输设置
            sendbuf(1,5) = uint8(score/100.0);
            fwrite(UnityControl,sendbuf);
@@ -126,7 +126,7 @@ for trial_idx = 1:length(ChoiceTrial)
            % 传输数据和更新模�?
            config_data = [WindowLength;size(channels, 2);ChoiceTrial(1,trial_idx);session_idx;trial_idx;timer/5;score;0;0;0;0 ];
            order = 2.0;  % 传输数据和训练的命令
-           % Online_Data2Server_Send(order, [0,0,0,0], ip, port, subject_name, config_data);  % 发�?�指令，让服务器更新数据，[0,0,0,0]单纯是用于凑下数据，防止应为空集影响传输
+           Online_Data2Server_Send(order, [0,0,0,0], ip, port, subject_name, config_data);  % 发�?�指令，让服务器更新数据，[0,0,0,0]单纯是用于凑下数据，防止应为空集影响传输
            results = [results, resultMI];
            
            sendbuf(1,2) = hex2dec('01');
@@ -137,7 +137,7 @@ for trial_idx = 1:length(ChoiceTrial)
            disp(['trial: ', num2str(trial_idx)]);
            disp('training model');
        end
-       if timer == 15
+       if timer == 13
            sendbuf(1,1) = hex2dec('02') ;
            sendbuf(1,2) = hex2dec('00') ;
            sendbuf(1,3) = hex2dec('00') ;

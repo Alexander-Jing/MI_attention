@@ -1,11 +1,11 @@
 %% 准备初始的存储数据的文件�?
 subject_name = 'FS_test';  % 被试的姓�?  
 
-foldername = ['.\\', subject_name]; % 指定文件夹路径和名称
-
-if ~exist(foldername, 'dir')
-   mkdir(foldername);
-end
+% foldername = ['.\\', subject_name]; % 指定文件夹路径和名称
+% 
+% if ~exist(foldername, 'dir')
+%    mkdir(foldername);
+% end
 
 %% 生成任务安排调度
 Trigger = 0;                                                               % 初始化Trigger，用于后续的数据存储
@@ -18,17 +18,17 @@ MajorPoportion = 0.6;
 TrialNum = 40;
 DiffLevels = [2,1,0];
 
-if session_idx == 1  % 如果是第�?个session，那�?要生成相关的任务集合
-    Level2task(MotorClass, MajorPoportion, TrialNum, DiffLevels, foldername, subject_name);
-    path = [foldername, '\\', 'Level2task', '_', subject_name, '\\', 'Online_EEGMI_session_', subject_name, '_', num2str(session_idx), '_', '.mat'];
-    ChoiceTrial = load(path,'session');
-else
-    path = [foldername, '\\', 'Level2task', '_', subject_name, '\\', 'Online_EEGMI_session_', subject_name, '_', num2str(session_idx), '_', '.mat'];
-    ChoiceTrial = load(path,'session');
-end
-
-ChoiceTrial = ChoiceTrial.session;
-% ChoiceTrial = [0,1,2,3];  % 临时使用
+% if session_idx == 1  % 如果是第�?个session，那�?要生成相关的任务集合
+%     Level2task(MotorClass, MajorPoportion, TrialNum, DiffLevels, foldername, subject_name);
+%     path = [foldername, '\\', 'Level2task', '_', subject_name, '\\', 'Online_EEGMI_session_', subject_name, '_', num2str(session_idx), '_', '.mat'];
+%     ChoiceTrial = load(path,'session');
+% else
+%     path = [foldername, '\\', 'Level2task', '_', subject_name, '\\', 'Online_EEGMI_session_', subject_name, '_', num2str(session_idx), '_', '.mat'];
+%     ChoiceTrial = load(path,'session');
+% end
+% 
+% ChoiceTrial = ChoiceTrial.session;
+ChoiceTrial = [0,1,2,3];  % 临时使用
 %% �?始实验，离线采集
 Timer = 0;
 TrialData = [];
