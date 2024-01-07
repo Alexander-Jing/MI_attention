@@ -20,7 +20,7 @@ function [Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgra
                 % 休息时长调整
                 RestTimeLen = RestTimeLenBaseline + 2;
                 % 加入静息任务，作为休�?
-                Trials = [Trials(1:AllTrial), 0, Trials(AllTrial+1:end)];
+                Trials = [Trials(1:AllTrial); 0; Trials(AllTrial+1:end)];
                 TrialNum = TrialNum + 1;
             case 1
                 % 如果此时是升高多余降低的，那么还是增加任务难�?

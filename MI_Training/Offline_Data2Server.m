@@ -1,7 +1,7 @@
 %% 在线实验参数设置部分，用于设置每一个被试的情况，依据被试情况进行修改
 
 % 运动想象基本参数设置
-subject_name = 'Jyt_online_test_offline';  % 被试姓名
+subject_name = 'Jyt_test_0101_1_offline';  % 被试姓名
 TrialNum = 30*3;  % 设置采集的数量
 %TrialNum = 3*3;
 MotorClasses = 3;  % 运动想象的种类的数量的设置，注意这里是把空想idle状态也要放进去的，注意这里的任务是[0,1,2]，和readme.txt里面的对应
@@ -27,11 +27,11 @@ ip = '172.18.22.21';
 port = 8888;  % 和后端服务器连接的两个参数
 
 % 传输数据的文件夹位置设置
-foldername = 'Jyt_test_1230_offline_20231230_160726526_data';
+foldername = 'Jyt_test_0101_1_offline_20240101_193332077_data';
 windows_per_session = 149;
 classes = MotorClasses;
 %% 读取待传输的数据
-DataX = load([foldername, '\\', 'Offline_EEGMI_Jyt_test_1230_offline', '\\', 'Offline_EEG_data_Jyt_test_1230_offline20231230_162258275.mat' ],'DataX');
+DataX = load([foldername, '\\', 'Offline_EEGMI_Jyt_test_0101_1_offline', '\\', 'Offline_EEG_data_Jyt_test_0101_1_offline20240101_194904463.mat' ],'DataX');
 
 %% 预处理数据传输
 % 设置传输的参数

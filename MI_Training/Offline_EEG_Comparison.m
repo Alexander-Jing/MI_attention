@@ -39,10 +39,10 @@ status = CheckNetStreamingVersion(con);                                    % ÅĞ¶
 %% ÔÚÏßÊµÑé²ÎÊıÉèÖÃ²¿·Ö£¬ÓÃÓÚÉèÖÃÃ¿Ò»¸ö±»ÊÔµÄÇé¿ö£¬ÒÀ¾İ±»ÊÔÇé¿ö½øĞĞĞŞ¸Ä
 
 % ÔË¶¯ÏëÏó»ù±¾²ÎÊıÉèÖÃ
-subject_name = 'Jyt_test_0101_1_offline';  % ±»ÊÔĞÕÃû
-TrialNum = 30*3;  % ÉèÖÃ²É¼¯µÄÊıÁ¿
+subject_name = 'Jyt_test_0101_1_comparison_1';  % ±»ÊÔĞÕÃû
+TrialNum = 30;  % ÉèÖÃ²É¼¯µÄÊıÁ¿
 %TrialNum = 3*3;
-MotorClasses = 3;  % ÔË¶¯ÏëÏóµÄÖÖÀàµÄÊıÁ¿µÄÉèÖÃ£¬×¢ÒâÕâÀïÊÇ°Ñ¿ÕÏëidle×´Ì¬Ò²Òª·Å½øÈ¥µÄ£¬×¢ÒâÕâÀïµÄÈÎÎñÊÇ[0,1,2]£¬ºÍreadme.txtÀïÃæµÄ¶ÔÓ¦
+MotorClasses = 2;  % ÔË¶¯ÏëÏóµÄÖÖÀàµÄÊıÁ¿µÄÉèÖÃ£¬¶Ô±ÈÊµÑéµÄÈÎÎñÊÇ[1,2]£¬ºÍreadme.txtÀïÃæµÄ¶ÔÓ¦
 % µ±Ç°ÉèÖÃµÄÈÎÎñ
 % Idle 0   -> SceneIdle 
 % MI1 1   -> SceneMI_Drinking 
@@ -74,7 +74,7 @@ Trigger = 0;                                                               % ³õÊ
 AllTrial = 0;
 
 randomindex = [];                                                          % ³õÊ¼»¯trialsµÄ¼¯ºÏ
-for i= 0:(MotorClasses-1)
+for i= 1:(MotorClasses)
     index_i = ones(TrialNum/MotorClasses,1)*i;                             % size TrialNum/MotorClasses*1£¬¸÷ÖÖÈÎÎñ
     randomindex = [randomindex; index_i];                                  % ¸÷¸öÈÎÎñÕûºÏ£¬×îÖÕsize TrialNum*1
 end
@@ -97,6 +97,8 @@ mu_powers = [];  % ÓÃÓÚ´æ´¢Ã¿Ò»¸ötrialÀïÃæµÄÃ¿Ò»¸öwindowµÄmuÆµ´øµÄÄÜÁ¿ÊıÖµ
 scores_task = [];  % ÓÃÓÚ´æ´¢scoreºÍtask
 mu_suppressions = [];  % ÓÃÓÚ´æ´¢mu_suppression
 
+EI_index_scores_trialmean = [];  % ÓÃÓÚ´æ´¢Ã¿Ò»¸ötrialÀïÃæµÄEIÖ¸±ê¾ùÖµ
+mu_suppressions_trialmean = [];  % ÓÃÓÚ´æ´¢Ã¿Ò»¸ötrialÀïÃæµÄmu_suppressionsÖ¸±ê¾ùÖµ
 %% ¿ªÊ¼ÊµÑé£¬ÀëÏß²É¼¯
 Timer = 0;
 TrialData = [];
@@ -112,10 +114,10 @@ while(AllTrial < TrialNum)
     end
     
     if Timer==2
-        Trigger = RandomTrial(AllTrial);  % ²¥·Å¶¯×÷µÄAO¶¯»­£¨Idle, MI1, MI2£©
+        Trigger = RandomTrial(AllTrial);  % ÇĞ»»µ½»­Ãæ£¬µ«ÊÇ²»²¥·Å¶¯×÷µÄAO¶¯»­£¨Idle, MI1, MI2£©
         mat2unity = ['0', num2str(Trigger + 3)];
         sendbuf(1,1) = hex2dec(mat2unity) ;
-        sendbuf(1,2) = hex2dec('01') ;
+        sendbuf(1,2) = hex2dec('00') ;
         sendbuf(1,3) = hex2dec('00') ;
         sendbuf(1,4) = hex2dec('00') ;
         fwrite(UnityControl,sendbuf);
@@ -153,15 +155,23 @@ while(AllTrial < TrialNum)
         EI_indices = [EI_indices, EI_index];  % Ìí¼ÓÏà¹ØµÄEIÖ¸±êÊıÖµ£¬ÓÃÓÚºóĞøµÄ·ÖÎö  
         mu_powers = [mu_powers, mu_power_MI];  % Ìí¼ÓÏà¹ØµÄmu½ÚÂÉÄÜÁ¿£¬ÓÃÓÚºóĞøµÄ·ÖÎö
         mu_suppressions = [mu_suppressions, mu_suppression];  % Ìí¼ÓÏà¹ØµÄmuË¥¼õÇé¿ö£¬ÓÃÓÚºóĞøµÄ·ÖÎö
+        
     end
     
-    if Timer==7  %¿ªÊ¼ĞİÏ¢
+    if Timer==7  %²¥·Å¶¯»­
+        sendbuf(1,2) = hex2dec('01') ;
+        fwrite(UnityControl,sendbuf);
+    end
+    
+    if Timer == (7+5)  % ¶¯»­Ê±¼ä5s
         Trigger = 7;
         sendbuf(1,1) = hex2dec('02') ;
         sendbuf(1,2) = hex2dec('00') ;
         sendbuf(1,3) = hex2dec('00') ;
         sendbuf(1,4) = hex2dec('00') ;
         fwrite(UnityControl,sendbuf);  
+        EI_index_scores_trialmean = [EI_index_scores_trialmean,[mean(EI_index_scores(1,end-4+1:end));RandomTrial(AllTrial)]];
+        mu_suppressions_trialmean = [mu_suppressions_trialmean,[mean(mu_suppressions(1,end-4+1:end));RandomTrial(AllTrial)]];
     end
     
     % Éú³É±êÇ©
@@ -175,7 +185,7 @@ while(AllTrial < TrialNum)
     TrialData = [TrialData,data];
     Timer = Timer + 1;
     
-    if Timer == 10
+    if Timer == 15  % ĞİÏ¢3s
         Timer = 0;  % ¼ÆÊ±Æ÷Çå0
         disp(['Trial: ', num2str(AllTrial), ', Task: ', num2str(RandomTrial(AllTrial))]);  % ÏÔÊ¾Ïà¹ØÊı¾İ
         score = weight_mu * mu_suppression + (1 - weight_mu) * EI_index_score;  % ¼ÆËãµÃ·Ö
@@ -213,14 +223,14 @@ mean_std_muSup = compute_mean_std(mu_suppressions, 'mu_suppressions');
 mean_std_EI_score = compute_mean_std(EI_index_scores, 'EI_index_scores');
 % ´æ´¢Ïà¹ØÊı¾İ
 save([foldername_Scores, '\\', ['Offline_EEGMI_Scores_', subject_name], '.mat' ],'scores_task','EI_indices','mu_powers', ...
-    'mu_suppressions','EI_index_scores', 'mean_std_EI_score','mean_std_muSup'); 
+    'mu_suppressions','EI_index_scores', 'mean_std_EI_score','mean_std_muSup','EI_index_scores_trialmean','mu_suppressions_trialmean'); 
 
 %% Ô¤´¦ÀíÊı¾İ´«Êä
 % ÉèÖÃ´«ÊäµÄ²ÎÊı
 send_order = 3.0;
 config_data = [WindowLength, size(channels, 2), windows_per_session, classes];
 %Offline_Data2Server_Send(DataX, ip, port, subject_name, config_data, send_order, foldername);
-class_accuracies = Offline_Data2Server_Communicate(DataX, ip, port, subject_name, config_data, send_order, foldername);
+%class_accuracies = Offline_Data2Server_Communicate(DataX, ip, port, subject_name, config_data, send_order, foldername);
 
 
 
