@@ -148,14 +148,14 @@ for trial_idx = 1:length(ChoiceTrial)
    end
 end
 
-s1 = scatter(1:length(results), results(:));
-s1.MarkerFaceColor = '#ff474c';
-s1.MarkerEdgeColor = '#ff474c';
-hold on
-s2 = scatter(1:length(ChoiceTrial), ChoiceTrial(:));
-s2.MarkerFaceColor = '#0485d1';
-s2.MarkerEdgeColor = '#0485d1';
-legend('results', 'ChoiceTrial');  % 添加图例
+% s1 = scatter(1:length(results), results(:));
+% s1.MarkerFaceColor = '#ff474c';
+% s1.MarkerEdgeColor = '#ff474c';
+% hold on
+% s2 = scatter(1:length(ChoiceTrial), ChoiceTrial(:));
+% s2.MarkerFaceColor = '#0485d1';
+% s2.MarkerEdgeColor = '#0485d1';
+% legend('results', 'ChoiceTrial');  % 添加图例
 
 %% 任务初始生成的函�?
 function Level2task(MotorClasses, MajorPoportion, TrialNum, DiffLevels, foldername, subject_name)  % MajorPoportion 每一个session中的主要动作的比例；TrailNum 每一个session中的trial数量, DiffLevels从低到高生成难度的矩阵，矩阵里的数�?�越高表示难度越�? 

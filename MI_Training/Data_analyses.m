@@ -145,6 +145,18 @@ ylabel('Value');
 title('Line plot of EI');
 grid on;
 
+figure;
+resultsTrigger = resultsMI_trials(2,:);
+plot(resultsMI_trials(1,resultsTrigger==1), 'LineWidth', 2);
+hold on;
+plot(resultsMI_trials(1,resultsTrigger==2), 'LineWidth', 2);
+hold off;
+legend('results MI 1', 'results MI 2');
+xlabel('Index');
+ylabel('Value');
+title('Line plot of results of each MI');
+grid on;
+
 disp('methods on mu_suppresions');
 [p_ttest, p_ranksum] = significance_analysis(mu_suppresions, mu_suppressions_compare.mu_suppressions_trialmean);
 significance_show(p_ttest,p_ranksum);
@@ -161,6 +173,10 @@ significance_show(p_ttest,p_ranksum);
 disp('method 1 on correlations on the mu_suppresions and EI_index_scores');
 display_correlation(mu_suppresions, EI_index_scores);
 display_correlation_trigger(mu_suppresions, EI_index_scores);
+
+disp('method 1 on correlations on the resultsMI_trials and EI_index_scores');
+display_correlation(mu_suppresions(1,:).*resultsMI_trials(1,:), EI_index_scores);
+display_correlation_trigger(resultsMI_trials, EI_index_scores);
 
 %disp('method 2 on correlations on the mu_suppresions and EI_index_scores');
 %display_correlation(mu_suppressions_compare.mu_suppressions_trialmean, EI_index_scores_compare.EI_index_scores_trialmean);

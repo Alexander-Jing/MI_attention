@@ -79,9 +79,13 @@ end
 %% 读取其余在线/离线对比实验中的数据，并且计算出一些相关的指标
 mu_suppressions_offline = load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0101_1_offline_20240101_193332077_data\Offline_EEGMI_Scores_Jyt_test_0101_1_offline\Offline_EEGMI_Scores_Jyt_test_0101_1_offline.mat', 'mu_suppressions');
 
-traj = load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0101_1_online_20240101_200123314_data\Online_EEGMI_trajectory_Jyt_test_0101_1_online\Online_EEGMI_trajectory_1_Jyt_test_0101_1_online20240101_202353792.mat','traj');
-MI_MUSup_thres = load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0101_1_online_20240101_200123314_data\Online_EEGMI_trajectory_Jyt_test_0101_1_online\Online_EEGMI_trajectory_1_Jyt_test_0101_1_online20240101_202353792.mat', 'MI_MUSup_thres');
-MI_MUSup_thre_weights = load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0101_1_online_20240101_200123314_data\Online_EEGMI_trajectory_Jyt_test_0101_1_online\Online_EEGMI_trajectory_1_Jyt_test_0101_1_online20240101_202353792.mat', 'MI_MUSup_thre_weights');
+%traj = load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0101_1_online_20240101_200123314_data\Online_EEGMI_trajectory_Jyt_test_0101_1_online\Online_EEGMI_trajectory_1_Jyt_test_0101_1_online20240101_202353792.mat','traj');
+traj = load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0101_online_20240101_175129548_data\Online_EEGMI_trajectory_Jyt_test_0101_online\Online_EEGMI_trajectory_1_Jyt_test_0101_online20240101_181409342.mat', 'traj');
+%MI_MUSup_thres = load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0101_1_online_20240101_200123314_data\Online_EEGMI_trajectory_Jyt_test_0101_1_online\Online_EEGMI_trajectory_1_Jyt_test_0101_1_online20240101_202353792.mat', 'MI_MUSup_thres');
+MI_MUSup_thres = load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0101_online_20240101_175129548_data\Online_EEGMI_trajectory_Jyt_test_0101_online\Online_EEGMI_trajectory_1_Jyt_test_0101_online20240101_181409342.mat', 'MI_MUSup_thres');
+%MI_MUSup_thre_weights = load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0101_1_online_20240101_200123314_data\Online_EEGMI_trajectory_Jyt_test_0101_1_online\Online_EEGMI_trajectory_1_Jyt_test_0101_1_online20240101_202353792.mat', 'MI_MUSup_thre_weights');
+MI_MUSup_thre_weights = load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0101_online_20240101_175129548_data\Online_EEGMI_trajectory_Jyt_test_0101_online\Online_EEGMI_trajectory_1_Jyt_test_0101_online20240101_181409342.mat', 'MI_MUSup_thre_weights');
+
 % 提取第一行的数据
 MI_MUSup_thres_row1 = MI_MUSup_thres.MI_MUSup_thres(1,:);
 MI_MUSup_thre_weights_row1 = MI_MUSup_thre_weights.MI_MUSup_thre_weights(1,:);
@@ -141,6 +145,17 @@ ylabel('Value');
 title('Line plot of EI');
 grid on;
 
+figure;
+plot(MI_MUSup_thres.MI_MUSup_thres(1,:), 'LineWidth', 2);
+hold on;
+plot(resultsMI_trials(1,:), 'LineWidth', 2);
+hold off;
+legend('mu sup online', 'mu sup thre', 'resultsMI');
+xlabel('Index');
+ylabel('Value');
+title('Line plot of EI');
+grid on;
+
 disp('methods on mu_suppresions');
 [p_ttest, p_ranksum] = significance_analysis(mu_suppresions, mu_suppressions_compare.mu_suppressions_trialmean);
 significance_show(p_ttest,p_ranksum);
@@ -157,6 +172,10 @@ significance_show(p_ttest,p_ranksum);
 disp('method 1 on correlations on the mu_suppresions and EI_index_scores');
 display_correlation(mu_suppresions, EI_index_scores);
 display_correlation_trigger(mu_suppresions, EI_index_scores);
+
+disp('method 1 on correlations on the task_thresholds and EI_index_scores');
+%display_correlation(resultsMI_trials(1,:), EI_index_scores);
+display_correlation_trigger(resultsMI_trials, EI_index_scores);
 
 %disp('method 2 on correlations on the mu_suppresions and EI_index_scores');
 %display_correlation(mu_suppressions_compare.mu_suppressions_trialmean, EI_index_scores_compare.EI_index_scores_trialmean);

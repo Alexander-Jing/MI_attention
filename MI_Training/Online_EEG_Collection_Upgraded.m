@@ -106,6 +106,7 @@ mu_suppressions = [];  % 用于存储每一个trial里面的mu_suppression
 resultsMI = [];  % 用于存储每一个trial里面的results
 
 scores_trial = [];  % 用于存储每一个trial的平均分数值
+muSups_trial = [];  % 用于存储每一个trial的任务完成数值，当前的任务完成指标设置为trial里面的最大的resultMI*MuSup比上MI_MUSup_thre  max(resultMI*MuSup)/MI_MUSup_thre
 MI_MUSup_thre_weights = []; % 用于存储每一个trial的权重
 MI_MUSup_thres = [];  % 用于存储每一个trial的阈值
 RestTimeLens = [];  % 用于存储每一个trial的休息时间
@@ -280,7 +281,12 @@ while(AllTrial < TrialNum)
         % 进入确定下一个任务
         average_score = mean(EI_index_scores(1, :));  % 这里换成EI指标，后续可能还会换
         scores_trial = [scores_trial, average_score];  % 存储好平均的分数
-        [Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgraded(scores_trial, Trials, AllTrial, MI_MUSup_thre_weight_baseline, RestTimeLenBaseline,TrialNum);
+        max_MuSup = max(mu_suppressions(1,:))/MI_MUSup_thre;  % 计算最大的Mu衰减比上阈值，衡量任务完成情况
+        muSups_trial = [muSups_trial, [max_MuSup; Trials(AllTrial)]];  % 存储好完成情况
+        
+        [Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgradedMI(scores_trial, Trials, AllTrial, MI_MUSup_thre_weight_baseline, RestTimeLenBaseline,TrialNum);
+        RestTimeLen_ = [RestTimeLen; Trials(AllTrial)];
+        RestTimeLens = [RestTimeLens, RestTimeLen_];
     end
     
     % 运动想象想对了之后，AO结束了之后让人休息
@@ -294,7 +300,12 @@ while(AllTrial < TrialNum)
         % 进入确定下一个任务
         average_score = mean(EI_index_scores(1, :));  % 这里换成EI指标，后续可能还会换
         scores_trial = [scores_trial, average_score];  % 存储好平均的分数
-        [Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgraded(scores_trial, Trials, AllTrial, MI_MUSup_thre_weight_baseline, RestTimeLenBaseline,TrialNum);
+        max_MuSup = max(mu_suppressions(1,:))/MI_MUSup_thre;  % 计算最大的Mu衰减比上阈值，衡量任务完成情况
+        muSups_trial = [muSups_trial, [max_MuSup; Trials(AllTrial)]];  % 存储好完成情况
+        
+        [Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgradedMI(scores_trial, Trials, AllTrial, MI_MUSup_thre_weight_baseline, RestTimeLenBaseline,TrialNum);
+        RestTimeLen_ = [RestTimeLen; Trials(AllTrial)];
+        RestTimeLens = [RestTimeLens, RestTimeLen_];
     end
     
     % 运动想象没有想对，提醒结束了之后让人休息
@@ -308,7 +319,12 @@ while(AllTrial < TrialNum)
         % 进入确定下一个任务
         average_score = mean(EI_index_scores(1, :));  % 这里换成EI指标，后续可能还会换
         scores_trial = [scores_trial, average_score];  % 存储好平均的分数
-        [Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgraded(scores_trial, Trials, AllTrial, MI_MUSup_thre_weight_baseline, RestTimeLenBaseline, TrialNum);
+        max_MuSup = max(mu_suppressions(1,:))/MI_MUSup_thre;  % 计算最大的Mu衰减比上阈值，衡量任务完成情况
+        muSups_trial = [muSups_trial, [max_MuSup; Trials(AllTrial)]];  % 存储好完成情况
+        
+        [Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgradedMI(scores_trial, Trials, AllTrial, MI_MUSup_thre_weight_baseline, RestTimeLenBaseline, TrialNum);
+        RestTimeLen_ = [RestTimeLen; Trials(AllTrial)];
+        RestTimeLens = [RestTimeLens, RestTimeLen_];
     end
     
     %% 时钟更新
