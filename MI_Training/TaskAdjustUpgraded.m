@@ -53,7 +53,7 @@ function [Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgra
         if size(task_performance, 1) < 3
             performance_eval = task_performance;  % 如果不满3次的话，直接提取所有的
         else
-            performance_eval = task_performance(1,end-3+1:end);  % 提取之前3次实验的表现
+            performance_eval = task_performance(1,end-3+1:end);  % 提取之前3次实验的表现，使用这三次的实验表现来规划接下来的实验难度
         end
     end
 end
