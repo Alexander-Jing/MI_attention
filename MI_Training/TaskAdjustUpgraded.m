@@ -51,7 +51,7 @@ function [Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgra
         task_performance = muSups_trial(1,tasks==Trigger);  % 提取同类别的数据
         
         if size(task_performance, 1) < 3
-            performance_eval = task_performance  % 如果不满3次的话，直接提取所有的
+            performance_eval = task_performance;  % 如果不满3次的话，直接提取所有的
         else
             performance_eval = task_performance(1,end-3+1:end);  % 提取之前3次实验的表现
         end
