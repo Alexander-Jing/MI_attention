@@ -284,7 +284,8 @@ while(AllTrial < TrialNum)
         max_MuSup = max(mu_suppressions(1,:))/MI_MUSup_thre;  % 计算最大的Mu衰减比上阈值，衡量任务完成情况
         muSups_trial = [muSups_trial, [max_MuSup; Trials(AllTrial)]];  % 存储好完成情况
         
-        [Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgradedMI(scores_trial, Trials, AllTrial, MI_MUSup_thre_weight_baseline, RestTimeLenBaseline,TrialNum);
+        %[Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgradedMI(scores_trial, Trials, AllTrial, MI_MUSup_thre_weight_baseline, RestTimeLenBaseline,TrialNum);
+        [Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgraded(scores_trial, muSups_trial, Trials, AllTrial, MI_MUSup_thre_weight_baseline, RestTimeLenBaseline, TrialNum);
         RestTimeLen_ = [RestTimeLen; Trials(AllTrial)];
         RestTimeLens = [RestTimeLens, RestTimeLen_];
     end
@@ -303,7 +304,8 @@ while(AllTrial < TrialNum)
         max_MuSup = max(mu_suppressions(1,:))/MI_MUSup_thre;  % 计算最大的Mu衰减比上阈值，衡量任务完成情况
         muSups_trial = [muSups_trial, [max_MuSup; Trials(AllTrial)]];  % 存储好完成情况
         
-        [Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgradedMI(scores_trial, Trials, AllTrial, MI_MUSup_thre_weight_baseline, RestTimeLenBaseline,TrialNum);
+        %[Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgradedMI(scores_trial, Trials, AllTrial, MI_MUSup_thre_weight_baseline, RestTimeLenBaseline,TrialNum);
+        [Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgraded(scores_trial, muSups_trial, Trials, AllTrial, MI_MUSup_thre_weight_baseline, RestTimeLenBaseline, TrialNum);
         RestTimeLen_ = [RestTimeLen; Trials(AllTrial)];
         RestTimeLens = [RestTimeLens, RestTimeLen_];
     end
@@ -322,7 +324,8 @@ while(AllTrial < TrialNum)
         max_MuSup = max(mu_suppressions(1,:))/MI_MUSup_thre;  % 计算最大的Mu衰减比上阈值，衡量任务完成情况
         muSups_trial = [muSups_trial, [max_MuSup; Trials(AllTrial)]];  % 存储好完成情况
         
-        [Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgradedMI(scores_trial, Trials, AllTrial, MI_MUSup_thre_weight_baseline, RestTimeLenBaseline, TrialNum);
+        %[Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgradedMI(scores_trial, Trials, AllTrial, MI_MUSup_thre_weight_baseline, RestTimeLenBaseline, TrialNum);
+        [Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgraded(scores_trial, muSups_trial, Trials, AllTrial, MI_MUSup_thre_weight_baseline, RestTimeLenBaseline, TrialNum);
         RestTimeLen_ = [RestTimeLen; Trials(AllTrial)];
         RestTimeLens = [RestTimeLens, RestTimeLen_];
     end
@@ -416,7 +419,7 @@ foldername_rawdata = [foldername, '\\Online_EEGMI_trajectory_', subject_name]; %
 if ~exist(foldername_rawdata, 'dir')
    mkdir(foldername_rawdata);
 end
-save([foldername_rawdata, '\\', FunctionNowFilename(['Online_EEGMI_trajectory_',num2str(session_idx), '_', subject_name], '.mat' )],'scores_trial','traj','MI_MUSup_thre_weights','MI_MUSup_thres','RestTimeLens');
+save([foldername_rawdata, '\\', FunctionNowFilename(['Online_EEGMI_trajectory_',num2str(session_idx), '_', subject_name], '.mat' )],'scores_trial','traj','MI_MUSup_thre_weights','MI_MUSup_thres','RestTimeLens','muSups_trial','scores_trial');
 
 
 %% 存储在运动想象过程中的参与度指标

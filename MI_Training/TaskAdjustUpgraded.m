@@ -15,32 +15,26 @@ function [Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgra
         deltaSum_ = sum(delta_score);
         switch deltaSum_
             case 3
-                % 降低权重
-                %MI_MUSup_thre_weight = MI_MUSup_thre_weight_baseline * 0.707;
+                
                 % 延长休息时间
                 RestTimeLen = RestTimeLenBaseline + 2;
                 % 调整trials，加入静息态
                 Trials = [Trials(1:AllTrial); 0; Trials(AllTrial+1:end)];
                 TrialNum = TrialNum + 1;
             case 1
-                % 增加权重
-                %MI_MUSup_thre_weight = MI_MUSup_thre_weight_baseline * 1.414;
                 % 减少休息时间
                 Trials = Trials;
                 RestTimeLen = RestTimeLenBaseline - 1;
                 TrialNum = TrialNum;
 
             case -1
-                % 增加权重
-                %MI_MUSup_thre_weight = MI_MUSup_thre_weight_baseline * 1.414;
                 % 减少休息时间
                 Trials = Trials;
                 RestTimeLen = RestTimeLenBaseline - 1;
                 TrialNum = TrialNum;
 
             case -3
-                % 降低权重
-                %MI_MUSup_thre_weight = MI_MUSup_thre_weight_baseline * 0.707;
+                
                 % 减少休息时间
                 Trials = Trials;
                 RestTimeLen = RestTimeLenBaseline + 2;
@@ -54,6 +48,18 @@ function [Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgra
             performance_eval = task_performance;  % 如果不满3次的话，直接提取所有的
         else
             performance_eval = task_performance(1,end-3+1:end);  % 提取之前3次实验的表现，使用这三次的实验表现来规划接下来的实验难度
+        end
+        % 使用基于ξ-greedy的方法来进行任务权重的调整
+        performance_pro = mean(performance_eval(1,:));  % 计算前3个的平均概率作为这个ξ的数值
+        task_weights = [0.707,1.0,1.414];
+        % 基于概率进行选择接下来的MI_MUSup_thre_weight
+        if rand() < performance_pro
+            % 随机选择是否增加权重
+            index = randi(length(task_weights(1,2:end)));
+            MI_MUSup_thre_weight = MI_MUSup_thre_weight_baseline * task_weights(index+1);
+        else
+            % 降低权重
+            MI_MUSup_thre_weight = MI_MUSup_thre_weight_baseline * task_weights(1);
         end
     end
 end
