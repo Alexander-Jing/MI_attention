@@ -18,9 +18,11 @@ function [Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgra
                 
                 % 延长休息时间
                 RestTimeLen = RestTimeLenBaseline + 2;
+                Trials = Trials;
+                TrialNum = TrialNum;
                 % 调整trials，加入静息态
-                Trials = [Trials(1:AllTrial); 0; Trials(AllTrial+1:end)];
-                TrialNum = TrialNum + 1;
+                %Trials = [Trials(1:AllTrial); 0; Trials(AllTrial+1:end)];
+                %TrialNum = TrialNum + 1;
             case 1
                 % 减少休息时间
                 Trials = Trials;

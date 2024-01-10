@@ -13,7 +13,10 @@ close all;
 %system('F:\CASIA\mwl_data_collection\climbstair\ClimbStair3.exe&');      % Unity¶¯»­exeÎÄ¼şµØÖ·
 %system('E:\MI_engagement\unity_test\unity_test\build_test\unity_test.exe&');
 %system('E:\UpperLimb_Animation\unity_test.exe&');
-system('E:\UpperLimb_Animation\unity_test.exe&');
+%system('E:\UpperLimb_Animation\unity_test.exe&');
+%system('E:\MI_AO_Animation\UpperLimb_Animation\unity_test.exe&');
+system('E:\MI_AO_Animation\UpperLimb_Animation_modified\unity_test.exe&');
+%system('F:\MI_UpperLimb_AO\UpperLimb_AO\UpperLimb_Animation\unity_test.exe&');
 pause(3)
 UnityControl = tcpip('localhost', 8881, 'NetworkRole', 'client');          % ĞÂµÄ¶Ë¿Ú¸ÄÎª8881
 fopen(UnityControl);
@@ -39,8 +42,8 @@ status = CheckNetStreamingVersion(con);                                    % ÅĞ¶
 %% ÔÚÏßÊµÑé²ÎÊıÉèÖÃ²¿·Ö£¬ÓÃÓÚÉèÖÃÃ¿Ò»¸ö±»ÊÔµÄÇé¿ö£¬ÒÀ¾İ±»ÊÔÇé¿ö½øĞĞĞŞ¸Ä
 
 % ÔË¶¯ÏëÏó»ù±¾²ÎÊıÉèÖÃ
-subject_name = 'Jyt_test_0101_1_offline';  % ±»ÊÔĞÕÃû
-TrialNum = 30*3;  % ÉèÖÃ²É¼¯µÄÊıÁ¿
+subject_name = 'Jyt_test_0108_offline';  % ±»ÊÔĞÕÃû
+TrialNum = 3*30;  % ÉèÖÃ²É¼¯µÄÊıÁ¿
 %TrialNum = 3*3;
 MotorClasses = 3;  % ÔË¶¯ÏëÏóµÄÖÖÀàµÄÊıÁ¿µÄÉèÖÃ£¬×¢ÒâÕâÀïÊÇ°Ñ¿ÕÏëidle×´Ì¬Ò²Òª·Å½øÈ¥µÄ£¬×¢ÒâÕâÀïµÄÈÎÎñÊÇ[0,1,2]£¬ºÍreadme.txtÀïÃæµÄ¶ÔÓ¦
 % µ±Ç°ÉèÖÃµÄÈÎÎñ
@@ -100,7 +103,7 @@ mu_suppressions = [];  % ÓÃÓÚ´æ´¢mu_suppression
 %% ¿ªÊ¼ÊµÑé£¬ÀëÏß²É¼¯
 Timer = 0;
 TrialData = [];
-while(AllTrial < TrialNum)
+while(AllTrial <= TrialNum)
     if Timer==0  %ÌáÊ¾×¨×¢ cross
         Trigger = 6;
         sendbuf(1,1) = hex2dec('01') ;

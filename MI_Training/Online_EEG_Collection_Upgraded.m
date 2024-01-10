@@ -13,7 +13,10 @@ close all;
 %system('F:\CASIA\mwl_data_collection\climbstair\ClimbStair3.exe&');       % Unity¶¯»­exeÎÄ¼şµØÖ·
 %system('E:\MI_engagement\unity_test\unity_test\build_test\unity_test.exe&');
 %system('E:\MI_UpperLimb_AO\UpperLimb_AO\UpperLimb_AO\build_test\unity_test.exe&');
-system('E:\UpperLimb_Animation\unity_test.exe&');
+%system('E:\UpperLimb_Animation\unity_test.exe&');
+%system('E:\MI_AO_Animation\UpperLimb_Animation\unity_test.exe&');
+system('E:\MI_AO_Animation\UpperLimb_Animation_modified\unity_test.exe&');
+%system('F:\MI_UpperLimb_AO\UpperLimb_AO\UpperLimb_Animation\unity_test.exe&');
 pause(3)
 UnityControl = tcpip('localhost', 8881, 'NetworkRole', 'client');          % ĞÂµÄ¶Ë¿Ú¸ÄÎª8881
 fopen(UnityControl);
@@ -38,9 +41,9 @@ status = CheckNetStreamingVersion(con);                                    % ÅĞ¶
 %% ÔÚÏßÊµÑé²ÎÊıÉèÖÃ²¿·Ö£¬ÓÃÓÚÉèÖÃÃ¿Ò»¸ö±»ÊÔµÄÇé¿ö£¬ÒÀ¾İ±»ÊÔÇé¿ö½øĞĞĞŞ¸Ä
 
 % ÔË¶¯ÏëÏó»ù±¾²ÎÊıÉèÖÃ
-subject_name = 'Jyt_test_0101_1_online';  % ±»ÊÔĞÕÃû
-sub_offline_collection_folder = 'Jyt_test_0101_1_offline_20240101_193332077_data';  % ±»ÊÔµÄÀëÏß²É¼¯Êı¾İ
-subject_name_offline =  'Jyt_test_0101_1_offline';  % ÀëÏßÊÕ¼¯Êı¾İÊ±ºòµÄ±»ÊÔÃû³Æ
+subject_name = 'Jyt_test_0110_online_test';  % ±»ÊÔĞÕÃû
+sub_offline_collection_folder = 'Jyt_test_0108_offline_20240109_222305628_data';  % ±»ÊÔµÄÀëÏß²É¼¯Êı¾İ
+subject_name_offline =  'Jyt_test_0108_offline';  % ÀëÏßÊÕ¼¯Êı¾İÊ±ºòµÄ±»ÊÔÃû³Æ
 session_idx = 1;  % session indexÊıÁ¿£¬Èç¹ûÊÇ1µÄ»°£¬»á×Ô¶¯Éú³ÉÏà¹ØÅÅ²¼
 MotorClass = 2; % ÔË¶¯ÏëÏó¶¯×÷ÊıÁ¿£¬×¢ÒâÕâÀïÊÇ´¿Éè¼ÆµÄÔË¶¯ÏëÏó¶¯×÷µÄÊıÁ¿£¬²»°üÀ¨¿ÕÏëidle×´Ì¬
 DiffLevels = [1,2];  % ¶ÔÓÚÉÏÃæµÄÔË¶¯ÏëÏóµÄÄÑ¶ÈÅÅ²¼£¬Ô½¿¿ºóÔ½ÄÑ£¬ÆäÖĞµÄ1,2¶ÔÓ¦µÄÊÇÔË¶¯ÏëÏóµÄÀàĞÍ£¬ºÍunity¶ÔÓ¦
@@ -114,11 +117,11 @@ RestTimeLens = [];  % ÓÃÓÚ´æ´¢Ã¿Ò»¸ötrialµÄĞİÏ¢Ê±¼ä
 clsFlag = 0; % ÓÃÓÚÅĞ¶ÏÊµÊ±·ÖÀàÊÇ·ñÕıÈ·µÄflag
 clsTime = 100;  % ³õÊ¼»¯·ÖÀàÕıÈ·µÄÊ±¼ä
 clsControl = 0;  % ÓÃÓÚÏà¶ÔÖ®ºóÅĞ¶ÏÊÇ·ñĞİÏ¢µÄflag
-RestTimeLenBaseline = 7 + session_idx;  % ĞİÏ¢Ê±¼äËæ×ÅsessionµÄÊıÁ¿Ôö¼Ó
+RestTimeLenBaseline = 5 + session_idx;  % ĞİÏ¢Ê±¼äËæ×ÅsessionµÄÊıÁ¿Ôö¼Ó
 RestTimeLen = RestTimeLenBaseline;  % ³õÊ¼»¯ĞİÏ¢Ê±¼ä
 Trials = RandomTrial;
 
-while(AllTrial < TrialNum)
+while(AllTrial <= TrialNum)
     %% ÌáÊ¾×¨×¢½×¶Î
     if Timer==0  %ÌáÊ¾×¨×¢ cross
         Trigger = 6;
@@ -128,6 +131,9 @@ while(AllTrial < TrialNum)
         sendbuf(1,4) = hex2dec('00') ;
         fwrite(UnityControl,sendbuf);       
         AllTrial = AllTrial + 1;
+        if AllTrial > TrialNum
+            break;
+        end
     end
     
     %% ÔË¶¯ÏëÏó½×¶Î
