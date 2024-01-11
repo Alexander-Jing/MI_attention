@@ -1,6 +1,6 @@
 %% 被试名称和实验的文件夹
-subject_name_online =  'Jyt_test_0101_online'; %  %'Jyt_test_0101_1_online'; 被试姓名
-sub_online_collection_folder = 'Jyt_test_0101_online_20240101_175129548_data';  % 'Jyt_test_0101_1_online_20240101_200123314_data'; 
+subject_name_online = 'Jyt_test_0108_online'; %'Jyt_test_0101_1_online';% 'Jyt_test_0101_online'; %  % 被试姓名
+sub_online_collection_folder = 'Jyt_test_0108_online_20240110_000906267_data'; % 'Jyt_test_0101_1_online_20240101_200123314_data';  %'Jyt_test_0101_online_20240101_175129548_data'; %  % 
 
 subject_name_offline =  'Jyt_test_0101_1_offline';  % 离线收集数据时候的被试名称
 sub_offline_collection_folder = 'Jyt_test_0101_1_offline_20240101_193332077_data';  % 被试的离线采集数据
@@ -11,7 +11,7 @@ EI_channels = struct('Fp1', 32, 'Fp2', 31, 'F7', 30, 'F3', 29, 'Fz', 28, 'F4', 2
 
 
 % 指定文件夹路径
-folder_path = [sub_online_collection_folder, '/', 'Offline_Engagements_', subject_name_online]; % 请将'./your_folder'替换为您的文件夹的相对路径
+folder_path = [sub_online_collection_folder, '/', 'Online_Engagements_', subject_name_online]; % 请将'./your_folder'替换为您的文件夹的相对路径
 
 %% 读取在线的文件中的每一个数据
 % 切换到指定的文件夹
@@ -77,14 +77,14 @@ for i = 1:length(files)
 end
 
 %% 读取其余在线/离线对比实验中的数据，并且计算出一些相关的指标
-mu_suppressions_offline = load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0101_1_offline_20240101_193332077_data\Offline_EEGMI_Scores_Jyt_test_0101_1_offline\Offline_EEGMI_Scores_Jyt_test_0101_1_offline.mat', 'mu_suppressions');
+mu_suppressions_offline = load('F:\MI_engagement\MI_attention\MI_Training\Jyt_test_0101_1_offline_20240101_193332077_data\Offline_EEGMI_Scores_Jyt_test_0101_1_offline\Offline_EEGMI_Scores_Jyt_test_0101_1_offline.mat', 'mu_suppressions');
 
 %traj = load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0101_1_online_20240101_200123314_data\Online_EEGMI_trajectory_Jyt_test_0101_1_online\Online_EEGMI_trajectory_1_Jyt_test_0101_1_online20240101_202353792.mat','traj');
-traj = load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0101_online_20240101_175129548_data\Online_EEGMI_trajectory_Jyt_test_0101_online\Online_EEGMI_trajectory_1_Jyt_test_0101_online20240101_181409342.mat', 'traj');
+traj = load('F:\MI_engagement\MI_attention\MI_Training\Jyt_test_0101_online_20240101_175129548_data\Online_EEGMI_trajectory_Jyt_test_0101_online\Online_EEGMI_trajectory_1_Jyt_test_0101_online20240101_181409342.mat', 'traj');
 %MI_MUSup_thres = load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0101_1_online_20240101_200123314_data\Online_EEGMI_trajectory_Jyt_test_0101_1_online\Online_EEGMI_trajectory_1_Jyt_test_0101_1_online20240101_202353792.mat', 'MI_MUSup_thres');
-MI_MUSup_thres = load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0101_online_20240101_175129548_data\Online_EEGMI_trajectory_Jyt_test_0101_online\Online_EEGMI_trajectory_1_Jyt_test_0101_online20240101_181409342.mat', 'MI_MUSup_thres');
+MI_MUSup_thres = load('F:\MI_engagement\MI_attention\MI_Training\Jyt_test_0101_online_20240101_175129548_data\Online_EEGMI_trajectory_Jyt_test_0101_online\Online_EEGMI_trajectory_1_Jyt_test_0101_online20240101_181409342.mat', 'MI_MUSup_thres');
 %MI_MUSup_thre_weights = load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0101_1_online_20240101_200123314_data\Online_EEGMI_trajectory_Jyt_test_0101_1_online\Online_EEGMI_trajectory_1_Jyt_test_0101_1_online20240101_202353792.mat', 'MI_MUSup_thre_weights');
-MI_MUSup_thre_weights = load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0101_online_20240101_175129548_data\Online_EEGMI_trajectory_Jyt_test_0101_online\Online_EEGMI_trajectory_1_Jyt_test_0101_online20240101_181409342.mat', 'MI_MUSup_thre_weights');
+MI_MUSup_thre_weights = load('F:\MI_engagement\MI_attention\MI_Training\Jyt_test_0101_online_20240101_175129548_data\Online_EEGMI_trajectory_Jyt_test_0101_online\Online_EEGMI_trajectory_1_Jyt_test_0101_online20240101_181409342.mat', 'MI_MUSup_thre_weights');
 
 % 提取第一行的数据
 MI_MUSup_thres_row1 = MI_MUSup_thres.MI_MUSup_thres(1,:);
@@ -94,8 +94,8 @@ MI_MUSup_thre_weights_row1 = MI_MUSup_thre_weights.MI_MUSup_thre_weights(1,:);
 MI_MUSUP_trajs = MI_MUSup_thre_weights_row1 ./ MI_MUSup_thres_row1;
 
 
-mu_suppressions_compare = load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0101_1_comparison_1_20240101_221830944_data\Offline_EEGMI_Scores_Jyt_test_0101_1_comparison_1\Offline_EEGMI_Scores_Jyt_test_0101_1_comparison_1.mat', 'mu_suppressions_trialmean');
-EI_index_scores_compare = load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0101_1_comparison_1_20240101_221830944_data\Offline_EEGMI_Scores_Jyt_test_0101_1_comparison_1\Offline_EEGMI_Scores_Jyt_test_0101_1_comparison_1.mat', 'EI_index_scores_trialmean');
+mu_suppressions_compare = load('F:\MI_engagement\MI_attention\MI_Training\Jyt_test_0101_1_comparison_1_20240101_221830944_data\Offline_EEGMI_Scores_Jyt_test_0101_1_comparison_1\Offline_EEGMI_Scores_Jyt_test_0101_1_comparison_1.mat', 'mu_suppressions_trialmean');
+EI_index_scores_compare = load('F:\MI_engagement\MI_attention\MI_Training\Jyt_test_0101_1_comparison_1_20240101_221830944_data\Offline_EEGMI_Scores_Jyt_test_0101_1_comparison_1\Offline_EEGMI_Scores_Jyt_test_0101_1_comparison_1.mat', 'EI_index_scores_trialmean');
 
 % 计算mu_suppresions和EI_index_scores的均值和标准差
 mu_suppresions_mean = mean(mu_suppresions(1,:));
@@ -226,6 +226,7 @@ end
 %% 计算相关的EI指标的函数
 function EI_index_score = EI_index_Caculation(EI_index, EI_channels)
     channels_ = [EI_channels.Fp1,EI_channels.Fp2, EI_channels.F7, EI_channels.F3, EI_channels.Fz, EI_channels.F4, EI_channels.F8'];
+    %channels_ = [EI_channels.Fp1];
     EI_index_score = mean(EI_index(channels_, 1));
 end
 
