@@ -1,6 +1,7 @@
 %% 被试名称和实验的文件夹
 subject_name_online = 'Jyt_test_0101_1_online';%'Jyt_test_0108_online'; %% 'Jyt_test_0101_online'; %  % 被试姓名
 sub_online_collection_folder = 'Jyt_test_0101_1_online_20240101_200123314_data';  %'Jyt_test_0108_online_20240110_000906267_data'; %   %'Jyt_test_0101_online_20240101_175129548_data'; %  % 
+sub_online_rawdata_file = 'Online_EEGMI_RawData_1_Jyt_test_0101_1_online20240101_202349586.mat';
 
 subject_name_offline =  'Jyt_test_0101_1_offline';  % 离线收集数据时候的被试名称
 sub_offline_collection_folder = 'Jyt_test_0101_1_offline_20240101_193332077_data';  % 被试的离线采集数据
@@ -9,10 +10,12 @@ channels = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, 16,17,18,19,20,21,22,23,24,25,2
 mu_channels = struct('C3',24, 'C4',22);  % 用于计算ERD/ERS的几个channels，是C3和C4两个通道,需要设定位置
 EI_channels = struct('Fp1', 32, 'Fp2', 31, 'F7', 30, 'F3', 29, 'Fz', 28, 'F4', 27, 'F8', 26);  % 用于计算EI指标的几个channels，需要确定下位置的
 motorclasses = 3;
+channels_num = length(channels);
 
 %% 读取数据
-subject_rawdata_folder = [sub_online_collection_folder, '\' 'Online_EEGMI_RawData_', subject_name_online]
-
+subject_rawdata_folder = ['.\', sub_online_collection_folder, '\' 'Online_EEGMI_RawData_', subject_name_online];
+rawdata = load([subject_rawdata_folder, '\', sub_online_rawdata_file]);
+rawdata = rawdata.TrialData;
 %% 采集参数，构建窗口
 sample_frequency = 256; 
 
@@ -41,7 +44,18 @@ FilteredDataMI_Pouring = DataFilter(RawDataMI_Pouring, sample_frequency);  % 滤
 [windows_per_session, SampleDataPre] = WindowsDataPre(FilteredDataMI_Pouring, WindowLength, SlideWindowLength);
 [DataSampleMI_Pouring, ] = DataWindows(SampleDataPre, FilteredDataMI_Pouring, channels, class_index, windows_per_session, SlideWindowLength, WindowLength);
 
-%% 
+%% 计算PSD图，并且绘制头部脑电地形图
+% 个人的PSD均值存储
+Idle_all = zeros(channels_num, 1);
+MIDrinking_all = zeros(channels_num, 1);
+MIPouring_all = zeros(channels_num, 1);
+
+% 计算Idle的离线基线
+all_eegdata_idle = zeros(channels_num, size(DataSampleIdle));
+for cell_idx = 1 : size(DataSampleIdle, 2)
+    eegdata_idle = zeros(channels_num, 1);
+    data_filtered = DataSampleIdle{cell_idx}(channels, :);
+    for channel_idx 
 
 
 
