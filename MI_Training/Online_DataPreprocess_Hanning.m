@@ -108,6 +108,7 @@ function [FilteredDataMI, EI_index, mu_power] = Online_DataPreprocess_Hanning(ra
         E_alpha = ones([1, number_of_channels]);
         E_theta = ones([1, number_of_channels]);
         E_mu = ones([1, number_of_channels]);
+        E_alpha_theta = ones([1, number_of_channels]);
         EI_ = ones([1, number_of_channels]); 
         
         % 提取每一个频带的信号
@@ -118,19 +119,22 @@ function [FilteredDataMI, EI_index, mu_power] = Online_DataPreprocess_Hanning(ra
 
         % 使用pwelch和hanning窗来计算频带的相关指标
         for j = 1:number_of_channels
-            [pxx, ] = pwelch(FilteredData_beta(j, :), hanning(128), 64, 128, sample_frequency);
-            E_beta(1,j) = 10 * log10(sum(pxx));
-            [pxx, ] = pwelch(FilteredData_alpha(j, :), hanning(128), 64, 128, sample_frequency);
-            E_alpha(1,j) = 10 * log10(sum(pxx));
-            [pxx, ] = pwelch(FilteredData_theta(j, :), hanning(128), 64, 128, sample_frequency);
-            E_theta(1,j) = 10 * log10(sum(pxx));
-            [pxx, ] = pwelch(FilteredData_mu(j, :), hanning(128), 64, 128, sample_frequency);
-            E_mu(1,j) = 10 * log10(sum(pxx));
+            [pxx_beta, ] = pwelch(FilteredData_beta(j, :), hanning(128), 64, 128, sample_frequency);
+            E_beta(1,j) = 10 * log10(sum(pxx_beta));
+            [pxx_alpha, ] = pwelch(FilteredData_alpha(j, :), hanning(128), 64, 128, sample_frequency);
+            E_alpha(1,j) = 10 * log10(sum(pxx_alpha));
+            [pxx_theta, ] = pwelch(FilteredData_theta(j, :), hanning(128), 64, 128, sample_frequency);
+            E_theta(1,j) = 10 * log10(sum(pxx_theta));
+            [pxx_mu, ] = pwelch(FilteredData_mu(j, :), hanning(128), 64, 128, sample_frequency);
+            E_mu(1,j) = 10 * log10(sum(pxx_mu));
+
+            % 专门准备一个用于计算EI指标分母上alpha theta频带能量的数值
+            E_alpha_theta(1,j) = 10 * log10(sum(pxx_alpha + pxx_theta));
         end
         
         % 计算相关的指标数值
         for j = 1:number_of_channels
-           EI_(1,j) = E_beta(1,j)/(E_alpha(1,j) + E_theta(1,j));  % EI指标的计算 
+           EI_(1,j) = E_beta(1,j) - E_alpha_theta(1,j);  % EI指标的计算，这里需要修改下 
         end
         % 返回每一个channel对应的EI指标和mu频带的能量
         EI_index = EI_';

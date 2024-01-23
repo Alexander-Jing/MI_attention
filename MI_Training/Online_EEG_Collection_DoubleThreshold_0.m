@@ -291,7 +291,8 @@ while(AllTrial <= TrialNum)
         muSups_trial = [muSups_trial, [max_MuSup; Trials(AllTrial)]];  % 存储好完成情况
         
         %[Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgradedMI(scores_trial, Trials, AllTrial, MI_MUSup_thre_weight_baseline, RestTimeLenBaseline,TrialNum);
-        [Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgraded(scores_trial, muSups_trial, Trials, AllTrial, MI_MUSup_thre_weight_baseline, RestTimeLenBaseline, TrialNum);
+        %[Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgraded(scores_trial, muSups_trial, Trials, AllTrial, MI_MUSup_thre_weight_baseline, RestTimeLenBaseline, TrialNum);
+        [Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgraded_DoubleThreshold_0(scores_trial, muSups_trial, Trials, AllTrial, MI_MUSup_thre_weight_baseline, RestTimeLenBaseline, TrialNum);
         RestTimeLen_ = [RestTimeLen; Trials(AllTrial)];
         RestTimeLens = [RestTimeLens, RestTimeLen_];
     end
@@ -311,7 +312,8 @@ while(AllTrial <= TrialNum)
         muSups_trial = [muSups_trial, [max_MuSup; Trials(AllTrial)]];  % 存储好完成情况
         
         %[Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgradedMI(scores_trial, Trials, AllTrial, MI_MUSup_thre_weight_baseline, RestTimeLenBaseline,TrialNum);
-        [Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgraded(scores_trial, muSups_trial, Trials, AllTrial, MI_MUSup_thre_weight_baseline, RestTimeLenBaseline, TrialNum);
+        %[Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgraded(scores_trial, muSups_trial, Trials, AllTrial, MI_MUSup_thre_weight_baseline, RestTimeLenBaseline, TrialNum);
+        [Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgraded_DoubleThreshold_0(scores_trial, muSups_trial, Trials, AllTrial, MI_MUSup_thre_weight_baseline, RestTimeLenBaseline, TrialNum);
         RestTimeLen_ = [RestTimeLen; Trials(AllTrial)];
         RestTimeLens = [RestTimeLens, RestTimeLen_];
     end
@@ -331,7 +333,8 @@ while(AllTrial <= TrialNum)
         muSups_trial = [muSups_trial, [max_MuSup; Trials(AllTrial)]];  % 存储好完成情况
         
         %[Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgradedMI(scores_trial, Trials, AllTrial, MI_MUSup_thre_weight_baseline, RestTimeLenBaseline, TrialNum);
-        [Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgraded(scores_trial, muSups_trial, Trials, AllTrial, MI_MUSup_thre_weight_baseline, RestTimeLenBaseline, TrialNum);
+        %[Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgraded(scores_trial, muSups_trial, Trials, AllTrial, MI_MUSup_thre_weight_baseline, RestTimeLenBaseline, TrialNum);
+        [Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgraded_DoubleThreshold_0(scores_trial, muSups_trial, Trials, AllTrial, MI_MUSup_thre_weight_baseline, RestTimeLenBaseline, TrialNum);
         RestTimeLen_ = [RestTimeLen; Trials(AllTrial)];
         RestTimeLens = [RestTimeLens, RestTimeLen_];
     end
@@ -440,11 +443,11 @@ function SaveMIEngageTrials(EI_indices, mu_powers, mu_suppressions, subject_name
         '_session_', num2str(config_data(4,1)), '_trial_', num2str(config_data(5,1)), ...
         '_window_', num2str(config_data(6,1)), 'EI_mu' ], '.mat' )],'EI_indices','mu_powers','mu_suppressions', 'EI_index_scores','resultsMI');  % 存储相关的数值
 end
-%% 计算相关mu频带衰减指标
+%% 计算相关mu频带衰减指标，这里需要修改
 function mu_suppresion = MI_MuSuperesion(mu_power_, mu_power, mu_channels)
-    ERD_C3 = (mu_power(mu_channels.C3, 1) - mu_power_(mu_channels.C3, 1))/mu_power_(mu_channels.C3, 1); 
-    ERD_C4 = (mu_power(mu_channels.C4, 1) - mu_power_(mu_channels.C4, 1))/mu_power_(mu_channels.C4, 1);  % 计算两个脑电位置的相关的指标 
-    mu_suppresion = abs(ERD_C4 - ERD_C3);
+    ERD_C3 = (mu_power(mu_channels.C3, 1) - mu_power_(mu_channels.C3, 1)); 
+    %ERD_C4 = (mu_power(mu_channels.C4, 1) - mu_power_(mu_channels.C4, 1));  % 计算两个脑电位置的相关的指标 
+    mu_suppresion = 1/2 * (1 - ERD_C3);  % 归一化到[0,1]的区间里面
 end
 
 %% 计算相关的EI指标的函数
