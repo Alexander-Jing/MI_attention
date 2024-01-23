@@ -38,6 +38,21 @@ con = pnet('tcpconnect','127.0.0.1',4455);                                 % ½¨Á
 status = CheckNetStreamingVersion(con);                                    % ÅĞ¶Ï°æ±¾ĞÅÏ¢£¬ÕıÈ··µ»Ø×´Ì¬ÖµÎª1
 [~, basicInfo] = ClientGetBasicMessage(con);                               % »ñÈ¡Éè±¸»ù±¾ĞÅÏ¢basicInfo°üº¬ size,eegChan,sampleRate,dataSize
 [~, infoList] = ClientGetChannelMessage(con,basicInfo.eegChan);            % »ñÈ¡Í¨µÀĞÅÏ¢
+
+%% ÉèÖÃµç´Ì¼¤Á¬½Ó
+% ÉèÖÃÁ¬½Ó
+system('F:\MI_engagement\fes\fes\x64\Debug\fes.exe&');
+pause(1);
+StimControl = tcpip('localhost', 8888, 'NetworkRole', 'client','Timeout',1000);
+StimControl.InputBuffersize = 1000;
+StimControl.OutputBuffersize = 1000;
+
+% ÉèÖÃµç´Ì¼¤Ïà¹Ø²ÎÊı
+fopen(StimControl);
+tStim = [3,14,2]; % [t_up,t_flat,t_down] * 100ms
+StimCommand_1 = uint8([0,9,tStim,1]); % left calf
+StimCommand_2 = uint8([0,7,tStim,2]); % left thigh
+
 %% ÔÚÏßÊµÑé²ÎÊıÉèÖÃ²¿·Ö£¬ÓÃÓÚÉèÖÃÃ¿Ò»¸ö±»ÊÔµÄÇé¿ö£¬ÒÀ¾İ±»ÊÔÇé¿ö½øĞĞĞŞ¸Ä
 
 % ÔË¶¯ÏëÏó»ù±¾²ÎÊıÉèÖÃ
@@ -177,9 +192,22 @@ while(AllTrial <= TrialNum)
             MI_MUSup_thre_weights = [MI_MUSup_thre_weights, [MI_MUSup_thre_weight;Trigger]];
             MI_MUSup_thres = [MI_MUSup_thres, [MI_MUSup_thre;Trigger]];
         end
+        
+        % Ìí¼Óµç´Ì¼¤£¬µç´Ì¼¤µÄÊ±¼äÎª2s
+        Trigger = RandomTrial(AllTrial);
+        if Trigger == 1
+            StimCommand = StimCommand_1;
+            fwrite(StimControl,StimCommand);
+        end
+        if Trigger == 2
+            StimCommand = StimCommand_2;
+            fwrite(StimControl,StimCommand);
+        end
+
     end
-    % µÚ4s¿ªÊ¼È¡512µÄTrigger~=6µÄMIµÄ´°¿Ú£¬Êı¾İ´¦Àí²¢ÇÒ½øĞĞ·ÖÎö
-    if Timer > 3 && Trials(AllTrial)> 0 && clsFlag == 0 && clsControl == 0
+    
+    % µÚ5s¿ªÊ¼È¡512µÄTrigger~=6µÄMIµÄ´°¿Ú£¬Êı¾İ´¦Àí²¢ÇÒ½øĞĞ·ÖÎö
+    if Timer > 4 && Trials(AllTrial)> 0 && clsFlag == 0 && clsControl == 0
         rawdata = TrialData(:,end-512+1:end);  % È¡Ç°Ò»¸ö512µÄ´°¿Ú
         rawdata = rawdata(2:end,:);
         

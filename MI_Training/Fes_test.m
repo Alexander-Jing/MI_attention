@@ -18,7 +18,7 @@ fopen(StimControl);
 % fwrite(StimControl,StimCommand);%´Ì¼¤¿ªÊ¼
 
 tStim = [3,14,2]; % [t_up,t_flat,t_down] * 100ms
-StimCommand_1 = uint8([0,7,tStim,1]); % left calf
+StimCommand_1 = uint8([0,9,tStim,1]); % left calf
 StimCommand_2 = uint8([0,7,tStim,2]); % left thigh
 StimCommand_3 = uint8([0,9,tStim,3]); % right thigh 
 
@@ -30,7 +30,7 @@ pause(3);
 %fwrite(StimControl,StimCommand);
 
 pause(2);
-StimCommand = StimCommand_1;
+StimCommand = StimCommand_2;
 fwrite(StimControl,StimCommand);
 pause(3);
 %StimCommand(1,1) = 100;
@@ -40,6 +40,17 @@ pause(2);
 StimCommand = StimCommand_1;
 fwrite(StimControl,StimCommand);
 pause(3);
+
+pause(2);
+StimCommand = StimCommand_2;
+fwrite(StimControl,StimCommand);
+pause(3);
+
+pause(2);
+StimCommand = StimCommand_1;
+fwrite(StimControl,StimCommand);
+pause(3);
+
 StimCommand(1,1) = 100;
 fwrite(StimControl,StimCommand);
 

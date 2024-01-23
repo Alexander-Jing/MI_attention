@@ -39,6 +39,20 @@ status = CheckNetStreamingVersion(con);                                    % ÅĞ¶
 [~, basicInfo] = ClientGetBasicMessage(con);                               % »ñÈ¡Éè±¸»ù±¾ĞÅÏ¢basicInfo°üº¬ size,eegChan,sampleRate,dataSize
 [~, infoList] = ClientGetChannelMessage(con,basicInfo.eegChan);            % »ñÈ¡Í¨µÀĞÅÏ¢
 
+%% ÉèÖÃµç´Ì¼¤Á¬½Ó
+% ÉèÖÃÁ¬½Ó
+system('F:\MI_engagement\fes\fes\x64\Debug\fes.exe&');
+pause(1);
+StimControl = tcpip('localhost', 8888, 'NetworkRole', 'client','Timeout',1000);
+StimControl.InputBuffersize = 1000;
+StimControl.OutputBuffersize = 1000;
+
+% ÉèÖÃµç´Ì¼¤Ïà¹Ø²ÎÊı
+fopen(StimControl);
+tStim = [3,14,2]; % [t_up,t_flat,t_down] * 100ms
+StimCommand_1 = uint8([0,9,tStim,1]); % left calf
+StimCommand_2 = uint8([0,7,tStim,2]); % left thigh
+
 %% ÔÚÏßÊµÑé²ÎÊıÉèÖÃ²¿·Ö£¬ÓÃÓÚÉèÖÃÃ¿Ò»¸ö±»ÊÔµÄÇé¿ö£¬ÒÀ¾İ±»ÊÔÇé¿ö½øĞĞĞŞ¸Ä
 
 % ÔË¶¯ÏëÏó»ù±¾²ÎÊıÉèÖÃ
@@ -128,10 +142,21 @@ while(AllTrial <= TrialNum)
         [~, ~, mu_power_] = Online_DataPreprocess_Hanning(rawdata, 6, sample_frequency, WindowLength, channels);
         mu_power_ = [mu_power_; 6];
         mu_powers = [mu_powers, mu_power_];  % Ìí¼ÓÏà¹ØµÄmu½ÚÂÉÄÜÁ¿
+        
+        % Ìí¼Óµç´Ì¼¤£¬µç´Ì¼¤µÄÊ±¼äÎª2s
+        Trigger = RandomTrial(AllTrial);
+        if Trigger == 1
+            StimCommand = StimCommand_1;
+            fwrite(StimControl,StimCommand);
+        end
+        if Trigger == 2
+            StimCommand = StimCommand_2;
+            fwrite(StimControl,StimCommand);
+        end
     end
     
-    % µÚ4s¿ªÊ¼È¡512µÄTrigger~=6µÄMIµÄ´°¿Ú£¬Êı¾İ´¦Àí²¢ÇÒ½øĞĞ·ÖÎö
-    if Timer > 3 && Timer <= 7
+    % µÚ5s¿ªÊ¼È¡512µÄTrigger~=6µÄMIµÄ´°¿Ú£¬Êı¾İ´¦Àí²¢ÇÒ½øĞĞ·ÖÎö£¬ÕâÀï¾àÀëµç´Ì¼¤»¹¼ä¸ôÁË1s£¬·ÀÖ¹³öÏÖµç´Ì¼¤µÄÓ°Ïì
+    if Timer > 4 && Timer <= 7
         rawdata = TrialData(:,end-512+1:end);  % È¡Ç°Ò»¸ö512µÄ´°¿Ú
         rawdata = rawdata(2:end,:);
         
@@ -225,7 +250,11 @@ config_data = [WindowLength, size(channels, 2), windows_per_session, classes];
 %Offline_Data2Server_Send(DataX, ip, port, subject_name, config_data, send_order, foldername);
 class_accuracies = Offline_Data2Server_Communicate(DataX, ip, port, subject_name, config_data, send_order, foldername);
 
-
+%% ¹Ø±Õµç´Ì¼¤
+StimCommand(1,1) = 100;
+fwrite(StimControl,StimCommand);
+system('taskkill /F /IM fes.exe');
+close all;
 
 %% »ñÈ¡Æ½¾ù²ÎÓë¶È·ÖÊıµÄº¯Êı
 function mean_std_scores = compute_mean_std(scores_task, scores_name)
