@@ -39,19 +39,7 @@ status = CheckNetStreamingVersion(con);                                    % ÅĞ¶
 [~, basicInfo] = ClientGetBasicMessage(con);                               % »ñÈ¡Éè±¸»ù±¾ĞÅÏ¢basicInfo°üº¬ size,eegChan,sampleRate,dataSize
 [~, infoList] = ClientGetChannelMessage(con,basicInfo.eegChan);            % »ñÈ¡Í¨µÀĞÅÏ¢
 
-%% ÉèÖÃµç´Ì¼¤Á¬½Ó
-% ÉèÖÃÁ¬½Ó
-system('F:\MI_engagement\fes\fes\x64\Debug\fes.exe&');
-pause(1);
-StimControl = tcpip('localhost', 8888, 'NetworkRole', 'client','Timeout',1000);
-StimControl.InputBuffersize = 1000;
-StimControl.OutputBuffersize = 1000;
 
-% ÉèÖÃµç´Ì¼¤Ïà¹Ø²ÎÊı
-fopen(StimControl);
-tStim = [3,14,2]; % [t_up,t_flat,t_down] * 100ms
-StimCommand_1 = uint8([0,9,tStim,1]); % left calf
-StimCommand_2 = uint8([0,7,tStim,2]); % left thigh
 
 %% ÔÚÏßÊµÑé²ÎÊıÉèÖÃ²¿·Ö£¬ÓÃÓÚÉèÖÃÃ¿Ò»¸ö±»ÊÔµÄÇé¿ö£¬ÒÀ¾İ±»ÊÔÇé¿ö½øĞĞĞŞ¸Ä
 
@@ -83,6 +71,25 @@ MI_MUSup_thre_weight = MI_MUSup_thre_weight_baseline;  % ÓÃÓÚ¼ÆËãMIÊ±ºòµÄmuË¥¼õµ
 % Í¨ĞÅÉèÖÃ
 ip = '172.18.22.21';
 port = 8888;  % ºÍºó¶Ë·şÎñÆ÷Á¬½ÓµÄÁ½¸ö²ÎÊı
+
+% µç´Ì¼¤Ç¿¶ÈÉèÖÃ
+StimAmplitude_1 = 5;
+StimAmplitude_2 = 5;  % ·ùÖµÉèÖÃ£¨mA£©
+
+%% ÉèÖÃµç´Ì¼¤Á¬½Ó
+% ÉèÖÃÁ¬½Ó
+%system('F:\MI_engagement\fes\fes\x64\Debug\fes.exe&');
+system('F:\CASIA\MI_engagement\fes\fes\x64\Debug\fes.exe&');
+pause(1);
+StimControl = tcpip('localhost', 8888, 'NetworkRole', 'client','Timeout',1000);
+StimControl.InputBuffersize = 1000;
+StimControl.OutputBuffersize = 1000;
+
+% ÉèÖÃµç´Ì¼¤Ïà¹Ø²ÎÊı
+fopen(StimControl);
+tStim = [3,14,2]; % [t_up,t_flat,t_down] * 100ms
+StimCommand_1 = uint8([0,StimAmplitude_1,tStim,1]); % left calf
+StimCommand_2 = uint8([0,StimAmplitude_2,tStim,2]); % left thigh
 
 %% ×¼±¸³õÊ¼µÄ´æ´¢Êı¾İµÄÎÄ¼ş¼Ğ
 foldername = ['.\\', FunctionNowFilename([subject_name, '_'], '_data')]; % Ö¸¶¨ÎÄ¼ş¼ĞÂ·¾¶ºÍÃû³Æ

@@ -39,26 +39,12 @@ status = CheckNetStreamingVersion(con);                                    % ÅĞ¶
 [~, basicInfo] = ClientGetBasicMessage(con);                               % »ñÈ¡Éè±¸»ù±¾ĞÅÏ¢basicInfo°üº¬ size,eegChan,sampleRate,dataSize
 [~, infoList] = ClientGetChannelMessage(con,basicInfo.eegChan);            % »ñÈ¡Í¨µÀĞÅÏ¢
 
-%% ÉèÖÃµç´Ì¼¤Á¬½Ó
-% ÉèÖÃÁ¬½Ó
-system('F:\MI_engagement\fes\fes\x64\Debug\fes.exe&');
-pause(1);
-StimControl = tcpip('localhost', 8888, 'NetworkRole', 'client','Timeout',1000);
-StimControl.InputBuffersize = 1000;
-StimControl.OutputBuffersize = 1000;
-
-% ÉèÖÃµç´Ì¼¤Ïà¹Ø²ÎÊı
-fopen(StimControl);
-tStim = [3,14,2]; % [t_up,t_flat,t_down] * 100ms
-StimCommand_1 = uint8([0,9,tStim,1]); % left calf
-StimCommand_2 = uint8([0,7,tStim,2]); % left thigh
-
-%% ÔÚÏßÊµÑé²ÎÊıÉèÖÃ²¿·Ö£¬ÓÃÓÚÉèÖÃÃ¿Ò»¸ö±»ÊÔµÄÇé¿ö£¬ÒÀ¾İ±»ÊÔÇé¿ö½øĞĞĞŞ¸Ä
+%% ÀëÏßÊµÑé²ÎÊıÉèÖÃ²¿·Ö£¬ÓÃÓÚÉèÖÃÃ¿Ò»¸ö±»ÊÔµÄÇé¿ö£¬ÒÀ¾İ±»ÊÔÇé¿ö½øĞĞĞŞ¸Ä
 
 % ÔË¶¯ÏëÏó»ù±¾²ÎÊıÉèÖÃ
-subject_name = 'Jyt_test_0112_offline_curry8_test';  % ±»ÊÔĞÕÃû
-%TrialNum = 3*30;  % ÉèÖÃ²É¼¯µÄÊıÁ¿
-TrialNum = 3*3;
+subject_name = 'Jyt_test_0124_offline_FES_test';  % ±»ÊÔĞÕÃû
+TrialNum = 3*30;  % ÉèÖÃ²É¼¯µÄÊıÁ¿
+%TrialNum = 3*3;
 MotorClasses = 3;  % ÔË¶¯ÏëÏóµÄÖÖÀàµÄÊıÁ¿µÄÉèÖÃ£¬×¢ÒâÕâÀïÊÇ°Ñ¿ÕÏëidle×´Ì¬Ò²Òª·Å½øÈ¥µÄ£¬×¢ÒâÕâÀïµÄÈÎÎñÊÇ[0,1,2]£¬ºÍreadme.txtÀïÃæµÄ¶ÔÓ¦
 % µ±Ç°ÉèÖÃµÄÈÎÎñ
 % Idle 0   -> SceneIdle 
@@ -81,8 +67,27 @@ weight_mu = 0.6;  % ÓÃÓÚ¼ÆËãERD/ERSÖ¸±êºÍEIÖ¸±êµÄ¼ÓÈ¨ºÍ
 ip = '172.18.22.21';
 port = 8888;  % ºÍºó¶Ë·şÎñÆ÷Á¬½ÓµÄÁ½¸ö²ÎÊı
 
+% µç´Ì¼¤Ç¿¶ÈÉèÖÃ
+StimAmplitude_1 = 5;
+StimAmplitude_2 = 5;  % ·ùÖµÉèÖÃ£¨mA£©
+
 % ÄÑ¶È¼ÆËãÓë»®·ÖÉèÖÃ
 %task_weights = [3,5,2];
+
+%% ÉèÖÃµç´Ì¼¤Á¬½Ó
+% ÉèÖÃÁ¬½Ó
+%system('F:\MI_engagement\fes\fes\x64\Debug\fes.exe&');
+system('F:\CASIA\MI_engagement\fes\fes\x64\Debug\fes.exe&');
+pause(1);
+StimControl = tcpip('localhost', 8888, 'NetworkRole', 'client','Timeout',1000);
+StimControl.InputBuffersize = 1000;
+StimControl.OutputBuffersize = 1000;
+
+% ÉèÖÃµç´Ì¼¤Ïà¹Ø²ÎÊı
+fopen(StimControl);
+tStim = [3,14,2]; % [t_up,t_flat,t_down] * 100ms
+StimCommand_1 = uint8([0,StimAmplitude_1,tStim,1]); % left calf
+StimCommand_2 = uint8([0,StimAmplitude_2,tStim,2]); % left thigh
 
 %% ÔË¶¯ÏëÏóÄÚÈİ°²ÅÅ
 TrialIndex = randperm(TrialNum);                                           % ¸ù¾İ²É¼¯µÄÊıÁ¿Éú³ÉËæ»úË³ĞòµÄÊı×é

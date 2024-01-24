@@ -14,7 +14,7 @@ function [FilteredDataMI, EI_index, mu_power] = Online_DataPreprocess_Hanning(ra
     FilteredDataMI = DataFilter(RawDataMI, sample_frequency, [3,50], [49,51]);  % 滤波去噪
     FilteredDataMI = FilteredDataMI(channels, :);  % 提取指定的channels
     %[EI_index, mu_power] = DataIndex(FilteredDataMI, WindowLength, sample_frequency, channels); 
-    [EI_index, mu_power] = DataIndex_Hanning(FilteredData, WindowLength, sample_frequency, channels);  % 使用pwelch和汉明窗的版本
+    [EI_index, mu_power] = DataIndex_Hanning(FilteredDataMI, WindowLength, sample_frequency, channels);  % 使用pwelch和汉明窗的版本
     
     
     %% 滤波函数
