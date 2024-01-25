@@ -1,9 +1,9 @@
 %% 被试名称和实验的文件夹
-subject_name_online = 'Jyt_test_0108_online'; %'Jyt_test_0101_1_online';% 'Jyt_test_0101_online'; %  % 被试姓名
-sub_online_collection_folder = 'Jyt_test_0108_online_20240110_000906267_data'; % 'Jyt_test_0101_1_online_20240101_200123314_data';  %'Jyt_test_0101_online_20240101_175129548_data'; %  % 
+subject_name_online = 'Jyt_test_0125_online_test'; %'Jyt_test_0101_1_online';% 'Jyt_test_0101_online'; %  % 被试姓名
+sub_online_collection_folder = 'Jyt_test_0125_online_test_20240125_220854676_data'; % 'Jyt_test_0101_1_online_20240101_200123314_data';  %'Jyt_test_0101_online_20240101_175129548_data'; %  % 
 
-subject_name_offline =  'Jyt_test_0101_1_offline';  % 离线收集数据时候的被试名称
-sub_offline_collection_folder = 'Jyt_test_0101_1_offline_20240101_193332077_data';  % 被试的离线采集数据
+subject_name_offline =  'Jyt_test_0125_offline_test';  % 离线收集数据时候的被试名称
+sub_offline_collection_folder = 'Jyt_test_0125_offline_test_20240125_203932146_data';  % 被试的离线采集数据
 
 channels = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, 16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];  % 选择的通道,
 mu_channels = struct('C3',24, 'C4',22);  % 用于计算ERD/ERS的几个channels，是C3和C4两个通道,需要设定位置
@@ -77,15 +77,14 @@ for i = 1:length(files)
 end
 
 %% 读取其余在线/离线对比实验中的数据，并且计算出一些相关的指标
-mu_suppressions_offline = load('F:\MI_engagement\MI_attention\MI_Training\Jyt_test_0101_1_offline_20240101_193332077_data\Offline_EEGMI_Scores_Jyt_test_0101_1_offline\Offline_EEGMI_Scores_Jyt_test_0101_1_offline.mat', 'mu_suppressions');
+mu_suppressions_offline = load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0125_offline_test_20240125_203932146_data\Offline_EEGMI_Scores_Jyt_test_0125_offline_test\Offline_EEGMI_Scores_Jyt_test_0125_offline_test.mat', 'mu_suppressions');
 
 %traj = load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0101_1_online_20240101_200123314_data\Online_EEGMI_trajectory_Jyt_test_0101_1_online\Online_EEGMI_trajectory_1_Jyt_test_0101_1_online20240101_202353792.mat','traj');
-traj = load('F:\MI_engagement\MI_attention\MI_Training\Jyt_test_0101_online_20240101_175129548_data\Online_EEGMI_trajectory_Jyt_test_0101_online\Online_EEGMI_trajectory_1_Jyt_test_0101_online20240101_181409342.mat', 'traj');
+traj = load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0125_online_test_20240125_220854676_data\Online_EEGMI_trajectory_Jyt_test_0125_online_test\Online_EEGMI_trajectory_1_Jyt_test_0125_online_test20240125_222645598.mat', 'traj');
 %MI_MUSup_thres = load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0101_1_online_20240101_200123314_data\Online_EEGMI_trajectory_Jyt_test_0101_1_online\Online_EEGMI_trajectory_1_Jyt_test_0101_1_online20240101_202353792.mat', 'MI_MUSup_thres');
-MI_MUSup_thres = load('F:\MI_engagement\MI_attention\MI_Training\Jyt_test_0101_online_20240101_175129548_data\Online_EEGMI_trajectory_Jyt_test_0101_online\Online_EEGMI_trajectory_1_Jyt_test_0101_online20240101_181409342.mat', 'MI_MUSup_thres');
+MI_MUSup_thres = load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0125_online_test_20240125_220854676_data\Online_EEGMI_trajectory_Jyt_test_0125_online_test\Online_EEGMI_trajectory_1_Jyt_test_0125_online_test20240125_222645598.mat', 'MI_MUSup_thres');
 %MI_MUSup_thre_weights = load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0101_1_online_20240101_200123314_data\Online_EEGMI_trajectory_Jyt_test_0101_1_online\Online_EEGMI_trajectory_1_Jyt_test_0101_1_online20240101_202353792.mat', 'MI_MUSup_thre_weights');
-MI_MUSup_thre_weights = load('F:\MI_engagement\MI_attention\MI_Training\Jyt_test_0101_online_20240101_175129548_data\Online_EEGMI_trajectory_Jyt_test_0101_online\Online_EEGMI_trajectory_1_Jyt_test_0101_online20240101_181409342.mat', 'MI_MUSup_thre_weights');
-
+MI_MUSup_thre_weights = load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0125_online_test_20240125_220854676_data\Online_EEGMI_trajectory_Jyt_test_0125_online_test\Online_EEGMI_trajectory_1_Jyt_test_0125_online_test20240125_222645598.mat', 'MI_MUSup_thre_weights');
 % 提取第一行的数据
 MI_MUSup_thres_row1 = MI_MUSup_thres.MI_MUSup_thres(1,:);
 MI_MUSup_thre_weights_row1 = MI_MUSup_thre_weights.MI_MUSup_thre_weights(1,:);
@@ -94,8 +93,8 @@ MI_MUSup_thre_weights_row1 = MI_MUSup_thre_weights.MI_MUSup_thre_weights(1,:);
 MI_MUSUP_trajs = MI_MUSup_thre_weights_row1 ./ MI_MUSup_thres_row1;
 
 
-mu_suppressions_compare = load('F:\MI_engagement\MI_attention\MI_Training\Jyt_test_0101_1_comparison_1_20240101_221830944_data\Offline_EEGMI_Scores_Jyt_test_0101_1_comparison_1\Offline_EEGMI_Scores_Jyt_test_0101_1_comparison_1.mat', 'mu_suppressions_trialmean');
-EI_index_scores_compare = load('F:\MI_engagement\MI_attention\MI_Training\Jyt_test_0101_1_comparison_1_20240101_221830944_data\Offline_EEGMI_Scores_Jyt_test_0101_1_comparison_1\Offline_EEGMI_Scores_Jyt_test_0101_1_comparison_1.mat', 'EI_index_scores_trialmean');
+mu_suppressions_compare = load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0125_comparison_test_20240125_215803328_data\Offline_EEGMI_Scores_Jyt_test_0125_comparison_test\Offline_EEGMI_Scores_Jyt_test_0125_comparison_test.mat', 'mu_suppressions_trialmean');
+EI_index_scores_compare = load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0125_comparison_test_20240125_215803328_data\Offline_EEGMI_Scores_Jyt_test_0125_comparison_test\Offline_EEGMI_Scores_Jyt_test_0125_comparison_test.mat', 'EI_index_scores_trialmean');
 
 % 计算mu_suppresions和EI_index_scores的均值和标准差
 mu_suppresions_mean = mean(mu_suppresions(1,:));
@@ -133,7 +132,7 @@ title('Line plot of EI');
 grid on;
 
 figure;
-plot(mu_suppresions(1,:).* resultsMI_trials(1,:), 'LineWidth', 2);
+plot(mu_suppresions(1,:).* resultsMI_trials(1,:), 'LineWidth', 2);  %.* resultsMI_trials(1,:)
 hold on;
 plot(MI_MUSup_thres.MI_MUSup_thres(1,:), 'LineWidth', 2);
 hold on;
@@ -218,16 +217,16 @@ end
 
 %% 计算相关mu频带衰减指标
 function mu_suppresion = MI_MuSuperesion(mu_power_, mu_power, mu_channels)
-    ERD_C3 = (mu_power(mu_channels.C3, 1) - mu_power_(mu_channels.C3, 1))/mu_power_(mu_channels.C3, 1); 
-    ERD_C4 = (mu_power(mu_channels.C4, 1) - mu_power_(mu_channels.C4, 1))/mu_power_(mu_channels.C4, 1);  % 计算两个脑电位置的相关的指标 
-    mu_suppresion = abs(ERD_C4 - ERD_C3);
+    ERD_C3 = (mu_power(mu_channels.C3, 1) - mu_power_(mu_channels.C3, 1)); 
+    %ERD_C4 = (mu_power(mu_channels.C4, 1) - mu_power_(mu_channels.C4, 1));  % 计算两个脑电位置的相关的指标 
+    mu_suppresion = 1/2 * (1 - ERD_C3);  % 归一化到[0,1]的区间里面
 end
-
+    
 %% 计算相关的EI指标的函数
 function EI_index_score = EI_index_Caculation(EI_index, EI_channels)
     channels_ = [EI_channels.Fp1,EI_channels.Fp2, EI_channels.F7, EI_channels.F3, EI_channels.Fz, EI_channels.F4, EI_channels.F8'];
-    %channels_ = [EI_channels.Fp1];
     EI_index_score = mean(EI_index(channels_, 1));
+
 end
 
 %% 分析显著性的函数

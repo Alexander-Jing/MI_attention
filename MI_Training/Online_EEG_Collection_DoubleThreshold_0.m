@@ -44,9 +44,9 @@ status = CheckNetStreamingVersion(con);                                    % ÅĞ¶
 %% ÔÚÏßÊµÑé²ÎÊıÉèÖÃ²¿·Ö£¬ÓÃÓÚÉèÖÃÃ¿Ò»¸ö±»ÊÔµÄÇé¿ö£¬ÒÀ¾İ±»ÊÔÇé¿ö½øĞĞĞŞ¸Ä
 
 % ÔË¶¯ÏëÏó»ù±¾²ÎÊıÉèÖÃ
-subject_name = 'Jyt_test_0110_online_test';  % ±»ÊÔĞÕÃû
-sub_offline_collection_folder = 'Jyt_test_0108_offline_20240109_222305628_data';  % ±»ÊÔµÄÀëÏß²É¼¯Êı¾İ
-subject_name_offline =  'Jyt_test_0108_offline';  % ÀëÏßÊÕ¼¯Êı¾İÊ±ºòµÄ±»ÊÔÃû³Æ
+subject_name = 'Jyt_test_0125_online_test';  % ±»ÊÔĞÕÃû
+sub_offline_collection_folder = 'Jyt_test_0125_offline_test_20240125_203932146_data';  % ±»ÊÔµÄÀëÏß²É¼¯Êı¾İ
+subject_name_offline =  'Jyt_test_0125_offline_test';  % ÀëÏßÊÕ¼¯Êı¾İÊ±ºòµÄ±»ÊÔÃû³Æ
 session_idx = 1;  % session indexÊıÁ¿£¬Èç¹ûÊÇ1µÄ»°£¬»á×Ô¶¯Éú³ÉÏà¹ØÅÅ²¼
 MotorClass = 2; % ÔË¶¯ÏëÏó¶¯×÷ÊıÁ¿£¬×¢ÒâÕâÀïÊÇ´¿Éè¼ÆµÄÔË¶¯ÏëÏó¶¯×÷µÄÊıÁ¿£¬²»°üÀ¨¿ÕÏëidle×´Ì¬
 DiffLevels = [1,2];  % ¶ÔÓÚÉÏÃæµÄÔË¶¯ÏëÏóµÄÄÑ¶ÈÅÅ²¼£¬Ô½¿¿ºóÔ½ÄÑ£¬ÆäÖĞµÄ1,2¶ÔÓ¦µÄÊÇÔË¶¯ÏëÏóµÄÀàĞÍ£¬ºÍunity¶ÔÓ¦
@@ -73,8 +73,8 @@ ip = '172.18.22.21';
 port = 8888;  % ºÍºó¶Ë·şÎñÆ÷Á¬½ÓµÄÁ½¸ö²ÎÊı
 
 % µç´Ì¼¤Ç¿¶ÈÉèÖÃ
-StimAmplitude_1 = 5;
-StimAmplitude_2 = 5;  % ·ùÖµÉèÖÃ£¨mA£©
+StimAmplitude_1 = 7;
+StimAmplitude_2 = 7;  % ·ùÖµÉèÖÃ£¨mA£©
 
 %% ÉèÖÃµç´Ì¼¤Á¬½Ó
 % ÉèÖÃÁ¬½Ó
