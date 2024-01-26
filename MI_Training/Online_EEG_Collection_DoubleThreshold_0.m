@@ -187,8 +187,9 @@ while(AllTrial <= TrialNum)
 
         % 确定这一轮的阈值
         if Trials(AllTrial)> 0
-            Trigger_num_ = count_trigger(Trials, Trigger);
-            MI_MUSup_thre = traj{Trigger}(Trigger_num_+1);  % 计算阈值
+            Trigger = Trials(AllTrial);
+            Trigger_num_ = count_trigger(Trials, AllTrial);  % 这里用于计算在AllTrial对应的Trigger之前已经出现了多少次，从而计算轨迹
+            MI_MUSup_thre = traj{Trigger+1}(Trigger_num_+1);  % 计算阈值
             % 确定加权之后的阈值
             MI_MUSup_thre = MI_MUSup_thre_weight * MI_MUSup_thre;
             disp(['Trial: ', num2str(AllTrial), ' Cls: ', num2str(Trials(AllTrial))])

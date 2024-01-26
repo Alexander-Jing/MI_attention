@@ -31,11 +31,14 @@ rawdata_offline = rawdata_offline.TrialData;
 %rawdata = rawdata_comparison;
 %% 闁插洭娉﹂崣鍌涙殶閿涘本鐎铏圭崶閸??
 sample_frequency = 256; 
+WindowLength = 512;  
+SlideWindowLength = 256;  
+Trigger = double(rawdata(end,:)); 
 
-WindowLength = 512;  % 濮ｅ繋閲滅粣妤?褰涢惃鍕毐鎼??
-SlideWindowLength = 256;  % 濠婃垹鐛ラ梻鎾
+% 初始化空列表来存储数据
+DataSampleMI_Drinking = [];
+DataSampleMI_Pouring = [];
 
-Trigger = double(rawdata(end,:)); %rawdata閺??閸氬簼绔寸悰
 % 闂堟瑦浼呴幀浣规殶閹??
 class_index = 6;
 RawDataIdle = double(rawdata(1:end-1, Trigger == class_index));  % 閹绘劕褰囨潻娆庣缁崵娈戦棃娆愪紖閹焦鏆熼幑?
@@ -43,20 +46,32 @@ FilteredDataIdle = DataFilter(RawDataIdle, sample_frequency);  % 濠娿倖灏濋
 [windows_per_session, SampleDataPre] = WindowsDataPre(FilteredDataIdle, WindowLength, SlideWindowLength);
 [DataSampleIdle, ] = DataWindows(SampleDataPre, FilteredDataIdle, channels, class_index, windows_per_session, SlideWindowLength, WindowLength);
 
-%鏉╂劕濮╅幆瀹犺杽閺佺増宓?1
-class_index = 1;
-RawDataMI_Drinking = double(rawdata(1:end-1, Trigger == class_index));  % 閹绘劕褰囨潻娆庣缁崵娈戞潻鎰З閹疇钖勯弫鐗堝祦
-FilteredDataMI_Drinking = DataFilter(RawDataMI_Drinking, sample_frequency);  % 濠娿倖灏濋崢璇叉珨
-[windows_per_session, SampleDataPre] = WindowsDataPre(FilteredDataMI_Drinking, WindowLength, SlideWindowLength);
-[DataSampleMI_Drinking, ] = DataWindows(SampleDataPre, FilteredDataMI_Drinking, channels, class_index, windows_per_session, SlideWindowLength, WindowLength);
-
-%鏉╂劕濮╅幆瀹犺杽閺佺増宓?2
-class_index = 2;
-RawDataMI_Pouring = double(rawdata(1:end-1, Trigger == class_index));  % 閹绘劕褰囨潻娆庣缁崵娈戞潻鎰З閹疇钖勯弫鐗堝祦
-FilteredDataMI_Pouring = DataFilter(RawDataMI_Pouring, sample_frequency);  % 濠娿倖灏濋崢璇叉珨
-[windows_per_session, SampleDataPre] = WindowsDataPre(FilteredDataMI_Pouring, WindowLength, SlideWindowLength);
-[DataSampleMI_Pouring, ] = DataWindows(SampleDataPre, FilteredDataMI_Pouring, channels, class_index, windows_per_session, SlideWindowLength, WindowLength);
-
+% 遍历所有数据点
+for i = WindowLength+1:length(Trigger)
+    % 检查当前Trigger是否为7（休息时间）
+    if Trigger(i) == 7
+        % 回溯并提取前512个数据点
+        window_data = rawdata(:, (i-WindowLength):i-1);
+        
+        % 检查这512个数据点中的Trigger是否为1或2
+        result_ = all(window_data(end, :) == 1);
+        if all(window_data(end, :) == 1)
+            class_index = 1;
+            RawDataMI = double(window_data(1:end-1, window_data(end, :) == class_index));
+            FilteredDataMI = DataFilter(RawDataMI, sample_frequency);
+            [windows_per_session, SampleDataPre] = WindowsDataPre(FilteredDataMI, WindowLength, SlideWindowLength);
+            [DataSample, ~] = DataWindows(SampleDataPre, FilteredDataMI, channels, class_index, windows_per_session, SlideWindowLength, WindowLength);
+            DataSampleMI_Drinking = [DataSampleMI_Drinking, DataSample];
+        elseif all(window_data(end, :) == 2)
+            class_index = 2;
+            RawDataMI = double(window_data(1:end-1, window_data(end, :) == class_index));
+            FilteredDataMI = DataFilter(RawDataMI, sample_frequency);
+            [windows_per_session, SampleDataPre] = WindowsDataPre(FilteredDataMI, WindowLength, SlideWindowLength);
+            [DataSample, ~] = DataWindows(SampleDataPre, FilteredDataMI, channels, class_index, windows_per_session, SlideWindowLength, WindowLength);
+            DataSampleMI_Pouring = [DataSampleMI_Pouring, DataSample];
+        end
+    end
+end
 %% 鐠侊紕鐣籔SD閸ユ拝绱濋獮鏈电瑬缂佹ê鍩楁径鎾劥閼存垹鏁搁崷鏉胯埌閸??
 % 濮ｅ繋绔存稉顏冩眽閻ㄥ嚤SD閸у洤?鐓庣摠閸岊煉绱濆ù瀣槸娴狅絿鐖滄潻娆撳櫡閸欘亝婀侀幋鎴滅娑??
 Idle_all = zeros(channels_num, 1);

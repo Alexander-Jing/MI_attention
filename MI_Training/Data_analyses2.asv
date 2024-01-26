@@ -18,8 +18,8 @@ channels_num = length(channels);
 %% 鐠囪褰囬弫鐗堝祦
 subject_rawdata_folder = ['.\', sub_online_collection_folder, '\' 'Online_EEGMI_RawData_', subject_name_online];
 rawdata = load([subject_rawdata_folder, '\', sub_online_rawdata_file]);
-rawdata_comparison = load('F:\MI_engagement\MI_attention\MI_Training\Jyt_test_0125_comparison_test_20240125_215803328_data\Offline_EEGMI_RawData_Jyt_test_0125_comparison_test\Offline_EEGMI_RawData_Jyt_test_0125_comparison_test20240125_220607487.mat', 'TrialData');
-rawdata_offline = load('F:\MI_engagement\MI_attention\MI_Training\Jyt_test_0125_offline_test_20240125_203932146_data\Offline_EEGMI_RawData_Jyt_test_0125_offline_test\Offline_EEGMI_RawData_Jyt_test_0125_offline_test20240125_205630245.mat', 'TrialData');
+rawdata_comparison = load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0125_comparison_test_20240125_215803328_data\Offline_EEGMI_RawData_Jyt_test_0125_comparison_test\Offline_EEGMI_RawData_Jyt_test_0125_comparison_test20240125_220607487.mat', 'TrialData');
+rawdata_offline = load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0125_offline_test_20240125_203932146_data\Offline_EEGMI_RawData_Jyt_test_0125_offline_test\Offline_EEGMI_RawData_Jyt_test_0125_offline_test20240125_205630245.mat', 'TrialData');
 %load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0101_1_offline_20240101_193332077_data\Offline_EEGMI_RawData_Jyt_test_0101_1_offline\Offline_EEGMI_RawData_Jyt_test_0101_1_offline20240101_194900541.mat', 'TrialData');
 
 rawdata = rawdata.TrialData;
@@ -46,7 +46,7 @@ FilteredDataIdle = DataFilter(RawDataIdle, sample_frequency);  % 濠娿倖灏濋
 %鏉╂劕濮╅幆瀹犺杽閺佺増宓?1
 class_index = 1;
 RawDataMI_Drinking = double(rawdata(1:end-1, Trigger == class_index));  % 閹绘劕褰囨潻娆庣缁崵娈戞潻鎰З閹疇钖勯弫鐗堝祦
-FilteredDataMI_Drinking = DataFilter(RawDataMI_Drinking, sample_frequency);  % 濠娿倖灏濋崢璇叉珨
+FilteredDataMI_Drinking = DataFilter(RawDataMI_Drinking(:,end-512+1,end), sample_frequency);  % 濠娿倖灏濋崢璇叉珨
 [windows_per_session, SampleDataPre] = WindowsDataPre(FilteredDataMI_Drinking, WindowLength, SlideWindowLength);
 [DataSampleMI_Drinking, ] = DataWindows(SampleDataPre, FilteredDataMI_Drinking, channels, class_index, windows_per_session, SlideWindowLength, WindowLength);
 

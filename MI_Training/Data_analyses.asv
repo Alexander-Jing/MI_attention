@@ -1,55 +1,55 @@
-%% ±»ÊÔÃû³ÆºÍÊµÑéµÄÎÄ¼ş¼Ğ
-subject_name_online = 'Jyt_test_0125_online_test'; %'Jyt_test_0101_1_online';% 'Jyt_test_0101_online'; %  % ±»ÊÔĞÕÃû
+%% è¢«è¯•åç§°å’Œå®éªŒçš„æ–‡ä»¶å¤¹
+subject_name_online = 'Jyt_test_0125_online_test'; %'Jyt_test_0101_1_online';% 'Jyt_test_0101_online'; %  % è¢«è¯•å§“å
 sub_online_collection_folder = 'Jyt_test_0125_online_test_20240125_220854676_data'; % 'Jyt_test_0101_1_online_20240101_200123314_data';  %'Jyt_test_0101_online_20240101_175129548_data'; %  % 
 
-subject_name_offline =  'Jyt_test_0125_offline_test';  % ÀëÏßÊÕ¼¯Êı¾İÊ±ºòµÄ±»ÊÔÃû³Æ
-sub_offline_collection_folder = 'Jyt_test_0125_offline_test_20240125_203932146_data';  % ±»ÊÔµÄÀëÏß²É¼¯Êı¾İ
+subject_name_offline =  'Jyt_test_0125_offline_test';  % ç¦»çº¿æ”¶é›†æ•°æ®æ—¶å€™çš„è¢«è¯•åç§°
+sub_offline_collection_folder = 'Jyt_test_0125_offline_test_20240125_203932146_data';  % è¢«è¯•çš„ç¦»çº¿é‡‡é›†æ•°æ®
 
-channels = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, 16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];  % Ñ¡ÔñµÄÍ¨µÀ,
-mu_channels = struct('C3',24, 'C4',22);  % ÓÃÓÚ¼ÆËãERD/ERSµÄ¼¸¸öchannels£¬ÊÇC3ºÍC4Á½¸öÍ¨µÀ,ĞèÒªÉè¶¨Î»ÖÃ
-EI_channels = struct('Fp1', 32, 'Fp2', 31, 'F7', 30, 'F3', 29, 'Fz', 28, 'F4', 27, 'F8', 26);  % ÓÃÓÚ¼ÆËãEIÖ¸±êµÄ¼¸¸öchannels£¬ĞèÒªÈ·¶¨ÏÂÎ»ÖÃµÄ
+channels = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, 16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];  % é€‰æ‹©çš„é€šé“,
+mu_channels = struct('C3',24, 'C4',22);  % ç”¨äºè®¡ç®—ERD/ERSçš„å‡ ä¸ªchannelsï¼Œæ˜¯C3å’ŒC4ä¸¤ä¸ªé€šé“,éœ€è¦è®¾å®šä½ç½®
+EI_channels = struct('Fp1', 32, 'Fp2', 31, 'F7', 30, 'F3', 29, 'Fz', 28, 'F4', 27, 'F8', 26);  % ç”¨äºè®¡ç®—EIæŒ‡æ ‡çš„å‡ ä¸ªchannelsï¼Œéœ€è¦ç¡®å®šä¸‹ä½ç½®çš„
 
 
-% Ö¸¶¨ÎÄ¼ş¼ĞÂ·¾¶
-folder_path = [sub_online_collection_folder, '/', 'Online_Engagements_', subject_name_online]; % Çë½«'./your_folder'Ìæ»»ÎªÄúµÄÎÄ¼ş¼ĞµÄÏà¶ÔÂ·¾¶
+% æŒ‡å®šæ–‡ä»¶å¤¹è·¯å¾„
+folder_path = [sub_online_collection_folder, '/', 'Online_Engagements_', subject_name_online]; % è¯·å°†'./your_folder'æ›¿æ¢ä¸ºæ‚¨çš„æ–‡ä»¶å¤¹çš„ç›¸å¯¹è·¯å¾„
 
-%% ¶ÁÈ¡ÔÚÏßµÄÎÄ¼şÖĞµÄÃ¿Ò»¸öÊı¾İ
-% ÇĞ»»µ½Ö¸¶¨µÄÎÄ¼ş¼Ğ
+%% è¯»å–åœ¨çº¿çš„æ–‡ä»¶ä¸­çš„æ¯ä¸€ä¸ªæ•°æ®
+% åˆ‡æ¢åˆ°æŒ‡å®šçš„æ–‡ä»¶å¤¹
 cd(folder_path);
 
-% »ñÈ¡ÎÄ¼ş¼ĞÖĞµÄËùÓĞ.matÎÄ¼ş
+% è·å–æ–‡ä»¶å¤¹ä¸­çš„æ‰€æœ‰.matæ–‡ä»¶
 files = dir('*.mat');
 
-% ÌáÈ¡³öÎÄ¼şÃûÖĞµÄcµÄÖµ£¬²¢×ª»»ÎªÊı×Ö
+% æå–å‡ºæ–‡ä»¶åä¸­çš„cçš„å€¼ï¼Œå¹¶è½¬æ¢ä¸ºæ•°å­—
 c_values = cellfun(@(x) str2double(regexp(x, 'trial_(\d+)', 'tokens', 'once')), {files.name});
 
-% ¸ù¾İcµÄÖµ¶ÔÎÄ¼ş½øĞĞÅÅĞò
+% æ ¹æ®cçš„å€¼å¯¹æ–‡ä»¶è¿›è¡Œæ’åº
 [~, index] = sort(c_values);
 files = files(index);
 
-% ³õÊ¼»¯mu_suppresionsºÍEI_index_scores
+% åˆå§‹åŒ–mu_suppresionså’ŒEI_index_scores
 mu_suppresions = [];
 EI_index_scores = [];
 resultsMI_trials = [];
 
-% ±éÀúÃ¿¸öÎÄ¼ş
+% éå†æ¯ä¸ªæ–‡ä»¶
 for i = 1:length(files)
-    % ¼ÓÔØ.matÎÄ¼ş
+    % åŠ è½½.matæ–‡ä»¶
     data = load(files(i).name);
     
-    % ÌáÈ¡mu_powersºÍEI_indices
+    % æå–mu_powerså’ŒEI_indices
     mu_powers = data.mu_powers;
     EI_indices = data.EI_indices;
-    % ÌáÈ¡·ÖÀà¸ÅÂÊ
+    % æå–åˆ†ç±»æ¦‚ç‡
     resultsMI = data.resultsMI;
     
-    % ÌáÈ¡mu_power_ºÍmu_power
+    % æå–mu_power_å’Œmu_power
     mu_power_ = mu_powers(:,1);
     mu_powers = mu_powers(:,2:end);
     
     resultsMI = resultsMI(2:end,:);
     
-    % ¼ÆËãmu_suppresion
+    % è®¡ç®—mu_suppresion
     mu_suppresion = zeros(1, size(mu_powers, 2));
     Trigger = mu_powers(33,1);
     for j = 1:size(mu_powers, 2)
@@ -57,26 +57,26 @@ for i = 1:length(files)
         mu_suppresion(j) = MI_MuSuperesion(mu_power_, mu_power, mu_channels);
     end
     
-    % ¼ÆËãmu_suppresionµÄ¾ùÖµ²¢±£´æ
+    % è®¡ç®—mu_suppresionçš„å‡å€¼å¹¶ä¿å­˜
     %mu_suppresions = [mu_suppresions, [mu_suppresion; repmat(Trigger,1,size(mu_powers, 2))]];
     mu_suppresions = [mu_suppresions, [mu_suppresion(end); Trigger]];
     
-    % ¼ÆËãEI_index_score
+    % è®¡ç®—EI_index_score
     EI_index_score = zeros(1, size(EI_indices, 2));
     for j = 1:size(EI_indices, 2)
         EI_index = EI_indices(:,j);
         EI_index_score(j) = EI_index_Caculation(EI_index, EI_channels);
     end
     
-    % ¼ÆËãEI_index_scoreµÄ¾ùÖµ²¢±£´æ
+    % è®¡ç®—EI_index_scoreçš„å‡å€¼å¹¶ä¿å­˜
     %EI_index_scores = [EI_index_scores, [EI_index_score; repmat(Trigger,1,size(mu_powers, 2))]];
     EI_index_scores = [EI_index_scores, [EI_index_score(end); Trigger]];
     
-    % ¼ÆËã·ÖÀà¸ÅÂÊÔÚÕâÒ»¸ötrialÀïÃæµÄ¾ùÖµ
+    % è®¡ç®—åˆ†ç±»æ¦‚ç‡åœ¨è¿™ä¸€ä¸ªtrialé‡Œé¢çš„å‡å€¼
     resultsMI_trials = [resultsMI_trials, [resultsMI(1,end); Trigger]];
 end
 
-%% ¶ÁÈ¡ÆäÓàÔÚÏß/ÀëÏß¶Ô±ÈÊµÑéÖĞµÄÊı¾İ£¬²¢ÇÒ¼ÆËã³öÒ»Ğ©Ïà¹ØµÄÖ¸±ê
+%% è¯»å–å…¶ä½™åœ¨çº¿/ç¦»çº¿å¯¹æ¯”å®éªŒä¸­çš„æ•°æ®ï¼Œå¹¶ä¸”è®¡ç®—å‡ºä¸€äº›ç›¸å…³çš„æŒ‡æ ‡
 %mu_suppressions_offline = load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0125_offline_test_20240125_203932146_data\Offline_EEGMI_Scores_Jyt_test_0125_offline_test\Offline_EEGMI_Scores_Jyt_test_0125_offline_test.mat', 'mu_suppressions');
 mu_suppressions_offline = load('F:\MI_engagement\MI_attention\MI_Training\Jyt_test_0125_offline_test_20240125_203932146_data\Offline_EEGMI_Scores_Jyt_test_0125_offline_test\Offline_EEGMI_Scores_Jyt_test_0125_offline_test.mat', 'mu_suppressions');
 
@@ -91,11 +91,11 @@ MI_MUSup_thres = load('F:\MI_engagement\MI_attention\MI_Training\Jyt_test_0125_o
 %MI_MUSup_thre_weights = load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0125_online_test_20240125_220854676_data\Online_EEGMI_trajectory_Jyt_test_0125_online_test\Online_EEGMI_trajectory_1_Jyt_test_0125_online_test20240125_222645598.mat', 'MI_MUSup_thre_weights');
 MI_MUSup_thre_weights = load('F:\MI_engagement\MI_attention\MI_Training\Jyt_test_0125_online_test_20240125_220854676_data\Online_EEGMI_trajectory_Jyt_test_0125_online_test\Online_EEGMI_trajectory_1_Jyt_test_0125_online_test20240125_222645598.mat', 'MI_MUSup_thre_weights');
 
-% ÌáÈ¡µÚÒ»ĞĞµÄÊı¾İ
+% æå–ç¬¬ä¸€è¡Œçš„æ•°æ®
 MI_MUSup_thres_row1 = MI_MUSup_thres.MI_MUSup_thres;
 MI_MUSup_thre_weights_row1 = MI_MUSup_thre_weights.MI_MUSup_thre_weights(1,:);
 
-% ½øĞĞ³ı·¨¼ÆËã,µÃµ½Ô­À´µÄÊµ¼ÊµÄ¹ì¼£
+% è¿›è¡Œé™¤æ³•è®¡ç®—,å¾—åˆ°åŸæ¥çš„å®é™…çš„è½¨è¿¹
 MI_MUSUP_trajs = MI_MUSup_thre_weights_row1 ./ MI_MUSup_thres_row1;
 
 
@@ -105,19 +105,19 @@ MI_MUSUP_trajs = MI_MUSup_thre_weights_row1 ./ MI_MUSup_thres_row1;
 mu_suppressions_compare = load('F:\MI_engagement\MI_attention\MI_Training\Jyt_test_0125_comparison_test_20240125_215803328_data\Offline_EEGMI_Scores_Jyt_test_0125_comparison_test\Offline_EEGMI_Scores_Jyt_test_0125_comparison_test.mat', 'mu_suppressions_trialmean');
 EI_index_scores_compare = load('F:\MI_engagement\MI_attention\MI_Training\Jyt_test_0125_comparison_test_20240125_215803328_data\Offline_EEGMI_Scores_Jyt_test_0125_comparison_test\Offline_EEGMI_Scores_Jyt_test_0125_comparison_test.mat', 'EI_index_scores_trialmean');
 
-% ¼ÆËãmu_suppresionsºÍEI_index_scoresµÄ¾ùÖµºÍ±ê×¼²î
+% è®¡ç®—mu_suppresionså’ŒEI_index_scoresçš„å‡å€¼å’Œæ ‡å‡†å·®
 mu_suppresions_mean = mean(mu_suppresions(1,:));
 mu_suppresions_std = std(mu_suppresions(1,:));
 EI_index_scores_mean = mean(EI_index_scores(1,:));
 EI_index_scores_std = std(EI_index_scores(1,:));
 
-% ÏÔÊ¾¾ùÖµºÍ±ê×¼²î
+% æ˜¾ç¤ºå‡å€¼å’Œæ ‡å‡†å·®
 fprintf('mu_suppresions: mean = %.2f, std = %.2f\n', mu_suppresions_mean, mu_suppresions_std);
 fprintf('EI_index_scores: mean = %.2f, std = %.2f\n', EI_index_scores_mean, EI_index_scores_std);
 
 
-%% ÏÔÊ¾Ïà¹ØÊıÖµ£¬·ÖÎöÏÔÖøĞÔ
-% »æÖÆmu_suppresionsºÍEI_index_scoresµÄÕÛÏßÍ¼
+%% æ˜¾ç¤ºç›¸å…³æ•°å€¼ï¼Œåˆ†ææ˜¾è‘—æ€§
+% ç»˜åˆ¶mu_suppresionså’ŒEI_index_scoresçš„æŠ˜çº¿å›¾
 figure;
 plot(mu_suppresions(1,:), 'LineWidth', 2);
 hold on;
@@ -141,7 +141,7 @@ title('Line plot of EI');
 grid on;
 
 figure;
-resultsTrigger = resultsMI_trials(2,:);
+resultsTrigger = 
 plot(mu_suppresions(1,:).* resultsMI_trials(1,:), 'LineWidth', 2);  %.* resultsMI_trials(1,:)
 hold on;
 plot(MI_MUSup_thres_row1(1,:), 'LineWidth', 2);
@@ -151,35 +151,10 @@ hold off;
 legend('mu sup online', 'mu sup thre', 'resultsMI');
 xlabel('Index');
 ylabel('Value');
-title('Line plot of thresholds');
+title('Line plot of EI');
 grid on;
 
-figure;
-resultsTrigger = resultsMI_trials(2,:);
-plot(mu_suppresions(1,resultsTrigger==1).* resultsMI_trials(1,resultsTrigger==1), 'LineWidth', 2);  %.* resultsMI_trials(1,:)
-hold on;
-plot(MI_MUSup_thres_row1(1,resultsTrigger==1), 'LineWidth', 2);
-hold on;
-plot(resultsMI_trials(1,resultsTrigger==1), 'LineWidth', 2);
-hold off;
-legend('mu sup online', 'mu sup thre', 'resultsMI');
-xlabel('Index');
-ylabel('Value');
-title('Line plot of thresholds task 1');
-grid on;
 
-figure;
-plot(mu_suppresions(1,resultsTrigger==2).* resultsMI_trials(1,resultsTrigger==2), 'LineWidth', 2);  %.* resultsMI_trials(1,:)
-hold on;
-plot(MI_MUSup_thres_row1(1,resultsTrigger==2), 'LineWidth', 2);
-hold on;
-plot(resultsMI_trials(1,resultsTrigger==2), 'LineWidth', 2);
-hold off;
-legend('mu sup online', 'mu sup thre', 'resultsMI');
-xlabel('Index');
-ylabel('Value');
-title('Line plot of thresholds task 2');
-grid on;
 
 figure;
 resultsTrigger = resultsMI_trials(2,:);
@@ -223,20 +198,20 @@ display_correlation_trigger(resultsMI_trials, EI_index_scores);
 %mean_std_muSup_online = compute_mean_std(mu_suppresions, 'mu_suppressions');  
 %mean_std_EI_score_online = compute_mean_std(EI_index_scores, 'EI_index_scores');
 
-%% »ñÈ¡Æ½¾ù²ÎÓë¶È·ÖÊıµÄº¯Êı
+%% è·å–å¹³å‡å‚ä¸åº¦åˆ†æ•°çš„å‡½æ•°
 function mean_std_scores = compute_mean_std(scores_task, scores_name)
-    % »ñÈ¡scoresºÍtriggers
+    % è·å–scoreså’Œtriggers
     scores = scores_task(1,:);
     triggers = scores_task(2,:);
 
-    % »ñÈ¡ËùÓĞ²»Í¬µÄtriggers
+    % è·å–æ‰€æœ‰ä¸åŒçš„triggers
     unique_triggers = unique(triggers);
 
-    % ³õÊ¼»¯Êä³ö
+    % åˆå§‹åŒ–è¾“å‡º
     mean_scores = zeros(size(unique_triggers));
     std_scores = zeros(size(unique_triggers));
 
-    % ¶ÔÓÚÃ¿Ò»¸ötrigger£¬¼ÆËã¶ÔÓ¦µÄscoreµÄ¾ùÖµ
+    % å¯¹äºæ¯ä¸€ä¸ªtriggerï¼Œè®¡ç®—å¯¹åº”çš„scoreçš„å‡å€¼
     for i = 1:length(unique_triggers)
         trigger = unique_triggers(i);
         mean_scores(i) = mean(scores(triggers == trigger));
@@ -244,148 +219,148 @@ function mean_std_scores = compute_mean_std(scores_task, scores_name)
     end
     mean_std_scores = [mean_scores; std_scores];
 
-    % Êä³ö½á¹û
-    disp(['Ã¿Ò»¸öTriggerµÄÆ½¾ù', scores_name, '·ÖÊıÊÇ£º']);
+    % è¾“å‡ºç»“æœ
+    disp(['æ¯ä¸€ä¸ªTriggerçš„å¹³å‡', scores_name, 'åˆ†æ•°æ˜¯ï¼š']);
     for i = 1:length(unique_triggers)
-        disp(['Trigger ' num2str(unique_triggers(i)) ' µÄÆ½¾ù·ÖÊıÊÇ ' num2str(mean_scores(i))]);
-        disp(['Trigger ' num2str(unique_triggers(i)) ' µÄ±ê×¼²îÊÇ ' num2str(std_scores(i))]);
+        disp(['Trigger ' num2str(unique_triggers(i)) ' çš„å¹³å‡åˆ†æ•°æ˜¯ ' num2str(mean_scores(i))]);
+        disp(['Trigger ' num2str(unique_triggers(i)) ' çš„æ ‡å‡†å·®æ˜¯ ' num2str(std_scores(i))]);
     end
 end
 
-%% ¼ÆËãÏà¹ØmuÆµ´øË¥¼õÖ¸±ê
+%% è®¡ç®—ç›¸å…³mué¢‘å¸¦è¡°å‡æŒ‡æ ‡
 function mu_suppresion = MI_MuSuperesion(mu_power_, mu_power, mu_channels)
     ERD_C3 = (mu_power(mu_channels.C3, 1) - mu_power_(mu_channels.C3, 1)); 
-    %ERD_C4 = (mu_power(mu_channels.C4, 1) - mu_power_(mu_channels.C4, 1));  % ¼ÆËãÁ½¸öÄÔµçÎ»ÖÃµÄÏà¹ØµÄÖ¸±ê 
-    mu_suppresion = 1/2 * (1 - ERD_C3);  % ¹éÒ»»¯µ½[0,1]µÄÇø¼äÀïÃæ
+    %ERD_C4 = (mu_power(mu_channels.C4, 1) - mu_power_(mu_channels.C4, 1));  % è®¡ç®—ä¸¤ä¸ªè„‘ç”µä½ç½®çš„ç›¸å…³çš„æŒ‡æ ‡ 
+    mu_suppresion = 1/2 * (1 - ERD_C3);  % å½’ä¸€åŒ–åˆ°[0,1]çš„åŒºé—´é‡Œé¢
 end
     
-%% ¼ÆËãÏà¹ØµÄEIÖ¸±êµÄº¯Êı
+%% è®¡ç®—ç›¸å…³çš„EIæŒ‡æ ‡çš„å‡½æ•°
 function EI_index_score = EI_index_Caculation(EI_index, EI_channels)
     channels_ = [EI_channels.Fp1,EI_channels.Fp2, EI_channels.F7, EI_channels.F3, EI_channels.Fz, EI_channels.F4, EI_channels.F8'];
     EI_index_score = mean(EI_index(channels_, 1));
 
 end
 
-%% ·ÖÎöÏÔÖøĞÔµÄº¯Êı
+%% åˆ†ææ˜¾è‘—æ€§çš„å‡½æ•°
 function [p_ttest, p_ranksum] = significance_analysis_trigger(mu_suppresions1, mu_suppresions2)
-    % »ñÈ¡Àà±ğµÄÎ¨Ò»Öµ
+    % è·å–ç±»åˆ«çš„å”¯ä¸€å€¼
     categories = unique(mu_suppresions1(2,:));
 
-    % ³õÊ¼»¯pÖµ
+    % åˆå§‹åŒ–på€¼
     p_ttest = zeros(1, length(categories));
     p_ranksum = zeros(1, length(categories));
 
-    % ¶ÔÃ¿¸öÀà±ğ½øĞĞÏÔÖøĞÔ·ÖÎö
+    % å¯¹æ¯ä¸ªç±»åˆ«è¿›è¡Œæ˜¾è‘—æ€§åˆ†æ
     for i = 1:length(categories)
-        % »ñÈ¡µ±Ç°Àà±ğ
+        % è·å–å½“å‰ç±»åˆ«
         category = categories(i);
         
-        % ÌáÈ¡³öµ±Ç°Àà±ğµÄÊı¾İ
+        % æå–å‡ºå½“å‰ç±»åˆ«çš„æ•°æ®
         data1 = mu_suppresions1(1, mu_suppresions1(2,:) == category);
         data2 = mu_suppresions2(1, mu_suppresions2(2,:) == category);
         
-        % ½øĞĞt¼ìÑé
+        % è¿›è¡Œtæ£€éªŒ
         [~,p_ttest(i)] = ttest2(data1, data2);
         
-        % ½øĞĞWilcoxonÖÈºÍ¼ìÑé
+        % è¿›è¡ŒWilcoxonç§©å’Œæ£€éªŒ
         p_ranksum(i) = ranksum(data1, data2);
     end
 end
 
 function [p_ttest, p_ranksum] = significance_analysis(mu_suppresions1, mu_suppresions2)
     
-    % ³õÊ¼»¯pÖµ
+    % åˆå§‹åŒ–på€¼
     p_ttest = zeros(1, 1);
     p_ranksum = zeros(1, 1);
 
-    % ÌáÈ¡³öµ±Ç°Àà±ğµÄÊı¾İ
+    % æå–å‡ºå½“å‰ç±»åˆ«çš„æ•°æ®
     data1 = mu_suppresions1(1, :);
     data2 = mu_suppresions2(1, :);
         
-    % ½øĞĞt¼ìÑé
+    % è¿›è¡Œtæ£€éªŒ
     [~,p_ttest(1)] = ttest2(data1, data2);
 
-    % ½øĞĞWilcoxonÖÈºÍ¼ìÑé
+    % è¿›è¡ŒWilcoxonç§©å’Œæ£€éªŒ
     p_ranksum(1) = ranksum(data1, data2);
     
 end
 
 function [p_anova] = anova_analysis(mu_suppresions1, mu_suppresions2)
-    % »ñÈ¡Àà±ğµÄÎ¨Ò»Öµ
+    % è·å–ç±»åˆ«çš„å”¯ä¸€å€¼
     categories = unique([mu_suppresions1(2,:), mu_suppresions2(2,:)]);
     %categories = [2];
-    % ³õÊ¼»¯Êı¾İ
+    % åˆå§‹åŒ–æ•°æ®
     data = [];
     group = [];
 
-    % ¶ÔÃ¿¸öÀà±ğ½øĞĞ´¦Àí
+    % å¯¹æ¯ä¸ªç±»åˆ«è¿›è¡Œå¤„ç†
     for i = 1:length(categories)
-        % »ñÈ¡µ±Ç°Àà±ğ
+        % è·å–å½“å‰ç±»åˆ«
         category = categories(i);
         
-        % ÌáÈ¡³öµ±Ç°Àà±ğµÄÊı¾İ
+        % æå–å‡ºå½“å‰ç±»åˆ«çš„æ•°æ®
         data1 = mu_suppresions1(1, mu_suppresions1(2,:) == category);
         data2 = mu_suppresions2(1, mu_suppresions2(2,:) == category);
         
-        % ½«Êı¾İÌí¼Óµ½dataÊı×éÖĞ
+        % å°†æ•°æ®æ·»åŠ åˆ°dataæ•°ç»„ä¸­
         data = [data, data1, data2];
         
-        % ´´½¨Ò»¸ö×é±êÇ©Êı×é
+        % åˆ›å»ºä¸€ä¸ªç»„æ ‡ç­¾æ•°ç»„
         group = [group, repmat({sprintf('Method1_Category%d', category)}, 1, length(data1)), ...
                          repmat({sprintf('Method2_Category%d', category)}, 1, length(data2))];
     end
     
-    % ½øĞĞ·½²î·ÖÎö
-    p_anova = anova1(data, group, 'off'); % 'off'±íÊ¾²»ÏÔÊ¾½á¹ûÍ¼±í
+    % è¿›è¡Œæ–¹å·®åˆ†æ
+    p_anova = anova1(data, group, 'off'); % 'off'è¡¨ç¤ºä¸æ˜¾ç¤ºç»“æœå›¾è¡¨
 end
-% ÏÔÊ¾½á¹û²¢±¨¸æÏÔÖøĞÔ
+% æ˜¾ç¤ºç»“æœå¹¶æŠ¥å‘Šæ˜¾è‘—æ€§
 function significance_show(p_ttest,p_ranksum)
     for i = 1:length(p_ttest)
         fprintf('Category %d: p_ttest = %.4f, p_ranksum = %.4f\n', i, p_ttest(i), p_ranksum(i));
         if p_ttest(i) < 0.05
-            fprintf('¶ÔÓÚt¼ìÑé£¬Àà±ğ%dµÄ²îÒìÊÇÏÔÖøµÄ¡£\n', i);
+            fprintf('å¯¹äºtæ£€éªŒï¼Œç±»åˆ«%dçš„å·®å¼‚æ˜¯æ˜¾è‘—çš„ã€‚\n', i);
         else
-            fprintf('¶ÔÓÚt¼ìÑé£¬Àà±ğ%dµÄ²îÒì²»ÊÇÏÔÖøµÄ¡£\n', i);
+            fprintf('å¯¹äºtæ£€éªŒï¼Œç±»åˆ«%dçš„å·®å¼‚ä¸æ˜¯æ˜¾è‘—çš„ã€‚\n', i);
         end
         if p_ranksum(i) < 0.05
-            fprintf('¶ÔÓÚWilcoxonÖÈºÍ¼ìÑé£¬Àà±ğ%dµÄ²îÒìÊÇÏÔÖøµÄ¡£\n', i);
+            fprintf('å¯¹äºWilcoxonç§©å’Œæ£€éªŒï¼Œç±»åˆ«%dçš„å·®å¼‚æ˜¯æ˜¾è‘—çš„ã€‚\n', i);
         else
-            fprintf('¶ÔÓÚWilcoxonÖÈºÍ¼ìÑé£¬Àà±ğ%dµÄ²îÒì²»ÊÇÏÔÖøµÄ¡£\n', i);
+            fprintf('å¯¹äºWilcoxonç§©å’Œæ£€éªŒï¼Œç±»åˆ«%dçš„å·®å¼‚ä¸æ˜¯æ˜¾è‘—çš„ã€‚\n', i);
         end
     end
 end
-%% ·ÖÎöÏà¹ØĞÔµÄº¯Êı
+%% åˆ†æç›¸å…³æ€§çš„å‡½æ•°
 function [correlation, p_value] = display_correlation(data1, data2)
-    % ¼ÆËãÏà¹ØÏµÊıºÍpÖµ
+    % è®¡ç®—ç›¸å…³ç³»æ•°å’Œpå€¼
     [R, P] = corrcoef(data1(1,:), data2(1,:));
 
-    % ÌáÈ¡Ïà¹ØÏµÊıºÍpÖµ
+    % æå–ç›¸å…³ç³»æ•°å’Œpå€¼
     correlation = R(1, 2);
     p_value = P(1, 2);
 
-    % ÏÔÊ¾Ïà¹ØÏµÊıºÍpÖµ
+    % æ˜¾ç¤ºç›¸å…³ç³»æ•°å’Œpå€¼
     fprintf('The correlation coefficient (r) between the two datasets is: %.4f\n', correlation);
     fprintf('The p-value for this correlation is: %.4f\n', p_value);
 end
 
 function [R, P] = display_correlation_trigger(mu_suppresions1, mu_suppresions2)
-    % »ñÈ¡Àà±ğµÄÎ¨Ò»Öµ
+    % è·å–ç±»åˆ«çš„å”¯ä¸€å€¼
     categories = unique(mu_suppresions1(2,:));
 
-    % ³õÊ¼»¯pÖµ
+    % åˆå§‹åŒ–på€¼
     R = zeros(1, length(categories));
     P = zeros(1, length(categories));
 
-    % ¶ÔÃ¿¸öÀà±ğ½øĞĞÏÔÖøĞÔ·ÖÎö
+    % å¯¹æ¯ä¸ªç±»åˆ«è¿›è¡Œæ˜¾è‘—æ€§åˆ†æ
     for i = 1:length(categories)
-        % »ñÈ¡µ±Ç°Àà±ğ
+        % è·å–å½“å‰ç±»åˆ«
         category = categories(i);
         disp(['category: ', num2str(category)]);
-        % ÌáÈ¡³öµ±Ç°Àà±ğµÄÊı¾İ
+        % æå–å‡ºå½“å‰ç±»åˆ«çš„æ•°æ®
         data1 = mu_suppresions1(1, mu_suppresions1(2,:) == category);
         data2 = mu_suppresions2(1, mu_suppresions2(2,:) == category);
         
-        % ½øĞĞÏà¹ØĞÔ¼ìÑé·ÖÎö
+        % è¿›è¡Œç›¸å…³æ€§æ£€éªŒåˆ†æ
         [R(i), P(i)] = display_correlation(data1, data2);
     end
 end
