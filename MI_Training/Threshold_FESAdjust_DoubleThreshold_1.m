@@ -1,4 +1,4 @@
-%% 根据之前的表现进行调整任务难度
+%% 根据之前的表现来判断是否需要电刺激
 function Fes_flag_ = Threshold_FESAdjust_DoubleThreshold_1(resultsMI, mu_suppressions, FES_ExamingNum)
     MI_num = size(mu_suppressions, 2);
     Fes_flag_ = 0;
