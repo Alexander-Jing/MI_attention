@@ -14,8 +14,8 @@ close all;
 %system('E:\MI_engagement\unity_test\unity_test\build_test\unity_test.exe&');
 %system('E:\UpperLimb_Animation\unity_test.exe&');
 %system('E:\MI_AO_Animation\UpperLimb_Animation\unity_test.exe&');
-system('E:\MI_AO_Animation\UpperLimb_Animation_modified\unity_test.exe&');
-%system('F:\MI_UpperLimb_AO\UpperLimb_AO\UpperLimb_Animation\unity_test.exe&');
+%system('E:\MI_AO_Animation\UpperLimb_Animation_modified\unity_test.exe&');
+system('F:\MI_UpperLimb_AO\UpperLimb_AO\UpperLimb_Animation\unity_test.exe&');
 pause(3)
 UnityControl = tcpip('localhost', 8881, 'NetworkRole', 'client');          % 新的端口改为8881
 fopen(UnityControl);
@@ -103,12 +103,15 @@ for trial_idx = 1:length(ChoiceTrial)
            [FilteredDataMI, EI_index, mu_power_MI] = Online_DataPreprocess(rawdata, ChoiceTrial(1,trial_idx), sample_frequency, WindowLength, channels);
            score = weight_mu * sum(mu_power_MI) + (1 - weight_mu) * sum(EI_index);  % 计算得分，这里临时使用求和来表征，后续需要修�?
            
-           
-           
+           score = score * (2 * rand() - 1);
+           if score < 0
+               score = 1.0*100;
+           end
+
            config_data = [WindowLength;size(channels, 2);ChoiceTrial(1,trial_idx);session_idx;trial_idx;timer;score;0;0;0;0 ];
            order = 1.0;
            
-           resultMI = Online_Data2Server_Communicate(order, FilteredDataMI, ip, port, subject_name, config_data, foldername);  % 传输数据给线上的模型，看分类情况
+           %resultMI = Online_Data2Server_Communicate(order, FilteredDataMI, ip, port, subject_name, config_data, foldername);  % 传输数据给线上的模型，看分类情况
            % score 数据传输设置
            sendbuf(1,5) = uint8(score/100.0);
            fwrite(UnityControl,sendbuf);
@@ -124,9 +127,9 @@ for trial_idx = 1:length(ChoiceTrial)
        if timer == 10
            disp('*********Online Updating');
            % 传输数据和更新模�?
-           config_data = [WindowLength;size(channels, 2);ChoiceTrial(1,trial_idx);session_idx;trial_idx;timer/5;score;0;0;0;0 ];
+           %config_data = [WindowLength;size(channels, 2);ChoiceTrial(1,trial_idx);session_idx;trial_idx;timer/5;score;0;0;0;0 ];
            order = 2.0;  % 传输数据和训练的命令
-           Online_Data2Server_Send(order, [0,0,0,0], ip, port, subject_name, config_data);  % 发�?�指令，让服务器更新数据，[0,0,0,0]单纯是用于凑下数据，防止应为空集影响传输
+           %Online_Data2Server_Send(order, [0,0,0,0], ip, port, subject_name, config_data);  % 发�?�指令，让服务器更新数据，[0,0,0,0]单纯是用于凑下数据，防止应为空集影响传输
            results = [results, resultMI];
            
            sendbuf(1,2) = hex2dec('01');

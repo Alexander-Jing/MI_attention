@@ -187,7 +187,7 @@ while(AllTrial <= TrialNum)
 
         % 确定这一轮的阈值
         if Trials(AllTrial)> 0
-            Trigger = Trials(AllTrial);
+            %Trigger = Trials(AllTrial);
             Trigger_num_ = count_trigger(Trials, AllTrial);  % 这里用于计算在AllTrial对应的Trigger之前已经出现了多少次，从而计算轨迹
             MI_MUSup_thre = traj{Trigger+1}(Trigger_num_+1);  % 计算阈值
             % 确定加权之后的阈值
@@ -235,9 +235,16 @@ while(AllTrial <= TrialNum)
         disp(['cls prob: ', num2str(resultMI(2,1))]);
         % 得分数据实时显示
         visual_feedback = (resultMI(2,1) * mu_suppression);
+        
+        % 设定下界，要不然不显示
+        if visual_feedback <= 0
+            visual_feedback = 1;
+        end
+        
+        % 实时的视觉反馈
         sendbuf(1,5) = uint8((visual_feedback*100.0));
         fwrite(UnityControl,sendbuf);
-           
+
         % 判断是否达成要求
         if resultMI(2,1) * mu_suppression >= MI_MUSup_thre
             clsFlag = 1;  % 识别正确，置1
