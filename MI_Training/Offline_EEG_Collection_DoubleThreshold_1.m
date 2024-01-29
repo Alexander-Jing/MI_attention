@@ -42,9 +42,9 @@ status = CheckNetStreamingVersion(con);                                    % ÅĞ¶
 %% ÀëÏßÊµÑé²ÎÊıÉèÖÃ²¿·Ö£¬ÓÃÓÚÉèÖÃÃ¿Ò»¸ö±»ÊÔµÄÇé¿ö£¬ÒÀ¾İ±»ÊÔÇé¿ö½øĞĞĞŞ¸Ä
 
 % ÔË¶¯ÏëÏó»ù±¾²ÎÊıÉèÖÃ
-subject_name = 'Jyt_test_0125_offline_test';  % ±»ÊÔĞÕÃû
-TrialNum = 3*30;  % ÉèÖÃ²É¼¯µÄÊıÁ¿
-%TrialNum = 3*3;
+subject_name = 'Jyt_test_0129_offline_debug';  % ±»ÊÔĞÕÃû
+%TrialNum = 3*30;  % ÉèÖÃ²É¼¯µÄÊıÁ¿
+TrialNum = 3*3;
 MotorClasses = 3;  % ÔË¶¯ÏëÏóµÄÖÖÀàµÄÊıÁ¿µÄÉèÖÃ£¬×¢ÒâÕâÀïÊÇ°Ñ¿ÕÏëidle×´Ì¬Ò²Òª·Å½øÈ¥µÄ£¬×¢ÒâÕâÀïµÄÈÎÎñÊÇ[0,1,2]£¬ºÍreadme.txtÀïÃæµÄ¶ÔÓ¦
 % µ±Ç°ÉèÖÃµÄÈÎÎñ
 % Idle 0   -> SceneIdle 
@@ -68,8 +68,8 @@ ip = '172.18.22.21';
 port = 8888;  % ºÍºó¶Ë·şÎñÆ÷Á¬½ÓµÄÁ½¸ö²ÎÊı
 
 % µç´Ì¼¤Ç¿¶ÈÉèÖÃ
-StimAmplitude_1 = 7;
-StimAmplitude_2 = 7;  % ·ùÖµÉèÖÃ£¨mA£©
+StimAmplitude_1 = 5;
+StimAmplitude_2 = 5;  % ·ùÖµÉèÖÃ£¨mA£©
 
 % ÄÑ¶È¼ÆËãÓë»®·ÖÉèÖÃ
 %task_weights = [3,5,2];
@@ -153,10 +153,12 @@ while(AllTrial <= TrialNum)
         if Trigger == 1
             StimCommand = StimCommand_1;
             fwrite(StimControl,StimCommand);
+            disp(['MIÖ®Ç°¸¨Öúµç´Ì¼¤']);
         end
         if Trigger == 2
             StimCommand = StimCommand_2;
             fwrite(StimControl,StimCommand);
+            disp(['MIÖ®Ç°¸¨Öúµç´Ì¼¤']);
         end
     end
     

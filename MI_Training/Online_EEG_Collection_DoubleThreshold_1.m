@@ -44,9 +44,9 @@ status = CheckNetStreamingVersion(con);                                    % ÅĞ¶
 %% ÔÚÏßÊµÑé²ÎÊıÉèÖÃ²¿·Ö£¬ÓÃÓÚÉèÖÃÃ¿Ò»¸ö±»ÊÔµÄÇé¿ö£¬ÒÀ¾İ±»ÊÔÇé¿ö½øĞĞĞŞ¸Ä
 
 % ÔË¶¯ÏëÏó»ù±¾²ÎÊıÉèÖÃ
-subject_name = 'Jyt_test_0125_online_test';  % ±»ÊÔĞÕÃû
-sub_offline_collection_folder = 'Jyt_test_0125_offline_test_20240125_203932146_data';  % ±»ÊÔµÄÀëÏß²É¼¯Êı¾İ
-subject_name_offline =  'Jyt_test_0125_offline_test';  % ÀëÏßÊÕ¼¯Êı¾İÊ±ºòµÄ±»ÊÔÃû³Æ
+subject_name = 'Jyt_test_0129_online_debug';  % ±»ÊÔĞÕÃû
+sub_offline_collection_folder = 'Jyt_test_0129_offline_debug_20240129_224307245_data';  % ±»ÊÔµÄÀëÏß²É¼¯Êı¾İ
+subject_name_offline =  'Jyt_test_0129_offline_debug';  % ÀëÏßÊÕ¼¯Êı¾İÊ±ºòµÄ±»ÊÔÃû³Æ
 session_idx = 1;  % session indexÊıÁ¿£¬Èç¹ûÊÇ1µÄ»°£¬»á×Ô¶¯Éú³ÉÏà¹ØÅÅ²¼
 MotorClass = 2; % ÔË¶¯ÏëÏó¶¯×÷ÊıÁ¿£¬×¢ÒâÕâÀïÊÇ´¿Éè¼ÆµÄÔË¶¯ÏëÏó¶¯×÷µÄÊıÁ¿£¬²»°üÀ¨¿ÕÏëidle×´Ì¬
 DiffLevels = [1,2];  % ¶ÔÓÚÉÏÃæµÄÔË¶¯ÏëÏóµÄÄÑ¶ÈÅÅ²¼£¬Ô½¿¿ºóÔ½ÄÑ£¬ÆäÖĞµÄ1,2¶ÔÓ¦µÄÊÇÔË¶¯ÏëÏóµÄÀàĞÍ£¬ºÍunity¶ÔÓ¦
@@ -73,8 +73,8 @@ ip = '172.18.22.21';
 port = 8888;  % ºÍºó¶Ë·şÎñÆ÷Á¬½ÓµÄÁ½¸ö²ÎÊı
 
 % µç´Ì¼¤Ç¿¶ÈÉèÖÃ
-StimAmplitude_1 = 7;
-StimAmplitude_2 = 7;  % ·ùÖµÉèÖÃ£¨mA£©
+StimAmplitude_1 = 5;
+StimAmplitude_2 = 5;  % ·ùÖµÉèÖÃ£¨mA£©
 
 %% ÉèÖÃµç´Ì¼¤Á¬½Ó
 % ÉèÖÃÁ¬½Ó
@@ -131,12 +131,15 @@ EI_indices = [];  % ÓÃÓÚ´æ´¢Ã¿Ò»¸ötrialÀïÃæµÄÃ¿Ò»¸öwindowµÄEI·ÖÊıÖµ
 EI_index_scores = [];  % ÓÃÓÚ´æ´¢EI_index_Caculation(EI_index, EI_channels)¼ÆËã³öÀ´µÄEI_index_scoreÊıÖµ
 mu_powers = [];  % ÓÃÓÚ´æ´¢Ã¿Ò»¸ötrialÀïÃæµÄÃ¿Ò»¸öwindowµÄmuÆµ´øµÄÄÜÁ¿ÊıÖµ
 mu_suppressions = [];  % ÓÃÓÚ´æ´¢Ã¿Ò»¸ötrialÀïÃæµÄmu_suppression
+mu_suppressions_normalized = [];  % ÓÃÓÚ´æ´¢Ã¿Ò»¸ötrialÀïÃæµÄmu_suppressions_normalized
 resultsMI = [];  % ÓÃÓÚ´æ´¢Ã¿Ò»¸ötrialÀïÃæµÄresults
+FES_flags = [];  % ÓÃÓÚ´æ´¢Ã¿Ò»¸ötrialÀïÃæµÄFESµç´Ì¼¤Çé¿ö£¬Èç¹ûÊ©¼Óµç´Ì¼¤£¬ÔòÎª1
 
 scores_trial = [];  % ÓÃÓÚ´æ´¢Ã¿Ò»¸ötrialµÄÆ½¾ù·ÖÊıÖµ
 muSups_trial = [];  % ÓÃÓÚ´æ´¢Ã¿Ò»¸ötrialµÄÈÎÎñÍê³ÉÊıÖµ£¬µ±Ç°µÄÈÎÎñÍê³ÉÖ¸±êÉèÖÃÎªtrialÀïÃæµÄ×î´óµÄresultMI*MuSup±ÈÉÏMI_MUSup_thre  max(resultMI*MuSup)/MI_MUSup_thre
 MI_MUSup_thre_weights = []; % ÓÃÓÚ´æ´¢Ã¿Ò»¸ötrialµÄÈ¨ÖØ
 MI_MUSup_thres = [];  % ÓÃÓÚ´æ´¢Ã¿Ò»¸ötrialµÄãĞÖµ
+MI_MUSup_thres_normalized = [];  % ÓÃÓÚ´æ´¢Ã¿Ò»¸ötrialµÄãĞÖµ
 RestTimeLens = [];  % ÓÃÓÚ´æ´¢Ã¿Ò»¸ötrialµÄĞİÏ¢Ê±¼ä
 
 Online_FES_ExamingNum = 5;  % ÔÚÏßµÄÊ±ºòÃ¿¸ô¶à¾Ã¼ì²éÅĞ¶ÏÊÇ·ñĞèÒª½øĞĞFES¸¨Öú
@@ -202,11 +205,12 @@ while(AllTrial <= TrialNum)
             MI_MUSup_thres = [MI_MUSup_thres, [MI_MUSup_thre;Trigger]];
 
             % ¹éÒ»»¯Ïà¹ØµÄÊıÖµ£¬ÓÃÓÚÊµÊ±ÏÔÊ¾
-            MI_MUSup_thre_normalized = mu_normalization(MI_MUSup_thre, min_max_value, Trigger+1);
+            MI_MUSup_thre_normalized = mu_normalization(MI_MUSup_thre, min_max_value.min_max_value, Trigger+1);
             MI_MUSup_thre_normalized = MI_MUSup_thre_weight * MI_MUSup_thre_normalized;
             disp(['Trial: ', num2str(AllTrial), ' Cls: ', num2str(Trials(AllTrial))])
             disp(['Threshold: ', num2str(MI_MUSup_thre_normalized)]);
-
+            MI_MUSup_thres_normalized = [MI_MUSup_thres_normalized, [MI_MUSup_thre_normalized;Trigger]];
+            
             % threshold Êı¾İ´«ÊäÉèÖÃÒÔ¼°ÏÔÊ¾
             sendbuf(1,6) = uint8((MI_MUSup_thre_normalized*100));
             fwrite(UnityControl,sendbuf);  
@@ -217,12 +221,14 @@ while(AllTrial <= TrialNum)
         if Trigger == 1
             StimCommand = StimCommand_1;
             fwrite(StimControl,StimCommand);
+            disp(['MIÖ®Ç°¸¨Öúµç´Ì¼¤']);
         end
         if Trigger == 2
             StimCommand = StimCommand_2;
             fwrite(StimControl,StimCommand);
+            disp(['MIÖ®Ç°¸¨Öúµç´Ì¼¤']);
         end
-
+        
     end
     
     % µÚ5s¿ªÊ¼È¡512µÄTrigger~=6µÄMIµÄ´°¿Ú£¬Êı¾İ´¦Àí²¢ÇÒ½øĞĞ·ÖÎö
@@ -246,9 +252,8 @@ while(AllTrial <= TrialNum)
         disp(['cls prob: ', num2str(resultMI(2,1))]);
         
         % µÃ·ÖÊı¾İ¹éÒ»»¯´¦Àí£¬Í¬Ê±±£³ÖÔÚ0-1Ö®¼ä£¬ÓÃÓÚÊµÊ±ÏÔÊ¾
-        mu_suppression_normalized = mu_normalization(mu_suppression, min_max_value, Trigger+1);
-        mu_suppression_normalized = resultMI(2,1) * mu_suppression_normalized;
-        visual_feedback = mu_suppression_normalized;
+        mu_suppression_normalized = mu_normalization(mu_suppression, min_max_value.min_max_value, Trigger+1);
+        visual_feedback = resultMI(2,1) * mu_suppression_normalized;
         if visual_feedback < 0.0
             visual_feedback = 0.01;
         elseif visual_feedback > 1
@@ -278,21 +283,24 @@ while(AllTrial <= TrialNum)
         mu_suppression = [mu_suppression; Trigger]; % ÕâÀïÌí¼ÓÉÏTriggerµÄÏà¹ØÊıÖµ£¬·½±ã´æ´¢
         EI_index_score = [EI_index_score; Trigger];
         resultMI_ = [resultMI; Trigger];
+        mu_suppression_normalized = [mu_suppression_normalized; Trigger];
         
         resultsMI = [resultsMI, resultMI_];
         EI_index_scores = [EI_index_scores, EI_index_score];
         EI_indices = [EI_indices, EI_index];  % Ìí¼ÓÏà¹ØµÄEIÖ¸±êÊıÖµ  
         mu_powers = [mu_powers, mu_power_MI];  % Ìí¼ÓÏà¹ØµÄmu½ÚÂÉÄÜÁ¿
         mu_suppressions = [mu_suppressions, mu_suppression];  % Ìí¼ÓÏà¹ØµÄmuË¥¼õÇé¿ö£¬ÓÃÓÚºóĞøµÄ·ÖÎö
+        mu_suppressions_normalized = [mu_suppressions_normalized, mu_suppression_normalized];
         
         % ÔÚÏëÏóµÄÍ¬Ê±¼ÓÈëµç´Ì¼¤£¬Èç¹ûÏëÏóµÄÊ±ºò³öÏÖÒ»¶¨µÄÀ§ÄÑ£¬ÄÇ¾Í¼ÓÈëµç´Ì¼¤
-        Online_FES_flag = Threshold_FESAdjust_DoubleThreshold_1(resultsMI, mu_suppressions, Online_FES_ExamingNum);
+        Online_FES_flag = Threshold_FESAdjust_DoubleThreshold_1(resultsMI, mu_suppressions_normalized, Online_FES_ExamingNum);
         
         if Online_FES_flag == 1
             % ½øĞĞµç´Ì¼¤
             if Trigger == 1
                 StimCommand = StimCommand_1;
                 fwrite(StimControl,StimCommand);
+                disp(['MIÔÚÏß¸¨Öúµç´Ì¼¤']);
             end
             if Trigger == 2
                 StimCommand = StimCommand_2;
@@ -300,7 +308,7 @@ while(AllTrial <= TrialNum)
             end
             Online_FES_flag = 0;  % µç´Ì¼¤½áÊøÖ®ºóÖØĞÂÖÃ0
         end
-
+        FES_flags = [FES_flags, [Online_FES_flag; Trigger]];  % ´æ´¢Ò»ÏÂµç´Ì¼¤Ïà¹ØµÄÊıÖµ
     end
     
    %% ÔË¶¯ÏëÏó¸øÓë·´À¡½×¶Î£¨Ïë¶Ô/Ê±¼ä·¶Î§ÄÚÃ»ÓĞÏë¶Ô£©,Í¬Ê±¸üĞÂÄ£ĞÍ
@@ -429,7 +437,7 @@ while(AllTrial <= TrialNum)
     % ¿ÕÏëÈÎÎñÏëÏó5s£¬µ½µÚ7sÖ®ºó¿ªÊ¼ĞİÏ¢£¬µ½µÚ10s¾Í½áÊøÈÎÎñ
     if Timer == 10 && Trials(AllTrial)==0 && clsControl == 0 %½áÊøĞİÏ¢£¬×¼±¸ÏÂÒ»¸ö
         % ´æ´¢Ïà¹ØµÄEIÖ¸±êºÍmu½ÚÂÉÄÜÁ¿µÄÊı¾İ
-        SaveMIEngageTrials(EI_indices, mu_powers, mu_suppressions, subject_name, foldername, config_data, EI_index_scores, resultsMI);
+        SaveMIEngageTrials(EI_indices, mu_powers, mu_suppressions, subject_name, foldername, config_data, EI_index_scores, resultsMI, FES_flags);
         %¼ÆÊ±Æ÷Çå0
         Timer = 0;  % ¼ÆÊ±Æ÷Çå0
         % Ã¿Ò»¸ötrialµÄÊıÖµ»¹Ô­
@@ -439,6 +447,7 @@ while(AllTrial <= TrialNum)
         resultsMI = [];  % MI·ÖÀà½á¹û±£´æÊıÖµ»¹Ô­
         EI_index_scores = [];  % EIÖ¸±ê±£´æÊıÖµ»¹Ô­
         mu_suppressions = [];  % muË¥¼õ±£´æÊıÖµ»¹Ô­
+        mu_suppressions_normalized = [];
         
         RestTimeLen = RestTimeLenBaseline;  % ĞİÏ¢Ê±¼ä»¹Ô­
         disp(['Trial: ', num2str(AllTrial), ', Task: ', num2str(Trials(AllTrial))]);  % ÏÔÊ¾Ïà¹ØÊı¾İ
@@ -446,7 +455,7 @@ while(AllTrial <= TrialNum)
     % Ïë¶ÔÁËÖ®ºó£¬AOÖ®ºó£¬ĞİÏ¢3sÖ®ºó£¬½áÊøĞİÏ¢£¬×¼±¸ÏÂÒ»¸ö
     if Trials(AllTrial)>0 && Timer == (clsTime + 8 + RestTimeLen) && clsControl == 1  %½áÊøĞİÏ¢
         % ´æ´¢Ïà¹ØµÄEIÖ¸±êºÍmu½ÚÂÉÄÜÁ¿µÄÊı¾İ
-        SaveMIEngageTrials(EI_indices, mu_powers, mu_suppressions, subject_name, foldername, config_data, EI_index_scores, resultsMI);
+        SaveMIEngageTrials(EI_indices, mu_powers, mu_suppressions, subject_name, foldername, config_data, EI_index_scores, resultsMI, FES_flags);
         % ¼ÆÊ±Æ÷Çå0
         Timer = 0;  % ¼ÆÊ±Æ÷Çå0
         % clsµÄÁ½¸öflagÇå0
@@ -459,6 +468,7 @@ while(AllTrial <= TrialNum)
         resultsMI = [];  % MI·ÖÀà½á¹û±£´æÊıÖµ»¹Ô­
         EI_index_scores = [];  % EIÖ¸±ê±£´æÊıÖµ»¹Ô­
         mu_suppressions = [];  % muË¥¼õ±£´æÊıÖµ»¹Ô­
+        mu_suppressions_normalized = [];
         
         % ÆäÓàÉèÖÃ»¹Ô­
         RestTimeLen = RestTimeLenBaseline;  % ĞİÏ¢Ê±¼ä»¹Ô­
@@ -467,7 +477,7 @@ while(AllTrial <= TrialNum)
     % ÔË¶¯ÏëÏóÃ»ÓĞÏë¶Ô£¬ÌáĞÑÖ®ºó£¬ĞİÏ¢3sÖ®ºó£¬½áÊøĞİÏ¢£¬×¼±¸ÏÂÒ»¸ö
     if Trials(AllTrial)>0 && clsFlag == 0 && Timer == (MaxMITime + 8 + RestTimeLen) && clsControl == 2
         % ´æ´¢Ïà¹ØµÄEIÖ¸±êºÍmu½ÚÂÉÄÜÁ¿µÄÊı¾İ
-        SaveMIEngageTrials(EI_indices, mu_powers, mu_suppressions, subject_name, foldername, config_data, EI_index_scores, resultsMI);
+        SaveMIEngageTrials(EI_indices, mu_powers, mu_suppressions, subject_name, foldername, config_data, EI_index_scores, resultsMI, FES_flags);
         % ¼ÆÊ±Æ÷Çå0
         Timer = 0;  % ¼ÆÊ±Æ÷Çå0
         % clsflagÇå0
@@ -480,6 +490,8 @@ while(AllTrial <= TrialNum)
         resultsMI = [];  % MI·ÖÀà½á¹û±£´æÊıÖµ»¹Ô­
         EI_index_scores = [];  % EIÖ¸±ê±£´æÊıÖµ»¹Ô­
         mu_suppressions = [];  % muË¥¼õ±£´æÊıÖµ»¹Ô­
+        mu_suppressions_normalized = [];
+        
         % ÆäÓàÉèÖÃ»¹Ô­
         RestTimeLen = RestTimeLenBaseline;  % ĞİÏ¢Ê±¼ä»¹Ô­
         disp(['Trial: ', num2str(AllTrial), ', Task: ', num2str(Trials(AllTrial))]);  % ÏÔÊ¾Ïà¹ØÊı¾İ
@@ -502,11 +514,12 @@ foldername_rawdata = [foldername, '\\Online_EEGMI_trajectory_', subject_name]; %
 if ~exist(foldername_rawdata, 'dir')
    mkdir(foldername_rawdata);
 end
-save([foldername_rawdata, '\\', FunctionNowFilename(['Online_EEGMI_trajectory_',num2str(session_idx), '_', subject_name], '.mat' )],'scores_trial','traj','MI_MUSup_thre_weights','MI_MUSup_thres','RestTimeLens','muSups_trial','scores_trial');
+save([foldername_rawdata, '\\', FunctionNowFilename(['Online_EEGMI_trajectory_',num2str(session_idx), '_', subject_name], '.mat' )],'scores_trial','traj','MI_MUSup_thre_weights',...
+    'MI_MUSup_thres','RestTimeLens','muSups_trial','scores_trial','MI_MUSup_thres_normalized');
 
 
 %% ´æ´¢ÔÚÔË¶¯ÏëÏó¹ı³ÌÖĞµÄ²ÎÓë¶ÈÖ¸±ê
-function SaveMIEngageTrials(EI_indices, mu_powers, mu_suppressions, subject_name, foldername, config_data, EI_index_scores, resultsMI)
+function SaveMIEngageTrials(EI_indices, mu_powers, mu_suppressions, subject_name, foldername, config_data, EI_index_scores, resultsMI, FES_flags,mu_suppressions_normalized)
     
     foldername = [foldername, '\\Online_Engagements_', subject_name]; % ¼ìÑéÎÄ¼ş¼ĞÊÇ·ñ´æÔÚ
     if ~exist(foldername, 'dir')
@@ -515,7 +528,7 @@ function SaveMIEngageTrials(EI_indices, mu_powers, mu_suppressions, subject_name
 
     save([foldername, '\\', FunctionNowFilename(['Online_EEG_data2Server_', subject_name, '_class_', num2str(config_data(3,1)),  ...
         '_session_', num2str(config_data(4,1)), '_trial_', num2str(config_data(5,1)), ...
-        '_window_', num2str(config_data(6,1)), 'EI_mu' ], '.mat' )],'EI_indices','mu_powers','mu_suppressions', 'EI_index_scores','resultsMI');  % ´æ´¢Ïà¹ØµÄÊıÖµ
+        '_window_', num2str(config_data(6,1)), 'EI_mu' ], '.mat' )],'EI_indices','mu_powers','mu_suppressions', 'EI_index_scores','resultsMI','FES_flags','mu_suppressions_normalized');  % ´æ´¢Ïà¹ØµÄÊıÖµ
 end
 %% ¼ÆËãÏà¹ØmuÆµ´øË¥¼õÖ¸±ê£¬ÕâÀïĞèÒªĞŞ¸Ä
 function mu_suppresion = MI_MuSuperesion(mu_power_, mu_power, mu_channels)
