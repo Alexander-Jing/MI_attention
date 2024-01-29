@@ -102,9 +102,12 @@ end
 foldername_Scores = [sub_offline_collection_folder, '\\Offline_EEGMI_Scores_', subject_name_offline]; % 指定之前存储的离线文件夹路径和名称
 mean_std_EI_score = load([foldername_Scores, '\\', ['Offline_EEGMI_Scores_', subject_name_offline], '.mat' ], 'mean_std_EI_score');
 mean_std_muSup = load([foldername_Scores, '\\', ['Offline_EEGMI_Scores_', subject_name_offline], '.mat' ], 'mean_std_muSup');
+quartile_caculation = load([foldername_Scores, '\\', ['Offline_EEGMI_Scores_', subject_name_offline], '.mat' ], 'quartile_caculation');
+min_max_value = load([foldername_Scores, '\\', ['Offline_EEGMI_Scores_', subject_name_offline], '.mat' ], 'min_max_value');
 
 % 生成现在的轨迹
-traj = generate_traj(mean_std_muSup.mean_std_muSup, TrialNum);
+%traj = generate_traj(mean_std_muSup.mean_std_muSup, TrialNum);
+traj = generate_traj_quartile(quartile_caculation.quartile_caculation, TrialNum);
 
 %% 运动想象内容安排
 TrialIndex = randperm(TrialNum);                                           % 根据采集的数量生成随机顺序的数组
@@ -192,15 +195,21 @@ while(AllTrial <= TrialNum)
             %Trigger = Trials(AllTrial);
             Trigger_num_ = count_trigger(Trials, AllTrial);  % 这里用于计算在AllTrial对应的Trigger之前已经出现了多少次，从而计算轨迹
             MI_MUSup_thre = traj{Trigger+1}(Trigger_num_+1);  % 计算阈值
-            % 确定加权之后的阈值
+            
+            % 确定加权之后的阈值，用于保存
             MI_MUSup_thre = MI_MUSup_thre_weight * MI_MUSup_thre;
-            disp(['Trial: ', num2str(AllTrial), ' Cls: ', num2str(Trials(AllTrial))])
-            disp(['Threshold: ', num2str(MI_MUSup_thre)]);
-            % threshold 数据传输设置以及显示
-            sendbuf(1,6) = uint8((MI_MUSup_thre*100));
-            fwrite(UnityControl,sendbuf);  
             MI_MUSup_thre_weights = [MI_MUSup_thre_weights, [MI_MUSup_thre_weight;Trigger]];
             MI_MUSup_thres = [MI_MUSup_thres, [MI_MUSup_thre;Trigger]];
+
+            % 归一化相关的数值，用于实时显示
+            MI_MUSup_thre_normalized = mu_normalization(MI_MUSup_thre, min_max_value, Trigger+1);
+            MI_MUSup_thre_normalized = MI_MUSup_thre_weight * MI_MUSup_thre_normalized;
+            disp(['Trial: ', num2str(AllTrial), ' Cls: ', num2str(Trials(AllTrial))])
+            disp(['Threshold: ', num2str(MI_MUSup_thre_normalized)]);
+
+            % threshold 数据传输设置以及显示
+            sendbuf(1,6) = uint8((MI_MUSup_thre_normalized*100));
+            fwrite(UnityControl,sendbuf);  
         end
         
         % 添加电刺激，电刺激的时间为2s
@@ -235,15 +244,18 @@ while(AllTrial <= TrialNum)
         resultMI = Online_Data2Server_Communicate(order, FilteredDataMI, ip, port, subject_name, config_data, foldername);  % 传输数据给线上的模型，看分类情况
         disp(['predict cls: ', num2str(resultMI(1,1))]);
         disp(['cls prob: ', num2str(resultMI(2,1))]);
-        % 得分数据实时显示
-        visual_feedback = (resultMI(2,1) * mu_suppression);
         
-        % 设定下界，要不然不显示
-        if visual_feedback <= 0
+        % 得分数据归一化处理，同时保持在0-1之间，用于实时显示
+        mu_suppression_normalized = mu_normalization(mu_suppression, min_max_value, Trigger+1);
+        mu_suppression_normalized = resultMI(2,1) * mu_suppression_normalized;
+        visual_feedback = mu_suppression_normalized;
+        if visual_feedback < 0.0
             visual_feedback = 0.01;
+        elseif visual_feedback > 1
+            visual_feedback = 1.0;
         end
-        
-        % 实时的视觉反馈
+
+        % 实时的视觉反馈分数
         sendbuf(1,5) = uint8((visual_feedback*100.0));
         fwrite(UnityControl,sendbuf);
 
@@ -509,7 +521,7 @@ end
 function mu_suppresion = MI_MuSuperesion(mu_power_, mu_power, mu_channels)
     ERD_C3 = (mu_power(mu_channels.C3, 1) - mu_power_(mu_channels.C3, 1)); 
     %ERD_C4 = (mu_power(mu_channels.C4, 1) - mu_power_(mu_channels.C4, 1));  % 计算两个脑电位置的相关的指标 
-    mu_suppresion = 1/2 * (1 - ERD_C3);  % 归一化到[0,1]的区间里面
+    mu_suppresion = - ERD_C3;  % 取负值，这样的话数值越大越正ERD效应越好
 end
 
 %% 计算相关的EI指标的函数
@@ -541,6 +553,31 @@ function traj = generate_traj(mean_std_muSup, TrialNum)
         end
     end
 end
+
+function traj = generate_traj_quartile(quartiles, TrialNum)
+    % 获取类别的数量
+    n = size(quartiles, 2);
+
+    % 初始化一个空的 cell 数组来存储每个类别的轨迹
+    traj = cell(1, n);
+
+    % 对于每一个类别
+    for i = 1:n
+        % 提取0.25, 0.5, 0.75的分位点
+        mu_supQ1 = quartiles(1, i);
+        mu_supQ2 = quartiles(2, i);
+        mu_supQ3 = quartiles(3, i);
+
+        % 初始化一个空的数组来存储轨迹
+        traj{i} = zeros(TrialNum, 1);
+
+        % 计算轨迹
+        for x = 1:TrialNum
+            traj{i}(x) = mu_supQ1 + (mu_supQ3 - mu_supQ1) * (1 - exp(-3 * x / TrialNum));
+        end
+    end
+end
+
 % Trials里面判断当前类别已经出现过多少次的函数，用于精细的轨迹生成
 function count = count_trigger(Trials, AllTrial)
     % 提取 Trigger
@@ -548,4 +585,13 @@ function count = count_trigger(Trials, AllTrial)
     
     % 计算 Trigger 在 Trials(1:AllTrial-1) 中的数量
     count = sum(Trials(1:AllTrial-1) == Trigger);
+end
+
+%% 归一化显示的函数，主要用于归一化的函数显示
+function mu_normalized = mu_normalization(mu_data, min_max_value, Trigger)
+    % 提取最大和最小数值
+    data_max = min_max_value(1, Trigger);
+    data_min = min_max_value(2, Trigger);
+    % 归一化相关的数据，使得其在0到1的范围内
+    mu_normalized = (mu_data - data_min)/(data_max - data_min);
 end

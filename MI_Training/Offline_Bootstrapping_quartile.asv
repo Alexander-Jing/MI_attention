@@ -1,0 +1,63 @@
+%% 用于检验被试mu衰减数据分布是否满足一定的正态分布
+function quartile_caculation = Offline_Bootstrapping_quartile(scores_data, scores_name, nBootstrap)
+    
+    % 获取scores和triggers
+    scores_ = scores_data(1,:);
+    Triggers_data = scores_data(2,:);
+    
+    % 获取所有不同的Triggers
+    unique_triggers = unique(Triggers_data);
+    
+    % 初始化输出
+    dataQ1 = zeros(size(unique_triggers));
+    dataQ2 = zeros(size(unique_triggers));
+    dataQ3 = zeros(size(unique_triggers));
+    
+    if nBootstrap == 0
+        for class_idx = 1:length(unique_triggers)
+            trigger = unique_triggers(class_idx);
+            data_ = score_(Triggers_data == trigger);
+            dataQ1(class_idx) = quantile(data_, 0.25);
+            dataQ2(class_idx) = quantile(data_, 0.50);
+            dataQ3(class_idx) = quantile(data_, 0.75);
+            
+            disp(['类别：', num2str(class_idx)]);
+            fprintf('第一四分位数: %f\n', dataQ1(class_idx));
+            fprintf('第二四分位数: %f\n', dataQ2(class_idx));
+            fprintf('第三四分位数: %f\n', dataQ3(class_idx));
+        end
+        quartile_caculation = [dataQ1; dataQ2; dataQ3];
+    else
+        for class_idx = 1:length(unique_triggers)
+            trigger = unique_triggers(class_idx);
+            data_ = score_(Triggers_data == trigger);
+            n = length(data_); % 数据的数量
+            bootstrapSampleQ1 = zeros(nBootstrap, 1); % 初始化bootstrap样本（第一四分位数）
+            bootstrapSampleQ2 = zeros(nBootstrap, 1); % 初始化bootstrap样本（第二四分位数，即中位数）
+            bootstrapSampleQ3 = zeros(nBootstrap, 1); % 初始化bootstrap样本（第三四分位数）
+            % 生成bootstrap样本
+            for Bootstrap_idx = 1:nBootstrap
+                resampleIndex = randsample(n, n, true); % 有放回地随机抽取n个样本
+                resample = data(resampleIndex); % 得到重抽样的数据
+                bootstrapSampleQ1(Bootstrap_idx) = quantile(resample, 0.25); % 计算重抽样数据的第一四分位数
+                bootstrapSampleQ2(Bootstrap_idx) = quantile(resample, 0.50); % 计算重抽样数据的第二四分位数
+                bootstrapSampleQ3(Bootstrap_idx) = quantile(resample, 0.75); % 计算重抽样数据的第三四分位数
+            end
+            % 计算bootstrap样本的均值和标准差，作为四分位数的估计值和标准误
+            bootstrapMeanQ1 = mean(bootstrapSampleQ1);
+            bootstrapStdQ1 = std(bootstrapSampleQ1);
+            bootstrapMeanQ2 = mean(bootstrapSampleQ2);
+            bootstrapStdQ2 = std(bootstrapSampleQ2);
+            bootstrapMeanQ3 = mean(bootstrapSampleQ3);
+            bootstrapStdQ3 = std(bootstrapSampleQ3);
+            
+            disp(['类别：', num2str(class_idx)]);
+            fprintf('第一四分位数的估计值: %f\n', bootstrapMeanQ1);
+            fprintf('第一四分位数的标准误: %f\n', bootstrapStdQ1);
+            fprintf('第二四分位数的估计值: %f\n', bootstrapMeanQ2);
+            fprintf('第二四分位数的标准误: %f\n', bootstrapStdQ2);
+            fprintf('第三四分位数的估计值: %f\n', bootstrapMeanQ3);
+            fprintf('第三四分位数的标准误: %f\n', bootstrapStdQ3);
+        end
+    end
+end
