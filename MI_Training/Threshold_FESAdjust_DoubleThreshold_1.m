@@ -3,7 +3,7 @@ function Fes_flag_ = Threshold_FESAdjust_DoubleThreshold_1(resultsMI, mu_suppres
     MI_num = size(mu_suppressions, 2);
     Fes_flag_ = 0;
     
-    if MI_num == FES_ExamingNum
+    if mod(MI_num, FES_ExamingNum) == 0
         % 提取之前的相关数据
         mu_suppressions_ = mu_suppressions(1, :);
         resultsMI_ = resultsMI(1, :);
