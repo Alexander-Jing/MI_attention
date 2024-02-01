@@ -41,7 +41,7 @@ status = CheckNetStreamingVersion(con);                                    % ÅĞ¶
 %% ÔÚÏßÊµÑé²ÎÊıÉèÖÃ²¿·Ö£¬ÓÃÓÚÉèÖÃÃ¿Ò»¸ö±»ÊÔµÄÇé¿ö£¬ÒÀ¾İ±»ÊÔÇé¿ö½øĞĞĞŞ¸Ä
 
 % ÔË¶¯ÏëÏó»ù±¾²ÎÊıÉèÖÃ
-subject_name = 'Jyt_test_0125_comparison_test';  % ±»ÊÔĞÕÃû
+subject_name = 'Jyt_test_0131_comparison';  % ±»ÊÔĞÕÃû
 TrialNum = 30;  % ÉèÖÃ²É¼¯µÄÊıÁ¿
 %TrialNum = 3*3;
 MotorClasses = 2;  % ÔË¶¯ÏëÏóµÄÖÖÀàµÄÊıÁ¿µÄÉèÖÃ£¬¶Ô±ÈÊµÑéµÄÈÎÎñÊÇ[1,2]£¬ºÍreadme.txtÀïÃæµÄ¶ÔÓ¦
@@ -268,7 +268,7 @@ end
 function mu_suppresion = MI_MuSuperesion(mu_power_, mu_power, mu_channels)
     ERD_C3 = (mu_power(mu_channels.C3, 1) - mu_power_(mu_channels.C3, 1)); 
     %ERD_C4 = (mu_power(mu_channels.C4, 1) - mu_power_(mu_channels.C4, 1));  % ¼ÆËãÁ½¸öÄÔµçÎ»ÖÃµÄÏà¹ØµÄÖ¸±ê 
-    mu_suppresion = 1/2 * (1 - ERD_C3);  % ¹éÒ»»¯µ½[0,1]µÄÇø¼äÀïÃæ
+    mu_suppresion =  - ERD_C3;  % ¹éÒ»»¯µ½[0,1]µÄÇø¼äÀïÃæ
 end
     
 %% ¼ÆËãÏà¹ØµÄEIÖ¸±êµÄº¯Êı

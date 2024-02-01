@@ -1,13 +1,13 @@
 %% 被试名称和实验的文件夹
-root_path = 'F:\MI_engagement\MI_attention\MI_Training';  % 根目录用于存储数据和分析
-subject_name_online = 'Jyt_test_0125_online_test'; %'Jyt_test_0101_1_online';% 'Jyt_test_0101_online'; %  % 被试姓名
-sub_online_collection_folder = 'Jyt_test_0125_online_test_20240125_220854676_data'; % 'Jyt_test_0101_1_online_20240101_200123314_data';  %'Jyt_test_0101_online_20240101_175129548_data'; %  % 
+root_path = 'F:\CASIA\MI_engagement\MI_attention\MI_Training';  % 根目录用于存储数据和分析
+subject_name_online = 'Jyt_test_0131_online'; %'Jyt_test_0101_1_online';% 'Jyt_test_0101_online'; %  % 被试姓名
+sub_online_collection_folder = 'Jyt_test_0131_online_20240131_210821243_data'; % 'Jyt_test_0101_1_online_20240101_200123314_data';  %'Jyt_test_0101_online_20240101_175129548_data'; %  % 
 
-subject_name_offline =  'Jyt_test_0125_offline_test';  % 离线收集数据时候的被试名称
-sub_offline_collection_folder = 'Jyt_test_0125_offline_test_20240125_203932146_data';  % 被试的离线采集数据
+subject_name_offline =  'Jyt_test_0131_offline';  % 离线收集数据时候的被试名称
+sub_offline_collection_folder = 'Jyt_test_0131_offline_20240131_204044614_data';  % 被试的离线采集数据
 
-subject_name_comparison = 'Jyt_test_0125_comparison_test';
-sub_comparison_collection_folder = 'Jyt_test_0125_comparison_test_20240125_215803328_data';
+subject_name_comparison = 'Jyt_test_0131_comparison';
+sub_comparison_collection_folder = 'Jyt_test_0131_comparison_20240131_194732925_data';
 
 channels = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, 16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];  % 选择的通道,
 mu_channels = struct('C3',24, 'C4',22);  % 用于计算ERD/ERS的几个channels，是C3和C4两个通道,需要设定位置
