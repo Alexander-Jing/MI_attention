@@ -18,16 +18,16 @@ channels_num = length(channels);
 %% 鐠囪褰囬弫鐗堝�?
 subject_rawdata_folder = ['.\', sub_online_collection_folder, '\' 'Online_EEGMI_RawData_', subject_name_online];
 rawdata = load([subject_rawdata_folder, '\', sub_online_rawdata_file]);
-rawdata_comparison = load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0131_comparison_20240131_194732925_data\Offline_EEGMI_RawData_Jyt_test_0131_comparison\Offline_EEGMI_RawData_Jyt_test_0131_comparison20240131_195537284.mat');
-rawdata_offline = load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0131_offline_20240131_204044614_data\Offline_EEGMI_RawData_Jyt_test_0131_offline\Offline_EEGMI_RawData_Jyt_test_0131_offline20240131_205742247.mat');%load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0101_1_offline_20240101_193332077_data\Offline_EEGMI_RawData_Jyt_test_0101_1_offline\Offline_EEGMI_RawData_Jyt_test_0101_1_offline20240101_194900541.mat', 'TrialData');
+rawdata_comparison = load('F:\MI_engagement\MI_attention\MI_Training\Jyt_test_0131_comparison_20240131_194732925_data\Offline_EEGMI_RawData_Jyt_test_0131_comparison\Offline_EEGMI_RawData_Jyt_test_0131_comparison20240131_195537284.mat');
+rawdata_offline = load('F:\MI_engagement\MI_attention\MI_Training\Jyt_test_0131_offline_20240131_204044614_data\Offline_EEGMI_RawData_Jyt_test_0131_offline\Offline_EEGMI_RawData_Jyt_test_0131_offline20240131_205742247.mat');%load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0101_1_offline_20240101_193332077_data\Offline_EEGMI_RawData_Jyt_test_0101_1_offline\Offline_EEGMI_RawData_Jyt_test_0101_1_offline20240101_194900541.mat', 'TrialData');
 
 rawdata = rawdata.TrialData;
 rawdata_comparison = rawdata_comparison.TrialData;
 rawdata_offline = rawdata_offline.TrialData;
 
 %rawdata = rawdata;
-rawdata = rawdata_offline;
-%rawdata = rawdata_comparison;
+%rawdata = rawdata_offline;
+rawdata = rawdata_comparison;
 %% 闁插洭娉﹂崣鍌涙殶閿涘本鐎铏圭崶�???
 sample_frequency = 256; 
 
@@ -102,8 +102,8 @@ end
 MIPouring_all(:, 1) = mean(all_eegdata_MI_Pouring, 2);
 
 % 缂佹ê鍩楁径鎾劥閼存垹鏁搁崷鏉胯埌閸??
-topo_painting = MIDrinking_all-Idle_all;
-topoplot([topo_painting; -1;-1;-1;-1],'Cap30.locs','maplimits',[-1.0,1.0], 'electrodes', 'on', 'style', 'map');
+topo_painting = MIPouring_all-Idle_all;
+topoplot([topo_painting;],'Cap30_1.locs','maplimits',[-1.0,1.0], 'electrodes', 'on', 'style', 'map');
 
 
 %% 閸忔湹缍戦崙鑺ユ殶闁劌鍨庨敍灞藉瘶閹奉剚鎶ゅ▔�???浣稿灊缁愭鍤遍�??
