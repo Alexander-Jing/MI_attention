@@ -15,8 +15,11 @@ close all;
 %system('E:\MI_UpperLimb_AO\UpperLimb_AO\UpperLimb_AO\build_test\unity_test.exe&');
 %system('E:\UpperLimb_Animation\unity_test.exe&');
 %system('E:\MI_AO_Animation\UpperLimb_Animation\unity_test.exe&');
-system('E:\MI_AO_Animation\UpperLimb_Animation_modified\unity_test.exe&');
+
+%system('E:\MI_AO_Animation\UpperLimb_Animation_modified\unity_test.exe&');
+
 %system('F:\MI_UpperLimb_AO\UpperLimb_AO\UpperLimb_Animation\unity_test.exe&');
+system('F:\MI_UpperLimb_AO\UpperLimb_AO\UpperLimb_Animation_modified_DoubleThreshold\unity_test.exe&');
 pause(3)
 UnityControl = tcpip('localhost', 8881, 'NetworkRole', 'client');          % 新的端口改为8881
 fopen(UnityControl);
@@ -134,17 +137,21 @@ mu_suppressions = [];  % 用于存储每一个trial里面的mu_suppression
 mu_suppressions_normalized = [];  % 用于存储每一个trial里面的mu_suppressions_normalized
 resultsMI = [];  % 用于存储每一个trial里面的results
 FES_flags = [];  % 用于存储每一个trial里面的FES电刺激情况，如果施加电刺激，则为1
+visual_feedbacks = [];  % 用于存储每一个trial里面的visual_feedback视觉反馈的数值
+MI_MUSup_thre1s_normalized = [];  % 用于存储每一个trial的第二阈值
 
 scores_trial = [];  % 用于存储每一个trial的平均分数值
 muSups_trial = [];  % 用于存储每一个trial的任务完成数值，当前的任务完成指标设置为trial里面的最大的resultMI*MuSup比上MI_MUSup_thre  max(resultMI*MuSup)/MI_MUSup_thre
 MI_MUSup_thre_weights = []; % 用于存储每一个trial的权重
 MI_MUSup_thres = [];  % 用于存储每一个trial的阈值
-MI_MUSup_thres_normalized = [];  % 用于存储每一个trial的阈值
+MI_MUSup_thres_normalized = [];  % 用于存储每一个trial的第一阈值
 RestTimeLens = [];  % 用于存储每一个trial的休息时间
+visual_feedbacks_trial = [];  % 用于存储每一个trial的visual_feedback视觉反馈的平均数值
 
 Online_FES_ExamingNum = 5;  % 在线的时候每隔多久检查判断是否需要进行FES辅助
 Online_FES_flag = 0;  % 用于设置是否进行实时FES刺激的相关控制flag
-clsFlag = 0; % 用于判断实时分类是否正确的flag
+clsFlag = 0; % 用于判断阈值0是否达到的flag
+clsFlag1 = 0; % 用于判断阈值1是否达到的flag
 clsTime = 100;  % 初始化分类正确的时间
 clsControl = 0;  % 用于相对之后判断是否休息的flag
 RestTimeLenBaseline = 7 + session_idx;  % 休息时间随着session的数量增加
@@ -212,9 +219,12 @@ while(AllTrial <= TrialNum)
             disp(['Mu Threshold：', num2str(MI_MUSup_thre)]);
             disp(['Threshold Normalized Weighted: ', num2str(MI_MUSup_thre_normalized)]);
             MI_MUSup_thres_normalized = [MI_MUSup_thres_normalized, [MI_MUSup_thre_normalized;Trigger]];
-            
+            MI_MUSup_thre1_normalized = MI_MUSup_thre_normalized;  % 确定阈值2
+            MI_MUSup_thre1s_normalized = [MI_MUSup_thre1s_normalized, [MI_MUSup_thre1_normalized; Trigger]];
+
             % threshold 数据传输设置以及显示
             sendbuf(1,6) = uint8((MI_MUSup_thre_normalized*100));
+            sendbuf(1,7) = uint8((MI_MUSup_thre1_normalized*100));
             fwrite(UnityControl,sendbuf);  
             % 初始化显示下视觉反馈数值
             sendbuf(1,5) = uint8((0.01*100.0));
@@ -222,7 +232,6 @@ while(AllTrial <= TrialNum)
         end
         
         % 添加电刺激，电刺激的时间为2s
-        Trigger = RandomTrial(AllTrial);
         if Trigger == 1
             StimCommand = StimCommand_1;
             fwrite(StimControl,StimCommand);
@@ -238,6 +247,7 @@ while(AllTrial <= TrialNum)
     
     % 第5s开始取512的Trigger~=6的MI的窗口，数据处理并且进行分析
     if Timer > 4 && Trials(AllTrial)> 0 && clsFlag == 0 && clsControl == 0
+        Trigger = Trials(AllTrial);
         rawdata = TrialData(:,end-512+1:end);  % 取前一个512的窗口
         rawdata = rawdata(2:end,:);
         
@@ -268,23 +278,6 @@ while(AllTrial <= TrialNum)
         end
         disp(['Mu Online：', num2str(mu_suppression)]);
         disp(['Mu normalized Weighted: ', num2str(visual_feedback)]);
-        
-        % 实时的视觉反馈分数
-        sendbuf(1,5) = uint8((visual_feedback*100.0));
-        fwrite(UnityControl,sendbuf);
-        
-        % 判断是否达成要求
-        if visual_feedback >= MI_MUSup_thre_normalized
-            clsFlag = 1;  % 识别正确，置1
-        else
-            clsFlag = 0;
-        end
-        
-%         if resultMI == Trials(AllTrial)
-%             clsFlag = 1;  % 识别正确，置1
-%         else
-%             clsFlag = 0;
-%         end   
 
         % 存储这一系列指标的数值
         EI_index = [EI_index; Trigger];
@@ -300,7 +293,46 @@ while(AllTrial <= TrialNum)
         mu_powers = [mu_powers, mu_power_MI];  % 添加相关的mu节律能量
         mu_suppressions = [mu_suppressions, mu_suppression];  % 添加相关的mu衰减情况，用于后续的分析
         mu_suppressions_normalized = [mu_suppressions_normalized, mu_suppression_normalized];
+        visual_feedbacks = [visual_feedbacks, [visual_feedback; Trigger]];
         
+        % 计算阈值2
+        MI_MUSup_thre1_normalized = Online_Threshold1Adjust_DoubleThreshold_2(visual_feedbacks(1,:), MI_MUSup_thre1_normalized, MI_MUSup_thre_normalized, 'Game');
+        MI_MUSup_thre1s_normalized = [MI_MUSup_thre1s_normalized, [MI_MUSup_thre1_normalized; Trigger]];
+        
+        % 实时的视觉反馈分数
+        sendbuf(1,5) = uint8((visual_feedback*100.0));
+        sendbuf(1,7) = uint8((MI_MUSup_thre1_normalized*100));
+        fwrite(UnityControl,sendbuf);
+
+
+        % 判断是否达成要求
+        if visual_feedback >= MI_MUSup_thre_normalized
+            clsFlag1 = 1;
+            % 进行电刺激
+            if Trials(AllTrial) == 1
+                StimCommand = StimCommand_1;
+                fwrite(StimControl,StimCommand);
+            end
+            if Trials(AllTrial) == 2
+                StimCommand = StimCommand_2;
+                fwrite(StimControl,StimCommand);
+            end
+            disp(['MI达到阈值0电刺激']);
+        end
+
+        if visual_feedback >= MI_MUSup_thre1_normalized
+            clsFlag = 1;  % 识别正确，置1
+            disp(['MI达到阈值1电刺激']);
+        else
+            clsFlag = 0;
+        end
+        
+%         if resultMI == Trials(AllTrial)
+%             clsFlag = 1;  % 识别正确，置1
+%         else
+%             clsFlag = 0;
+%         end  
+
         % 在想象的同时加入电刺激，如果想象的时候出现一定的困难，那就加入电刺激
         Online_FES_flag = Threshold_FESAdjust_DoubleThreshold_1(resultsMI, mu_suppressions_normalized, Online_FES_ExamingNum);
         
@@ -322,33 +354,46 @@ while(AllTrial <= TrialNum)
     
    %% 运动想象给与反馈阶段（想对/时间范围内没有想对）,同时更新模型
    % 想对了开始播放动作 
-   if clsFlag == 1 && clsControl == 0
+   if (clsFlag == 1 || clsFlag1==1) && clsControl == 0
        Trigger = 7; 
        clsTime = Timer;  % 这是分类正确的时间
         if Trials(AllTrial) > 0  % 运动想象任务
-            Trigger = Trials(AllTrial);  % 播放动作的AO动画（Idle, MI1, MI2）
-            mat2unity = ['0', num2str(Trigger + 3)];
+            % 播放动作的AO动画（Idle, MI1, MI2）
+            mat2unity = ['0', num2str(Trials(AllTrial) + 3)];
             sendbuf(1,1) = hex2dec(mat2unity);
             sendbuf(1,2) = hex2dec('01') ;
             sendbuf(1,3) = hex2dec('01') ;  % 给与反馈，显示文字
             sendbuf(1,4) = hex2dec('00') ;
             fwrite(UnityControl,sendbuf);  
         end
+        
+        % 进行电刺激
+        if Trials(AllTrial) == 1
+            StimCommand = StimCommand_1;
+            fwrite(StimControl,StimCommand);
+        end
+        if Trials(AllTrial) == 2
+            StimCommand = StimCommand_2;
+            fwrite(StimControl,StimCommand);
+        end
+        disp(['MI达到阈值电刺激']);
+
         % 传输数据和更新模型
         config_data = [WindowLength;size(channels, 2);Trials(AllTrial);session_idx;AllTrial;size(scores, 2);score;0;0;0;0 ];
         order = 2.0;  % 传输数据和训练的命令
         Online_Data2Server_Send(order, [0,0,0,0], ip, port, subject_name, config_data);  % 发送指令，让服务器更新数据，[0,0,0,0]单纯是用于凑下数据，防止应为空集影响传输
-        % 重置下2个flag
+        % 重置下3个flag
         clsControl = 1;
         clsFlag = 0;
+        clsFlag1 = 0;
    end
     
     % 想错了开始休息和提醒
-    if clsFlag == 0 && Timer == (MaxMITime) && clsControl == 0
+    if (clsFlag == 0 && clsFlag1==0) && Timer == (MaxMITime) && clsControl == 0
         Trigger = 7;
         if Trials(AllTrial) > 0  % 运动想象任务
-            Trigger = Trials(AllTrial);  % 播放动作的AO动画（Idle, MI1, MI2）
-            mat2unity = ['0', num2str(Trigger + 3)];
+            % 播放动作的AO动画（Idle, MI1, MI2）
+            mat2unity = ['0', num2str(Trials(AllTrial) + 3)];
             sendbuf(1,1) = hex2dec(mat2unity);
             sendbuf(1,2) = hex2dec('00') ;
             sendbuf(1,3) = hex2dec('02') ;  % 给与反馈，显示文字
@@ -380,7 +425,8 @@ while(AllTrial <= TrialNum)
         scores_trial = [scores_trial, average_score];  % 存储好平均的分数
         max_MuSup = max(mu_suppressions(1,:))/MI_MUSup_thre;  % 计算最大的Mu衰减比上阈值，衡量任务完成情况
         muSups_trial = [muSups_trial, [max_MuSup; Trials(AllTrial)]];  % 存储好完成情况
-        
+        visual_feedbacks_trial = [visual_feedbacks_trial, [mean(visual_feedbacks1(1,:)); Trials(AllTrial)]];  % 存储相关视觉反馈情况
+
         %[Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgradedMI(scores_trial, Trials, AllTrial, MI_MUSup_thre_weight_baseline, RestTimeLenBaseline,TrialNum);
         %[Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgraded(scores_trial, muSups_trial, Trials, AllTrial, MI_MUSup_thre_weight_baseline, RestTimeLenBaseline, TrialNum);
         [Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgraded_DoubleThreshold_0(scores_trial, muSups_trial, Trials, AllTrial, MI_MUSup_thre_weight_baseline, RestTimeLenBaseline, TrialNum);
@@ -401,6 +447,7 @@ while(AllTrial <= TrialNum)
         scores_trial = [scores_trial, average_score];  % 存储好平均的分数
         max_MuSup = max(mu_suppressions(1,:))/MI_MUSup_thre;  % 计算最大的Mu衰减比上阈值，衡量任务完成情况
         muSups_trial = [muSups_trial, [max_MuSup; Trials(AllTrial)]];  % 存储好完成情况
+        visual_feedbacks_trial = [visual_feedbacks_trial, [mean(visual_feedbacks1(1,:)); Trials(AllTrial)]];  % 存储相关视觉反馈情况
         
         %[Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgradedMI(scores_trial, Trials, AllTrial, MI_MUSup_thre_weight_baseline, RestTimeLenBaseline,TrialNum);
         %[Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgraded(scores_trial, muSups_trial, Trials, AllTrial, MI_MUSup_thre_weight_baseline, RestTimeLenBaseline, TrialNum);
@@ -410,7 +457,7 @@ while(AllTrial <= TrialNum)
     end
     
     % 运动想象没有想对，提醒结束了之后让人休息
-    if Trials(AllTrial)>0 && clsFlag == 0 && Timer == (MaxMITime + 8) && clsControl == 2
+    if Trials(AllTrial)>0 && (clsFlag==0 && clsFlag1==0) == 0 && Timer == (MaxMITime + 8) && clsControl == 2
         Trigger = 7;
         sendbuf(1,1) = hex2dec('02') ;
         sendbuf(1,2) = hex2dec('00') ;
@@ -422,6 +469,7 @@ while(AllTrial <= TrialNum)
         scores_trial = [scores_trial, average_score];  % 存储好平均的分数
         max_MuSup = max(mu_suppressions(1,:))/MI_MUSup_thre;  % 计算最大的Mu衰减比上阈值，衡量任务完成情况
         muSups_trial = [muSups_trial, [max_MuSup; Trials(AllTrial)]];  % 存储好完成情况
+        visual_feedbacks_trial = [visual_feedbacks_trial, [mean(visual_feedbacks1(1,:)); Trials(AllTrial)]];  % 存储相关视觉反馈情况
         
         %[Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgradedMI(scores_trial, Trials, AllTrial, MI_MUSup_thre_weight_baseline, RestTimeLenBaseline, TrialNum);
         %[Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgraded(scores_trial, muSups_trial, Trials, AllTrial, MI_MUSup_thre_weight_baseline, RestTimeLenBaseline, TrialNum);
@@ -446,7 +494,7 @@ while(AllTrial <= TrialNum)
     % 空想任务想象5s，到第7s之后开始休息，到第10s就结束任务
     if Timer == 10 && Trials(AllTrial)==0 && clsControl == 0 %结束休息，准备下一个
         % 存储相关的EI指标和mu节律能量的数据
-        SaveMIEngageTrials(EI_indices, mu_powers, mu_suppressions, subject_name, foldername, config_data, EI_index_scores, resultsMI, FES_flags, mu_suppressions_normalized);
+        SaveMIEngageTrials(EI_indices, mu_powers, mu_suppressions, subject_name, foldername, config_data, EI_index_scores, resultsMI, FES_flags, mu_suppressions_normalized, visual_feedbacks, MI_MUSup_thre1s_normalized);
         %计时器清0
         Timer = 0;  % 计时器清0
         % 每一个trial的数值还原
@@ -457,6 +505,8 @@ while(AllTrial <= TrialNum)
         EI_index_scores = [];  % EI指标保存数值还原
         mu_suppressions = [];  % mu衰减保存数值还原
         mu_suppressions_normalized = [];
+        visual_feedbacks = [];
+        MI_MUSup_thre1s_normalized = [];
         
         RestTimeLen = RestTimeLenBaseline;  % 休息时间还原
         disp(['Trial: ', num2str(AllTrial), ', Task: ', num2str(Trials(AllTrial))]);  % 显示相关数据
@@ -464,11 +514,12 @@ while(AllTrial <= TrialNum)
     % 想对了之后，AO之后，休息3s之后，结束休息，准备下一个
     if Trials(AllTrial)>0 && Timer == (clsTime + 8 + RestTimeLen) && clsControl == 1  %结束休息
         % 存储相关的EI指标和mu节律能量的数据
-        SaveMIEngageTrials(EI_indices, mu_powers, mu_suppressions, subject_name, foldername, config_data, EI_index_scores, resultsMI, FES_flags, mu_suppressions_normalized);
+        SaveMIEngageTrials(EI_indices, mu_powers, mu_suppressions, subject_name, foldername, config_data, EI_index_scores, resultsMI, FES_flags, mu_suppressions_normalized, visual_feedbacks, MI_MUSup_thre1s_normalized);
         % 计时器清0
         Timer = 0;  % 计时器清0
         % cls的两个flag清0
         clsFlag = 0;  % 分类flag清0
+        clsFlag1 = 0;  % 分类clsFlag1清0
         clsControl = 0;
         % 每一个trial的数值还原
         scores = [];  % 分数值还原
@@ -478,19 +529,22 @@ while(AllTrial <= TrialNum)
         EI_index_scores = [];  % EI指标保存数值还原
         mu_suppressions = [];  % mu衰减保存数值还原
         mu_suppressions_normalized = [];
+        visual_feedbacks = [];
+        MI_MUSup_thre1s_normalized = [];
         
         % 其余设置还原
         RestTimeLen = RestTimeLenBaseline;  % 休息时间还原
         disp(['Trial: ', num2str(AllTrial), ', Task: ', num2str(Trials(AllTrial))]);  % 显示相关数据
     end
     % 运动想象没有想对，提醒之后，休息3s之后，结束休息，准备下一个
-    if Trials(AllTrial)>0 && clsFlag == 0 && Timer == (MaxMITime + 8 + RestTimeLen) && clsControl == 2
+    if Trials(AllTrial)>0 && (clsFlag == 0 && clsFlag1==0) && Timer == (MaxMITime + 8 + RestTimeLen) && clsControl == 2
         % 存储相关的EI指标和mu节律能量的数据
-        SaveMIEngageTrials(EI_indices, mu_powers, mu_suppressions, subject_name, foldername, config_data, EI_index_scores, resultsMI, FES_flags, mu_suppressions_normalized);
+        SaveMIEngageTrials(EI_indices, mu_powers, mu_suppressions, subject_name, foldername, config_data, EI_index_scores, resultsMI, FES_flags, mu_suppressions_normalized, visual_feedbacks, MI_MUSup_thre1s_normalized);
         % 计时器清0
         Timer = 0;  % 计时器清0
         % clsflag清0
         clsFlag = 0;  % 分类flag清0
+        clsFlag1 = 0;  % 分类clsFlag1清0
         clsControl = 0;
         % 每一个trial的数值还原
         scores = [];  % 分数值还原
@@ -500,6 +554,8 @@ while(AllTrial <= TrialNum)
         EI_index_scores = [];  % EI指标保存数值还原
         mu_suppressions = [];  % mu衰减保存数值还原
         mu_suppressions_normalized = [];
+        visual_feedbacks = [];
+        MI_MUSup_thre1s_normalized = [];
         
         % 其余设置还原
         RestTimeLen = RestTimeLenBaseline;  % 休息时间还原
@@ -524,11 +580,11 @@ if ~exist(foldername_rawdata, 'dir')
    mkdir(foldername_rawdata);
 end
 save([foldername_rawdata, '\\', FunctionNowFilename(['Online_EEGMI_trajectory_',num2str(session_idx), '_', subject_name], '.mat' )],'scores_trial','traj','MI_MUSup_thre_weights',...
-    'MI_MUSup_thres','RestTimeLens','muSups_trial','scores_trial','MI_MUSup_thres_normalized');
+    'MI_MUSup_thres','RestTimeLens','muSups_trial','scores_trial','MI_MUSup_thres_normalized', 'visual_feedbacks_trial');
 
 
 %% 存储在运动想象过程中的参与度指标
-function SaveMIEngageTrials(EI_indices, mu_powers, mu_suppressions, subject_name, foldername, config_data, EI_index_scores, resultsMI, FES_flags, mu_suppressions_normalized)
+function SaveMIEngageTrials(EI_indices, mu_powers, mu_suppressions, subject_name, foldername, config_data, EI_index_scores, resultsMI, FES_flags, mu_suppressions_normalized, visual_feedbacks, MI_MUSup_thre1s_normalized)
     
     foldername = [foldername, '\\Online_Engagements_', subject_name]; % 检验文件夹是否存在
     if ~exist(foldername, 'dir')
@@ -537,7 +593,7 @@ function SaveMIEngageTrials(EI_indices, mu_powers, mu_suppressions, subject_name
 
     save([foldername, '\\', FunctionNowFilename(['Online_EEG_data2Server_', subject_name, '_class_', num2str(config_data(3,1)),  ...
         '_session_', num2str(config_data(4,1)), '_trial_', num2str(config_data(5,1)), ...
-        '_window_', num2str(config_data(6,1)), 'EI_mu' ], '.mat' )],'EI_indices','mu_powers','mu_suppressions', 'EI_index_scores','resultsMI','FES_flags','mu_suppressions_normalized');  % 存储相关的数值
+        '_window_', num2str(config_data(6,1)), 'EI_mu' ], '.mat' )],'EI_indices','mu_powers','mu_suppressions', 'EI_index_scores','resultsMI','FES_flags','mu_suppressions_normalized', 'visual_feedbacks', 'MI_MUSup_thre1s_normalized');  % 存储相关的数值
 end
 %% 计算相关mu频带衰减指标，这里需要修改
 function mu_suppresion = MI_MuSuperesion(mu_power_, mu_power, mu_channels)
