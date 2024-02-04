@@ -19,7 +19,10 @@ close all;
 %system('E:\MI_AO_Animation\UpperLimb_Animation_modified\unity_test.exe&');
 
 %system('F:\MI_UpperLimb_AO\UpperLimb_AO\UpperLimb_Animation\unity_test.exe&');
-system('F:\MI_UpperLimb_AO\UpperLimb_AO\UpperLimb_Animation_modified_DoubleThreshold\unity_test.exe&');
+%system('F:\MI_UpperLimb_AO\UpperLimb_AO\UpperLimb_Animation_modified_DoubleThreshold\unity_test.exe&');
+
+system('E:\MI_AO_Animation\UpperLimb_Animation_modified_DoubleThreshold\unity_test.exe&');
+
 pause(3)
 UnityControl = tcpip('localhost', 8881, 'NetworkRole', 'client');          % ĞÂµÄ¶Ë¿Ú¸ÄÎª8881
 fopen(UnityControl);
@@ -47,7 +50,7 @@ status = CheckNetStreamingVersion(con);                                    % ÅĞ¶
 %% ÔÚÏßÊµÑé²ÎÊıÉèÖÃ²¿·Ö£¬ÓÃÓÚÉèÖÃÃ¿Ò»¸ö±»ÊÔµÄÇé¿ö£¬ÒÀ¾İ±»ÊÔÇé¿ö½øĞĞĞŞ¸Ä
 
 % ÔË¶¯ÏëÏó»ù±¾²ÎÊıÉèÖÃ
-subject_name = 'Jyt_test_0131_online';  % ±»ÊÔĞÕÃû
+subject_name = 'Jyt_test_0204_online_debug_1';  % ±»ÊÔĞÕÃû
 sub_offline_collection_folder = 'Jyt_test_0131_offline_20240131_204044614_data';  % ±»ÊÔµÄÀëÏß²É¼¯Êı¾İ
 subject_name_offline =  'Jyt_test_0131_offline';  % ÀëÏßÊÕ¼¯Êı¾İÊ±ºòµÄ±»ÊÔÃû³Æ
 session_idx = 1;  % session indexÊıÁ¿£¬Èç¹ûÊÇ1µÄ»°£¬»á×Ô¶¯Éú³ÉÏà¹ØÅÅ²¼
@@ -76,8 +79,8 @@ ip = '172.18.22.21';
 port = 8888;  % ºÍºó¶Ë·şÎñÆ÷Á¬½ÓµÄÁ½¸ö²ÎÊı
 
 % µç´Ì¼¤Ç¿¶ÈÉèÖÃ
-StimAmplitude_1 = 7;
-StimAmplitude_2 = 7;  % ·ùÖµÉèÖÃ£¨mA£©
+StimAmplitude_1 = 5;
+StimAmplitude_2 = 5;  % ·ùÖµÉèÖÃ£¨mA£©
 
 %% ÉèÖÃµç´Ì¼¤Á¬½Ó
 % ÉèÖÃÁ¬½Ó
@@ -296,7 +299,7 @@ while(AllTrial <= TrialNum)
         visual_feedbacks = [visual_feedbacks, [visual_feedback; Trigger]];
         
         % ¼ÆËããĞÖµ2
-        MI_MUSup_thre1_normalized = Online_Threshold1Adjust_DoubleThreshold_2(visual_feedbacks(1,:), MI_MUSup_thre1_normalized, MI_MUSup_thre_normalized, 'Game');
+        MI_MUSup_thre1_normalized = Online_Threshold1Adjust_DoubleThreshold_2(visual_feedbacks(1,:), MI_MUSup_thre1_normalized, MI_MUSup_thre_normalized, "Game");
         MI_MUSup_thre1s_normalized = [MI_MUSup_thre1s_normalized, [MI_MUSup_thre1_normalized; Trigger]];
         
         % ÊµÊ±µÄÊÓ¾õ·´À¡·ÖÊı
@@ -425,7 +428,7 @@ while(AllTrial <= TrialNum)
         scores_trial = [scores_trial, average_score];  % ´æ´¢ºÃÆ½¾ùµÄ·ÖÊı
         max_MuSup = max(mu_suppressions(1,:))/MI_MUSup_thre;  % ¼ÆËã×î´óµÄMuË¥¼õ±ÈÉÏãĞÖµ£¬ºâÁ¿ÈÎÎñÍê³ÉÇé¿ö
         muSups_trial = [muSups_trial, [max_MuSup; Trials(AllTrial)]];  % ´æ´¢ºÃÍê³ÉÇé¿ö
-        visual_feedbacks_trial = [visual_feedbacks_trial, [mean(visual_feedbacks1(1,:)); Trials(AllTrial)]];  % ´æ´¢Ïà¹ØÊÓ¾õ·´À¡Çé¿ö
+        visual_feedbacks_trial = [visual_feedbacks_trial, [mean(visual_feedbacks(1,:)); Trials(AllTrial)]];  % ´æ´¢Ïà¹ØÊÓ¾õ·´À¡Çé¿ö
 
         %[Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgradedMI(scores_trial, Trials, AllTrial, MI_MUSup_thre_weight_baseline, RestTimeLenBaseline,TrialNum);
         %[Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgraded(scores_trial, muSups_trial, Trials, AllTrial, MI_MUSup_thre_weight_baseline, RestTimeLenBaseline, TrialNum);
@@ -447,7 +450,7 @@ while(AllTrial <= TrialNum)
         scores_trial = [scores_trial, average_score];  % ´æ´¢ºÃÆ½¾ùµÄ·ÖÊı
         max_MuSup = max(mu_suppressions(1,:))/MI_MUSup_thre;  % ¼ÆËã×î´óµÄMuË¥¼õ±ÈÉÏãĞÖµ£¬ºâÁ¿ÈÎÎñÍê³ÉÇé¿ö
         muSups_trial = [muSups_trial, [max_MuSup; Trials(AllTrial)]];  % ´æ´¢ºÃÍê³ÉÇé¿ö
-        visual_feedbacks_trial = [visual_feedbacks_trial, [mean(visual_feedbacks1(1,:)); Trials(AllTrial)]];  % ´æ´¢Ïà¹ØÊÓ¾õ·´À¡Çé¿ö
+        visual_feedbacks_trial = [visual_feedbacks_trial, [mean(visual_feedbacks(1,:)); Trials(AllTrial)]];  % ´æ´¢Ïà¹ØÊÓ¾õ·´À¡Çé¿ö
         
         %[Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgradedMI(scores_trial, Trials, AllTrial, MI_MUSup_thre_weight_baseline, RestTimeLenBaseline,TrialNum);
         %[Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgraded(scores_trial, muSups_trial, Trials, AllTrial, MI_MUSup_thre_weight_baseline, RestTimeLenBaseline, TrialNum);
@@ -457,7 +460,7 @@ while(AllTrial <= TrialNum)
     end
     
     % ÔË¶¯ÏëÏóÃ»ÓĞÏë¶Ô£¬ÌáĞÑ½áÊøÁËÖ®ºóÈÃÈËĞİÏ¢
-    if Trials(AllTrial)>0 && (clsFlag==0 && clsFlag1==0) == 0 && Timer == (MaxMITime + 8) && clsControl == 2
+    if Trials(AllTrial)>0 && (clsFlag==0 && clsFlag1==0) && Timer == (MaxMITime + 8) && clsControl == 2
         Trigger = 7;
         sendbuf(1,1) = hex2dec('02') ;
         sendbuf(1,2) = hex2dec('00') ;
@@ -469,7 +472,7 @@ while(AllTrial <= TrialNum)
         scores_trial = [scores_trial, average_score];  % ´æ´¢ºÃÆ½¾ùµÄ·ÖÊı
         max_MuSup = max(mu_suppressions(1,:))/MI_MUSup_thre;  % ¼ÆËã×î´óµÄMuË¥¼õ±ÈÉÏãĞÖµ£¬ºâÁ¿ÈÎÎñÍê³ÉÇé¿ö
         muSups_trial = [muSups_trial, [max_MuSup; Trials(AllTrial)]];  % ´æ´¢ºÃÍê³ÉÇé¿ö
-        visual_feedbacks_trial = [visual_feedbacks_trial, [mean(visual_feedbacks1(1,:)); Trials(AllTrial)]];  % ´æ´¢Ïà¹ØÊÓ¾õ·´À¡Çé¿ö
+        visual_feedbacks_trial = [visual_feedbacks_trial, [mean(visual_feedbacks(1,:)); Trials(AllTrial)]];  % ´æ´¢Ïà¹ØÊÓ¾õ·´À¡Çé¿ö
         
         %[Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgradedMI(scores_trial, Trials, AllTrial, MI_MUSup_thre_weight_baseline, RestTimeLenBaseline, TrialNum);
         %[Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgraded(scores_trial, muSups_trial, Trials, AllTrial, MI_MUSup_thre_weight_baseline, RestTimeLenBaseline, TrialNum);
