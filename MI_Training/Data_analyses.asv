@@ -247,9 +247,7 @@ function [mu_suppresions, EI_index_scores, resultsMI_trials] = mu_EI_MIresult_ca
         
         % 计算mu_suppresion的均值并保存
         %mu_suppresions = [mu_suppresions, [mu_suppresion; repmat(Trigger,1,size(mu_powers, 2))]];
-        %mu_suppresions = [mu_suppresions, [mean(mu_suppresion); Trigger]];
-        mu_suppresions = [mu_suppresions, [max(mu_suppresion); Trigger]];
-        %mu_suppresions = [mu_suppresions, [mean(mu_suppresion(end)); Trigger]];
+        mu_suppresions = [mu_suppresions, [mean(mu_suppresion); Trigger]];
         
         % 计算EI_index_score
         EI_index_score = zeros(1, size(EI_indices, 2));
@@ -260,12 +258,12 @@ function [mu_suppresions, EI_index_scores, resultsMI_trials] = mu_EI_MIresult_ca
         
         % 计算EI_index_score的均值并保存
         %EI_index_scores = [EI_index_scores, [EI_index_score; repmat(Trigger,1,size(mu_powers, 2))]];
+        %EI_index_scores = [EI_index_scores, [mean(EI_index_score); Trigger]];
         EI_index_scores = [EI_index_scores, [mean(EI_index_score); Trigger]];
-        %EI_index_scores = [EI_index_scores, [max(EI_index_score); Trigger]];
         
         % 计算分类概率在这一个trial里面的均值
-        resultsMI_trials = [resultsMI_trials, [mean(resultsMI(1,:)); Trigger]];
-        %resultsMI_trials = [resultsMI_trials, [max(resultsMI(1,:)); Trigger]];
+        %resultsMI_trials = [resultsMI_trials, [mean(resultsMI(1,:)); Trigger]];
+        resultsMI_trials = [resultsMI_trials, [max(resultsMI(1,:)); Trigger]];
     end
 end
 %% 获取平均参与度分数的函数

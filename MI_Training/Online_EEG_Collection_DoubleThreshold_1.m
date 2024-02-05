@@ -326,8 +326,8 @@ while(AllTrial <= TrialNum)
        Trigger = 7; 
        clsTime = Timer;  % 这是分类正确的时间
         if Trials(AllTrial) > 0  % 运动想象任务
-            Trigger = Trials(AllTrial);  % 播放动作的AO动画（Idle, MI1, MI2）
-            mat2unity = ['0', num2str(Trigger + 3)];
+            % 播放动作的AO动画（Idle, MI1, MI2）
+            mat2unity = ['0', num2str(Trials(AllTrial) + 3)];
             sendbuf(1,1) = hex2dec(mat2unity);
             sendbuf(1,2) = hex2dec('01') ;
             sendbuf(1,3) = hex2dec('01') ;  % 给与反馈，显示文字
@@ -347,8 +347,8 @@ while(AllTrial <= TrialNum)
     if clsFlag == 0 && Timer == (MaxMITime) && clsControl == 0
         Trigger = 7;
         if Trials(AllTrial) > 0  % 运动想象任务
-            Trigger = Trials(AllTrial);  % 播放动作的AO动画（Idle, MI1, MI2）
-            mat2unity = ['0', num2str(Trigger + 3)];
+            % 播放动作的AO动画（Idle, MI1, MI2）
+            mat2unity = ['0', num2str(Trials(AllTrial) + 3)];
             sendbuf(1,1) = hex2dec(mat2unity);
             sendbuf(1,2) = hex2dec('00') ;
             sendbuf(1,3) = hex2dec('02') ;  % 给与反馈，显示文字

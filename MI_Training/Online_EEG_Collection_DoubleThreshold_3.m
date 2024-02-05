@@ -45,20 +45,19 @@ status = CheckNetStreamingVersion(con);                                    % ÅĞ¶
 [~, basicInfo] = ClientGetBasicMessage(con);                               % »ñÈ¡Éè±¸»ù±¾ĞÅÏ¢basicInfo°üº¬ size,eegChan,sampleRate,dataSize
 [~, infoList] = ClientGetChannelMessage(con,basicInfo.eegChan);            % »ñÈ¡Í¨µÀĞÅÏ¢
 
-
-
 %% ÔÚÏßÊµÑé²ÎÊıÉèÖÃ²¿·Ö£¬ÓÃÓÚÉèÖÃÃ¿Ò»¸ö±»ÊÔµÄÇé¿ö£¬ÒÀ¾İ±»ÊÔÇé¿ö½øĞĞĞŞ¸Ä
 
 % ÔË¶¯ÏëÏó»ù±¾²ÎÊıÉèÖÃ
-subject_name = 'Jyt_test_0205_online';  % ±»ÊÔĞÕÃû
+subject_name = 'Jyt_test_0205_online_22';  % ±»ÊÔĞÕÃû
 sub_offline_collection_folder = 'Jyt_test_0205_offline_20240205_161112842_data';  % ±»ÊÔµÄÀëÏß²É¼¯Êı¾İ
 subject_name_offline =  'Jyt_test_0205_offline';  % ÀëÏßÊÕ¼¯Êı¾İÊ±ºòµÄ±»ÊÔÃû³Æ
 session_idx = 1;  % session indexÊıÁ¿£¬Èç¹ûÊÇ1µÄ»°£¬»á×Ô¶¯Éú³ÉÏà¹ØÅÅ²¼
-MotorClass = 2; % ÔË¶¯ÏëÏó¶¯×÷ÊıÁ¿£¬×¢ÒâÕâÀïÊÇ´¿Éè¼ÆµÄÔË¶¯ÏëÏó¶¯×÷µÄÊıÁ¿£¬²»°üÀ¨¿ÕÏëidle×´Ì¬
 DiffLevels = [1,2];  % ¶ÔÓÚÉÏÃæµÄÔË¶¯ÏëÏóµÄÄÑ¶ÈÅÅ²¼£¬Ô½¿¿ºóÔ½ÄÑ£¬ÆäÖĞµÄ1,2¶ÔÓ¦µÄÊÇÔË¶¯ÏëÏóµÄÀàĞÍ£¬ºÍunity¶ÔÓ¦
 MajorPoportion = 0.6;  % Ã¿Ò»¸ösessionÀïÃæ²»Í¬ÀàĞÍÔË¶¯ÏëÏó×ÜÊıËùÕ¼µÄ±ÈÖµ
 %TrialNum = 40;  % Ã¿Ò»¸ösessionÀïÃæµÄtrialµÄÊıÁ¿
-TrialNum = 30;  % Ã¿Ò»¸ösessionÀïÃæµÄtrialµÄÊıÁ¿
+TrialNum = 15;  % Ã¿Ò»¸ösessionÀïÃæµÄtrialµÄÊıÁ¿
+MotorClass = 1; % ÔË¶¯ÏëÏó¶¯×÷ÊıÁ¿£¬×¢ÒâÕâÀïÊÇ´¿Éè¼ÆµÄÔË¶¯ÏëÏó¶¯×÷µÄÊıÁ¿£¬²»°üÀ¨¿ÕÏëidle×´Ì¬
+MotorClassMI = 2;  % Èç¹ûÊÇµ¥ÔË¶¯ÏëÏóÈÎÎñµÄ»°£¬ÄÇ¾ÍÖ±½ÓÖ¸¶¨ÈÎÎñ¾ÍºÃÁË
 
 
 % ÔË¶¯ÏëÏóÈÎÎñµ÷ÕûÉèÖÃ
@@ -113,7 +112,7 @@ min_max_value = load([foldername_Scores, '\\', ['Offline_EEGMI_Scores_', subject
 
 % Éú³ÉÏÖÔÚµÄ¹ì¼£
 %traj = generate_traj(mean_std_muSup.mean_std_muSup, TrialNum);
-traj = generate_traj_quartile(quartile_caculation.quartile_caculation, TrialNum/2);
+traj = generate_traj_quartile(quartile_caculation.quartile_caculation, TrialNum);
 
 %% ÔË¶¯ÏëÏóÄÚÈİ°²ÅÅ
 TrialIndex = randperm(TrialNum);                                           % ¸ù¾İ²É¼¯µÄÊıÁ¿Éú³ÉËæ»úË³ĞòµÄÊı×é
@@ -121,13 +120,17 @@ TrialIndex = randperm(TrialNum);                                           % ¸ù¾
 Trigger = 0;                                                               % ³õÊ¼»¯Trigger£¬ÓÃÓÚºóĞøµÄÊı¾İ´æ´¢
 AllTrial = 0;
 
-randomindex = [];                                                          % ³õÊ¼»¯trialsµÄ¼¯ºÏ
-for i= 1:(MotorClass)                                                    % ×¢Òâ£¬ÕâÀïÖ»Éú³ÉÔË¶¯ÏëÏóµÄÈÎÎñ£¬ºóÃæ»áÒÀ¾İÊµ¼ÊÇé¿ö¼ÓÈëÏà¹ØµÄ¾²Ï¢×´Ì¬
-    index_i = ones(TrialNum/MotorClass,1)*i;                             % size TrialNum/MotorClasses*1£¬¸÷ÖÖÈÎÎñ
-    randomindex = [randomindex; index_i];                                  % ¸÷¸öÈÎÎñÕûºÏ£¬×îÖÕsize TrialNum*1
-end
+randomindex = [];   
+if MotorClass > 1                                                       % ³õÊ¼»¯trialsµÄ¼¯ºÏ
+    for i= 1:(MotorClass)                                                    % ×¢Òâ£¬ÕâÀïÖ»Éú³ÉÔË¶¯ÏëÏóµÄÈÎÎñ£¬ºóÃæ»áÒÀ¾İÊµ¼ÊÇé¿ö¼ÓÈëÏà¹ØµÄ¾²Ï¢×´Ì¬
+        index_i = ones(TrialNum/MotorClass,1)*i;                             % size TrialNum/MotorClasses*1£¬¸÷ÖÖÈÎÎñ
+        randomindex = [randomindex; index_i];                                  % ¸÷¸öÈÎÎñÕûºÏ£¬×îÖÕsize TrialNum*1
+    end
 
-RandomTrial = randomindex(TrialIndex);                                     % Ëæ»úÉú³É¸÷¸öTrial¶ÔÓ¦µÄÈÎÎñ
+    RandomTrial = randomindex(TrialIndex);                                     % Ëæ»úÉú³É¸÷¸öTrial¶ÔÓ¦µÄÈÎÎñ
+else
+    Trials = repmat(MotorClassMI, TrialNum);   % Èç¹ûÊÇµ¥ÈÎÎñµÄ»°£¬ÎÒÃÇÖ±½ÓÉèÖÃÈÎÎñ
+end
 
 %% ¿ªÊ¼ÊµÑé£¬ÀëÏß²É¼¯
 Timer = 0;
@@ -159,7 +162,9 @@ clsTime = 100;  % ³õÊ¼»¯·ÖÀàÕıÈ·µÄÊ±¼ä
 clsControl = 0;  % ÓÃÓÚÏà¶ÔÖ®ºóÅĞ¶ÏÊÇ·ñĞİÏ¢µÄflag
 RestTimeLenBaseline = 7 + session_idx;  % ĞİÏ¢Ê±¼äËæ×ÅsessionµÄÊıÁ¿Ôö¼Ó
 RestTimeLen = RestTimeLenBaseline;  % ³õÊ¼»¯ĞİÏ¢Ê±¼ä
-Trials = RandomTrial;
+if MotorClass > 1
+    Trials = RandomTrial;
+end
 
 while(AllTrial <= TrialNum)
     %% ÌáÊ¾×¨×¢½×¶Î
@@ -357,7 +362,7 @@ while(AllTrial <= TrialNum)
     
    %% ÔË¶¯ÏëÏó¸øÓë·´À¡½×¶Î£¨Ïë¶Ô/Ê±¼ä·¶Î§ÄÚÃ»ÓĞÏë¶Ô£©,Í¬Ê±¸üĞÂÄ£ĞÍ
    % Ïë¶ÔÁË¿ªÊ¼²¥·Å¶¯×÷ 
-   if (clsFlag == 1 || clsFlag1==1) && clsControl == 0
+   if (clsFlag == 1 && clsFlag1==1) && clsControl == 0
        Trigger = 7; 
        clsTime = Timer;  % ÕâÊÇ·ÖÀàÕıÈ·µÄÊ±¼ä
         if Trials(AllTrial) > 0  % ÔË¶¯ÏëÏóÈÎÎñ
@@ -392,7 +397,7 @@ while(AllTrial <= TrialNum)
    end
     
     % Ïë´íÁË¿ªÊ¼ĞİÏ¢ºÍÌáĞÑ
-    if (clsFlag == 0 && clsFlag1==0) && Timer == (MaxMITime) && clsControl == 0
+    if (clsFlag == 0 || clsFlag1==0) && Timer == (MaxMITime) && clsControl == 0
         Trigger = 7;
         if Trials(AllTrial) > 0  % ÔË¶¯ÏëÏóÈÎÎñ
             % ²¥·Å¶¯×÷µÄAO¶¯»­£¨Idle, MI1, MI2£©
@@ -460,7 +465,7 @@ while(AllTrial <= TrialNum)
     end
     
     % ÔË¶¯ÏëÏóÃ»ÓĞÏë¶Ô£¬ÌáĞÑ½áÊøÁËÖ®ºóÈÃÈËĞİÏ¢
-    if Trials(AllTrial)>0 && (clsFlag==0 && clsFlag1==0) && Timer == (MaxMITime + 8) && clsControl == 2
+    if Trials(AllTrial)>0 && (clsFlag==0 || clsFlag1==0) && Timer == (MaxMITime + 8) && clsControl == 2
         Trigger = 7;
         sendbuf(1,1) = hex2dec('02') ;
         sendbuf(1,2) = hex2dec('00') ;
@@ -540,7 +545,7 @@ while(AllTrial <= TrialNum)
         disp(['Trial: ', num2str(AllTrial), ', Task: ', num2str(Trials(AllTrial))]);  % ÏÔÊ¾Ïà¹ØÊı¾İ
     end
     % ÔË¶¯ÏëÏóÃ»ÓĞÏë¶Ô£¬ÌáĞÑÖ®ºó£¬ĞİÏ¢3sÖ®ºó£¬½áÊøĞİÏ¢£¬×¼±¸ÏÂÒ»¸ö
-    if Trials(AllTrial)>0 && (clsFlag == 0 && clsFlag1==0) && Timer == (MaxMITime + 8 + RestTimeLen) && clsControl == 2
+    if Trials(AllTrial)>0 && (clsFlag == 0 || clsFlag1==0) && Timer == (MaxMITime + 8 + RestTimeLen) && clsControl == 2
         % ´æ´¢Ïà¹ØµÄEIÖ¸±êºÍmu½ÚÂÉÄÜÁ¿µÄÊı¾İ
         SaveMIEngageTrials(EI_indices, mu_powers, mu_suppressions, subject_name, foldername, config_data, EI_index_scores, resultsMI, FES_flags, mu_suppressions_normalized, visual_feedbacks, MI_MUSup_thre1s_normalized);
         % ¼ÆÊ±Æ÷Çå0
@@ -654,7 +659,7 @@ function traj = generate_traj_quartile(quartiles, TrialNum)
 
         % ¼ÆËã¹ì¼£
         for x = 1:TrialNum
-            traj{i}(x) = mu_supQ1 + (mu_supQ3 - mu_supQ1) * (1 - exp(-3 * x / TrialNum));
+            traj{i}(x) = mu_supQ2 + (mu_supQ3 - mu_supQ2) * (1 - exp(-3 * x / TrialNum));
         end
     end
 end

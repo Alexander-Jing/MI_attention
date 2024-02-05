@@ -1,7 +1,7 @@
 %% 鐞氼偉鐦崥宥囆為崪灞界杽妤犲瞼娈戦弬鍥︽�???
-subject_name_online =  'Jyt_test_0131_online'; % 'Jyt_test_0101_online';%'Jyt_test_0108_online'; %%  %  % 鐞氼偉鐦慨鎾虫�?
-sub_online_collection_folder = 'Jyt_test_0131_online_20240131_210821243_data'; %'Jyt_test_0101_online_20240101_175129548_data';  % %'';%  %'Jyt_test_0108_online_20240110_000906267_data'; %   %''; %  % 
-sub_online_rawdata_file = 'Online_EEGMI_RawData_1_Jyt_test_0131_online20240131_212549959.mat'; %'Online_EEGMI_RawData_1_Jyt_test_0101_online20240101_181405221';  %;;  
+subject_name_online =  'Jyt_test_0205_online'; % 'Jyt_test_0101_online';%'Jyt_test_0108_online'; %%  %  % 鐞氼偉鐦慨鎾虫�?
+sub_online_collection_folder = 'Jyt_test_0205_online_20240205_164446522_data'; %'Jyt_test_0101_online_20240101_175129548_data';  % %'';%  %'Jyt_test_0108_online_20240110_000906267_data'; %   %''; %  % 
+sub_online_rawdata_file = 'Online_EEGMI_RawData_1_Jyt_test_0205_online20240205_170603727.mat'; %'Online_EEGMI_RawData_1_Jyt_test_0101_online20240101_181405221';  %;;  
 
 subject_name_offline =  'Jyt_test_0131_offline';  % 缁傝崵鍤庨弨鍫曟肠閺佺増宓侀弮璺??娆戞畱鐞氼偉鐦崥宥�??
 sub_offline_collection_folder = 'Jyt_test_0131_offline_20240131_204044614_data';  % 鐞氼偉鐦惃鍕瀲缁惧潡鍣伴梿鍡樻殶�???
@@ -18,8 +18,8 @@ channels_num = length(channels);
 %% 鐠囪褰囬弫鐗堝�?
 subject_rawdata_folder = ['.\', sub_online_collection_folder, '\' 'Online_EEGMI_RawData_', subject_name_online];
 rawdata = load([subject_rawdata_folder, '\', sub_online_rawdata_file]);
-rawdata_comparison = load('F:\MI_engagement\MI_attention\MI_Training\Jyt_test_0131_comparison_20240131_194732925_data\Offline_EEGMI_RawData_Jyt_test_0131_comparison\Offline_EEGMI_RawData_Jyt_test_0131_comparison20240131_195537284.mat');
-rawdata_offline = load('F:\MI_engagement\MI_attention\MI_Training\Jyt_test_0131_offline_20240131_204044614_data\Offline_EEGMI_RawData_Jyt_test_0131_offline\Offline_EEGMI_RawData_Jyt_test_0131_offline20240131_205742247.mat');%load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0101_1_offline_20240101_193332077_data\Offline_EEGMI_RawData_Jyt_test_0101_1_offline\Offline_EEGMI_RawData_Jyt_test_0101_1_offline20240101_194900541.mat', 'TrialData');
+rawdata_comparison = load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0131_comparison_20240131_194732925_data\Offline_EEGMI_RawData_Jyt_test_0131_comparison\Offline_EEGMI_RawData_Jyt_test_0131_comparison20240131_195537284.mat');
+rawdata_offline = load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0131_offline_20240131_204044614_data\Offline_EEGMI_RawData_Jyt_test_0131_offline\Offline_EEGMI_RawData_Jyt_test_0131_offline20240131_205742247.mat');%load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0101_1_offline_20240101_193332077_data\Offline_EEGMI_RawData_Jyt_test_0101_1_offline\Offline_EEGMI_RawData_Jyt_test_0101_1_offline20240101_194900541.mat', 'TrialData');
 
 rawdata = rawdata.TrialData;
 rawdata_comparison = rawdata_comparison.TrialData;
@@ -27,7 +27,7 @@ rawdata_offline = rawdata_offline.TrialData;
 
 %rawdata = rawdata;
 %rawdata = rawdata_offline;
-rawdata = rawdata_comparison;
+%rawdata = rawdata_comparison;
 %% 闁插洭娉﹂崣鍌涙殶閿涘本鐎铏圭崶�???
 sample_frequency = 256; 
 
@@ -102,7 +102,7 @@ end
 MIPouring_all(:, 1) = mean(all_eegdata_MI_Pouring, 2);
 
 % 缂佹ê鍩楁径鎾劥閼存垹鏁搁崷鏉胯埌閸??
-topo_painting = MIPouring_all-Idle_all;
+topo_painting = MIDrinking_all-Idle_all;
 topoplot([topo_painting;],'Cap30_1.locs','maplimits',[-1.0,1.0], 'electrodes', 'on', 'style', 'map');
 
 
