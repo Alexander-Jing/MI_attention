@@ -1,13 +1,13 @@
 %% 被试名称和实验的文件夹
 root_path = 'F:\CASIA\MI_engagement\MI_attention\MI_Training';  % 根目录用于存储数据和分析
-subject_name_online = 'Jyt_test_0205_online_11'; %'Jyt_test_0101_1_online';% 'Jyt_test_0101_online'; %  % 被试姓名
-sub_online_collection_folder = 'Jyt_test_0205_online_11_20240205_200236041_data'; % 'Jyt_test_0101_1_online_20240101_200123314_data';  %'Jyt_test_0101_online_20240101_175129548_data'; %  % 
+subject_name_online = 'Jyt_test_0205_online_22'; %'Jyt_test_0101_1_online';% 'Jyt_test_0101_online'; %  % 被试姓名
+sub_online_collection_folder = 'Jyt_test_0205_online_22_20240205_204019722_data'; % 'Jyt_test_0101_1_online_20240101_200123314_data';  %'Jyt_test_0101_online_20240101_175129548_data'; %  % 
 
 subject_name_offline =  'Jyt_test_0131_offline';  % 离线收集数据时候的被试名称
 sub_offline_collection_folder = 'Jyt_test_0131_offline_20240131_204044614_data';  % 被试的离线采集数据
 
-subject_name_comparison = 'Jyt_test_0205_comparison_11';
-sub_comparison_collection_folder = 'Jyt_test_0205_comparison_11_20240205_214849138_data';
+subject_name_comparison = 'Jyt_test_0205_comparison_22';
+sub_comparison_collection_folder = 'Jyt_test_0205_comparison_22_20240205_220245054_data';
 
 channels = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, 16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];  % 选择的通道,
 mu_channels = struct('C3',24, 'C4',22);  % 用于计算ERD/ERS的几个channels，是C3和C4两个通道,需要设定位置
@@ -159,16 +159,16 @@ ylabel('Value');
 title('Line plot of results of each MI');
 grid on;
 
-figure;
-plot(visual_feedbacks_trial(1,:), 'LineWidth', 2);
-hold on;
-plot(MI_MUSup_thres_normalized(1,:), 'LineWidth', 2);
-hold off;
-legend('visual_feedback', 'MI_MUSup_thres');
-xlabel('Index');
-ylabel('Value');
-title('Line plot of visual_feedbacks_trial');
-grid on;
+% figure;
+% plot(visual_feedbacks_trial(1,:), 'LineWidth', 2);
+% hold on;
+% plot(MI_MUSup_thres_normalized(1,:), 'LineWidth', 2);
+% hold off;
+% legend('visual_feedback', 'MI_MUSup_thres');
+% xlabel('Index');
+% ylabel('Value');
+% title('Line plot of visual_feedbacks_trial');
+% grid on;
 
 % figure;
 % envelope_extraction(EI_index_scores(1,:));
@@ -260,10 +260,10 @@ function [mu_suppresions, EI_index_scores, resultsMI_trials] = mu_EI_MIresult_ca
         
         % 计算mu_suppresion的均值并保存
         %mu_suppresions = [mu_suppresions, [mu_suppresion; repmat(Trigger,1,size(mu_powers, 2))]];
-        %mu_suppresions = [mu_suppresions, [mean(mu_suppresion); Trigger]];
+        mu_suppresions = [mu_suppresions, [mean(mu_suppresion); Trigger]];
         %mu_suppresions = [mu_suppresions, [max(mu_suppresion); Trigger]];
         %mu_suppresions = [mu_suppresions, [mu_suppresion(end); Trigger]];
-        mu_suppresions = [mu_suppresions, [mean(mu_suppresion(end)); Trigger]];
+        %mu_suppresions = [mu_suppresions, [mean(mu_suppresion(end)); Trigger]];
         
         % 计算EI_index_score
         EI_index_score = zeros(1, size(EI_indices, 2));
