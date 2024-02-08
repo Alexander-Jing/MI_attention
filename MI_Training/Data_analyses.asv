@@ -196,7 +196,7 @@ plot_signal_and_fit_double(mu_suppresions(1,:), 'Mu sup online', mu_suppressions
 subplot(2,2,4);
 plot_signal_and_fit_double(EI_index_scores(1,:), 'EI online', EI_index_scores_compare(1,:), 'EI compare', 'EI');
 %plot_signal_and_fit_double(EI_index_scores(1,EI_index_scores(2,:)==2), 'EI online 2', EI_index_scores_compare(1,EI_index_scores_compare(2,:)==2), 'EI compare 2', 'Ei');
-suptitle(strrep(subject_name_online, '_', ' '));
+suptitle();
 
 disp('methods on visualfeedback')
 [p_ttest, p_ranksum] = significance_analysis(visual_feedbacks_trial(1,:), visualfeedback_trial_compare);

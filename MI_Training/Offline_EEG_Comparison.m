@@ -165,6 +165,7 @@ while(AllTrial < TrialNum)
     end
     
     if Timer==7  %²¥·Å¶¯»­
+        Trigger = 7;
         sendbuf(1,2) = hex2dec('01') ;
         fwrite(UnityControl,sendbuf);
     end
