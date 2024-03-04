@@ -1,5 +1,5 @@
 %% 被试名称和实验的文件夹
-root_path = 'F:\CASIA\MI_engagement\MI_attention\MI_Training';  % 根目录用于存储数据和分析
+root_path = 'F:\MI_engagement\MI_attention\MI_Training';  % 根目录用于存储数据和分析
 subject_name_online = 'Jyt_test_0131_online'; %'Jyt_test_0101_1_online';% 'Jyt_test_0101_online'; %  % 被试姓名
 sub_online_collection_folder = 'Jyt_test_0131_online_20240131_210821243_data'; % 'Jyt_test_0101_1_online_20240101_200123314_data';  %'Jyt_test_0101_online_20240101_175129548_data'; %  % 
 
@@ -44,8 +44,22 @@ mu_suppressions_compare = scores_compare.mu_suppressions;
 mu_suppressions_trial_compare = scores_compare.mu_suppressions_trialmean;
 EI_index_scores_compare = scores_compare.EI_index_scores_trialmean;
 resultsMI_compare = results_compare.resultsMI;
-resultsMI_trial_compare = mean(reshape(resultsMI_compare(1,:), 4, []));
-Trigger = unique(mu_suppressions_compare(2,:));
+resultsMI_trial_compare = mean(reshape(resultsMI_compare(1,:), 4, []));  % 计算对比实验组的每一个trial的平均准确率
+resultsMI_trial_compare = [resultsMI_trial_compare; mu_suppressions_trial_compare(2,:)];
+Triggers = unique(mu_suppressions_compare(2,:));
+% 初始化一个空的归一化结果矩阵
+mu_suppressions_normalized_compare = zeros(size(mu_suppressions_compare));
+% 对每一个Trigger进行归一化
+for i = 1:(length(Triggers)-1)
+    % 获取当前Trigger
+    current_Trigger = Triggers(i);
+    
+    % 找到当前Trigger对应的索引
+    indices = mu_suppressions_compare(2,:) == current_Trigger;
+    
+    % 对当前Trigger对应的数值进行归一化
+    mu_suppressions_normalized_compare(1, indices) = mu_normalization(mu_suppressions_compare(1, indices), min_max_value, current_Trigger+1);
+end
 mu_suppressions_normalized_compare = mu_normalization(mu_suppressions_compare, min_max_value, Trigger+1);
 visualfeedback_compare = mu_suppressions_normalized_compare.* resultsMI_compare;  % 计算下compare的对比实验
 visualfeedback_trial_compare = mean(reshape(visualfeedback_compare(1,:), 4, []));
@@ -192,15 +206,13 @@ subplot(2,2,2);
 plot_signal_and_fit_double(resultsMI_trials(1,:), 'results', resultsMI_trial_compare(1,:), 'results compare', 'results');
 subplot(2,2,3);
 plot_signal_and_fit_double(mu_suppresions(1,:), 'Mu sup online', mu_suppressions_trial_compare(1,:), 'Mu sup compare', 'mu sup');
-plot_signal_and_fit_double(mu_suppresions(1,mu_suppresions(2,:)==2), 'Mu sup online 2', mu_suppressions_compare(1,mu_suppressions_compare(2,:)==2), 'Mu sup compare 2', 'mu sup');
 subplot(2,2,4);
 plot_signal_and_fit_double(EI_index_scores(1,:), 'EI online', EI_index_scores_compare(1,:), 'EI compare', 'EI');
-plot_signal_and_fit_double(EI_index_scores(1,EI_index_scores(2,:)==2), 'EI online 2', EI_index_scores_compare(1,EI_index_scores_compare(2,:)==2), 'EI compare 2', 'Ei');
-suptitle(strrep(subject_name_online, '_', ' '));
+%suptitle(strrep(subject_name_online, '_', ' '));
 
 disp('methods on visualfeedback')
 %[p_ttest, p_ranksum] = significance_analysis(visual_feedbacks_trial(1,:), visualfeedback_trial_compare);
-significance_show(p_ttest,p_ranksum);
+%significance_show(p_ttest,p_ranksum);
 disp('methods on mu_suppresions');
 [p_ttest, p_ranksum] = significance_analysis(mu_suppresions, mu_suppressions_trial_compare);
 significance_show(p_ttest,p_ranksum);
@@ -216,6 +228,9 @@ disp('methods on mu_suppresions on triggers');
 significance_show(p_ttest,p_ranksum);
 disp('methods on EI_index_scores on triggers');
 [p_ttest, p_ranksum] = significance_analysis_trigger(EI_index_scores, EI_index_scores_compare);
+significance_show(p_ttest,p_ranksum);
+disp('methods on resultsMI on triggers');
+[p_ttest, p_ranksum] = significance_analysis_trigger(resultsMI_trials, resultsMI_trial_compare);
 significance_show(p_ttest,p_ranksum);
 
 disp('method 1 on correlations on the mu_suppresions and EI_index_scores');
