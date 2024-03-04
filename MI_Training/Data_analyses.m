@@ -1,13 +1,13 @@
 %% 被试名称和实验的文件夹
-root_path = 'F:\CASIA\MI_engagement\MI_attention\MI_Training';  % 根目录用于存储数据和分析
-subject_name_online = 'Jyt_test_0205_online_22'; %'Jyt_test_0101_1_online';% 'Jyt_test_0101_online'; %  % 被试姓名
-sub_online_collection_folder = 'Jyt_test_0205_online_22_20240205_205709457_data'; % 'Jyt_test_0101_1_online_20240101_200123314_data';  %'Jyt_test_0101_online_20240101_175129548_data'; %  % 
+root_path = 'F:\MI_engagement\MI_attention\MI_Training';  % 根目录用于存储数据和分析
+subject_name_online = 'Jyt_test_0131_online'; %'Jyt_test_0101_1_online';% 'Jyt_test_0101_online'; %  % 被试姓名
+sub_online_collection_folder = 'Jyt_test_0131_online_20240131_210821243_data'; % 'Jyt_test_0101_1_online_20240101_200123314_data';  %'Jyt_test_0101_online_20240101_175129548_data'; %  % 
 
-subject_name_offline =  'Jyt_test_0205_offline';  % 离线收集数据时候的被试名称
-sub_offline_collection_folder = 'Jyt_test_0205_offline_20240205_161112842_data';  % 被试的离线采集数据
+subject_name_offline =  'Jyt_test_0131_offline';  % 离线收集数据时候的被试名称
+sub_offline_collection_folder = 'Jyt_test_0131_offline_20240131_204044614_data';  % 被试的离线采集数据
 
-subject_name_comparison = 'Jyt_test_0205_comparison_22';
-sub_comparison_collection_folder = 'Jyt_test_0205_comparison_22_20240205_220245054_data';
+subject_name_comparison = 'Jyt_test_0131_offline_comparison';
+sub_comparison_collection_folder = 'Jyt_test_0131_offline_comparison_20240131_191233752_data';
 
 channels = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, 16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];  % 选择的通道,
 mu_channels = struct('C3',24, 'C4',22);  % 用于计算ERD/ERS的几个channels，是C3和C4两个通道,需要设定位置
@@ -192,10 +192,10 @@ subplot(2,2,2);
 plot_signal_and_fit_double(resultsMI_trials(1,:), 'results', resultsMI_trial_compare(1,:), 'results compare', 'results');
 subplot(2,2,3);
 plot_signal_and_fit_double(mu_suppresions(1,:), 'Mu sup online', mu_suppressions_trial_compare(1,:), 'Mu sup compare', 'mu sup');
-%plot_signal_and_fit_double(mu_suppresions(1,mu_suppresions(2,:)==2), 'Mu sup online 2', mu_suppressions_compare(1,mu_suppressions_compare(2,:)==2), 'Mu sup compare 2', 'mu sup');
+plot_signal_and_fit_double(mu_suppresions(1,mu_suppresions(2,:)==2), 'Mu sup online 2', mu_suppressions_compare(1,mu_suppressions_compare(2,:)==2), 'Mu sup compare 2', 'mu sup');
 subplot(2,2,4);
 plot_signal_and_fit_double(EI_index_scores(1,:), 'EI online', EI_index_scores_compare(1,:), 'EI compare', 'EI');
-%plot_signal_and_fit_double(EI_index_scores(1,EI_index_scores(2,:)==2), 'EI online 2', EI_index_scores_compare(1,EI_index_scores_compare(2,:)==2), 'EI compare 2', 'Ei');
+plot_signal_and_fit_double(EI_index_scores(1,EI_index_scores(2,:)==2), 'EI online 2', EI_index_scores_compare(1,EI_index_scores_compare(2,:)==2), 'EI compare 2', 'Ei');
 suptitle(strrep(subject_name_online, '_', ' '));
 
 disp('methods on visualfeedback')

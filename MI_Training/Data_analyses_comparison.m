@@ -1,7 +1,7 @@
 %% 被试名称和实验的文件夹
-root_path = 'F:\CASIA\MI_engagement\MI_attention\MI_Training';  % 根目录用于存储数据和分析
-subject_name_comparison = 'Jyt_test_0205_comparison_22';
-sub_comparison_collection_folder = 'Jyt_test_0205_comparison_22_20240205_220245054_data';
+root_path = 'F:\MI_engagement\MI_attention\MI_Training';  % 根目录用于存储数据和分析
+subject_name_comparison = 'Jyt_test_0131_comparison';
+sub_comparison_collection_folder = 'Jyt_test_0131_comparison_20240131_194732925_data';
 
 channels = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, 16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];  % 选择的通道,
 mu_channels = struct('C3',24, 'C4',22);  % 用于计算ERD/ERS的几个channels，是C3和C4两个通道,需要设定位置
@@ -26,12 +26,12 @@ rawdata_compare = trialdata_compare.TrialData;
 
 %% 读取在线的rawdata，用于一个伪在线的识别，从而得到在线的识别准确率
 trial_length = 15;  % trial时长15s
-trial_nums = 14;  %总共14个trial
+trial_nums = 29;  %总共14个trial
 MI_start = 2;  % MI开始记录的时刻
 MI_length = 7-2;  % MI所用的时间长度
 sample_freq = 256;
 window_length = 2;
-Trigger = 2;
+%Trigger = 2;
 session_idx = 1;
 resultsMI = [];
 
@@ -40,7 +40,7 @@ for trial_idx = 1:trial_nums
     window_num = MI_length - window_length + 1;
     for MI_idx = 1:window_num   
         rawdata_MI = rawdata_trial(:, 1 + (MI_start + (MI_idx - 1) * window_length) * sample_freq:(MI_start + MI_idx * window_length) * sample_freq);
-        %Trigger = unique(rawdata_MI(end,:));
+        Trigger = unique(rawdata_MI(end,:));
         [FilteredDataMI, EI_index, mu_power_MI] = Online_DataPreprocess_Hanning(rawdata_MI, Trigger, sample_freq, window_length * sample_freq, channels);
         config_data = [window_length * sample_freq;size(channels, 2);Trigger;session_idx;trial_idx;MI_idx;1.0;0;0;0;0 ];  %按照相关数值配置好服务器发送
         order = 4.0;
