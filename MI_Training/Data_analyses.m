@@ -1,13 +1,13 @@
 %% 被试名称和实验的文件夹
-root_path = 'F:\MI_engagement\MI_attention\MI_Training';  % 根目录用于存储数据和分析
+root_path = 'F:\CASIA\MI_engagement\MI_attention\MI_Training';  % 根目录用于存储数据和分析
 subject_name_online = 'Jyt_test_0131_online'; %'Jyt_test_0101_1_online';% 'Jyt_test_0101_online'; %  % 被试姓名
 sub_online_collection_folder = 'Jyt_test_0131_online_20240131_210821243_data'; % 'Jyt_test_0101_1_online_20240101_200123314_data';  %'Jyt_test_0101_online_20240101_175129548_data'; %  % 
 
 subject_name_offline =  'Jyt_test_0131_offline';  % 离线收集数据时候的被试名称
 sub_offline_collection_folder = 'Jyt_test_0131_offline_20240131_204044614_data';  % 被试的离线采集数据
 
-subject_name_comparison = 'Jyt_test_0131_offline_comparison';
-sub_comparison_collection_folder = 'Jyt_test_0131_offline_comparison_20240131_191233752_data';
+subject_name_comparison = 'Jyt_test_0131_comparison';
+sub_comparison_collection_folder = 'Jyt_test_0131_comparison_20240131_194732925_data';
 
 channels = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, 16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];  % 选择的通道,
 mu_channels = struct('C3',24, 'C4',22);  % 用于计算ERD/ERS的几个channels，是C3和C4两个通道,需要设定位置
@@ -34,7 +34,7 @@ Online_EEGMI_trajectory = load(fullfile(Online_traj_path, Online_traj_file));
 traj = Online_EEGMI_trajectory.traj;
 MI_MUSup_thres = Online_EEGMI_trajectory.MI_MUSup_thres;
 MI_MUSup_thre_weights = Online_EEGMI_trajectory.MI_MUSup_thre_weights;
-visual_feedbacks_trial = Online_EEGMI_trajectory.visual_feedbacks_trial;
+%visual_feedbacks_trial = Online_EEGMI_trajectory.visual_feedbacks_trial;
 MI_MUSup_thres_normalized = Online_EEGMI_trajectory.MI_MUSup_thres_normalized;
 
 % 读取对比实验的数据
@@ -187,7 +187,7 @@ fprintf('EI_index_scores: mean = %.2f, std = %.2f\n', EI_index_scores_mean, EI_i
 %plot_signal_and_fit(EI_index_scores(1,:), 'EI online');
 %plot_signal_and_fit(EI_index_scores_compare(1,:), 'EI compare');
 subplot(2,2,1);
-plot_signal_and_fit_double(visual_feedbacks_trial(1,:), 'visualfeedback', visualfeedback_trial_compare(1,:), 'visualfeedback compare', 'visualfeedback');
+%plot_signal_and_fit_double(visual_feedbacks_trial(1,:), 'visualfeedback', visualfeedback_trial_compare(1,:), 'visualfeedback compare', 'visualfeedback');
 subplot(2,2,2);
 plot_signal_and_fit_double(resultsMI_trials(1,:), 'results', resultsMI_trial_compare(1,:), 'results compare', 'results');
 subplot(2,2,3);
@@ -199,7 +199,7 @@ plot_signal_and_fit_double(EI_index_scores(1,EI_index_scores(2,:)==2), 'EI onlin
 suptitle(strrep(subject_name_online, '_', ' '));
 
 disp('methods on visualfeedback')
-[p_ttest, p_ranksum] = significance_analysis(visual_feedbacks_trial(1,:), visualfeedback_trial_compare);
+%[p_ttest, p_ranksum] = significance_analysis(visual_feedbacks_trial(1,:), visualfeedback_trial_compare);
 significance_show(p_ttest,p_ranksum);
 disp('methods on mu_suppresions');
 [p_ttest, p_ranksum] = significance_analysis(mu_suppresions, mu_suppressions_trial_compare);

@@ -1,5 +1,5 @@
 %% 被试名称和实验的文件夹
-root_path = 'F:\MI_engagement\MI_attention\MI_Training';  % 根目录用于存储数据和分析
+root_path = 'F:\CASIA\MI_engagement\MI_attention\MI_Training';  % 根目录用于存储数据和分析
 subject_name_comparison = 'Jyt_test_0131_comparison';
 sub_comparison_collection_folder = 'Jyt_test_0131_comparison_20240131_194732925_data';
 
