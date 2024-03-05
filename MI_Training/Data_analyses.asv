@@ -19,6 +19,21 @@ EI_channels = struct('Fp1', 32, 'Fp2', 31, 'F7', 30, 'F3', 29, 'Fz', 28, 'F4', 2
 folder_path = fullfile(sub_online_collection_folder, ['Online_Engagements_', subject_name_online]);
 % [sub_online_collection_folder, '/', 'Online_Engagements_', subject_name_online]; % 请将'./your_folder'替换为您的文件夹的相对路径
 [mu_suppresions, EI_index_scores, resultsMI_trials] = mu_EI_MIresult_caculation(folder_path, mu_channels, EI_channels);  % 提取相关指标
+Triggers = unique(mu_suppresions(2,:));
+% 初始化一个空的归一化结果矩阵
+mu_suppressions_normalized = zeros(size(mu_suppresions));
+% 对每一个Trigger进行归一化
+for i = 1:(length(Triggers)-1)
+    % 获取当前Trigger
+    current_Trigger = Triggers(i);
+    
+    % 找到当前Trigger对应的索引
+    indices = mu_suppresions(2,:) == current_Trigger;
+    
+    % 对当前Trigger对应的数值进行归一化
+    mu_suppressions_normalized(1, indices) = mu_normalization(mu_suppresions(1, indices), min_max_value, current_Trigger+1);
+end
+mu_suppressions_normalized = [mu_suppressions_normalized(1,:);mu_suppresions]
 
 % 读取和计算后续的在线/离线和对比实验的数据，并且计算出相关的一些指标
 % 读取离线的mu衰减变化
@@ -60,9 +75,10 @@ for i = 1:(length(Triggers)-1)
     % 对当前Trigger对应的数值进行归一化
     mu_suppressions_normalized_compare(1, indices) = mu_normalization(mu_suppressions_compare(1, indices), min_max_value, current_Trigger+1);
 end
-mu_suppressions_normalized_compare = mu_normalization(mu_suppressions_compare, min_max_value, Trigger+1);
-visualfeedback_compare = mu_suppressions_normalized_compare.* resultsMI_compare;  % 计算下compare的对比实验
+visualfeedback_compare = mu_suppressions_normalized_compare(1,:).* resultsMI_compare(1,:);  % 计算下compare的对比实验
 visualfeedback_trial_compare = mean(reshape(visualfeedback_compare(1,:), 4, []));
+mu_suppressions_normalized_compare_trial = mean(reshape(mu_suppressions_normalized_compare(1,:), 4, []));
+mu_suppressions_normalized_compare_trial = [mu_suppressions_normalized_compare_trial(1,:); mu_suppressions_trial_compare(2,:)];
 
 %% 读取其余在线/离线对比实验中的数据，并且计算出一些相关的指标（备用代码，平时隐藏）
 %mu_suppressions_offline = load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0125_offline_test_20240125_203932146_data\Offline_EEGMI_Scores_Jyt_test_0125_offline_test\Offline_EEGMI_Scores_Jyt_test_0125_offline_test.mat', 'mu_suppressions');
@@ -228,6 +244,9 @@ disp('methods on mu_suppresions on triggers');
 significance_show(p_ttest,p_ranksum);
 disp('methods on EI_index_scores on triggers');
 [p_ttest, p_ranksum] = significance_analysis_trigger(EI_index_scores, EI_index_scores_compare);
+significance_show(p_ttest,p_ranksum);
+disp('methods on resultsMI on triggers');
+[p_ttest, p_ranksum] = significance_analysis_trigger(resultsMI_trials, resultsMI_trial_compare);
 significance_show(p_ttest,p_ranksum);
 
 disp('method 1 on correlations on the mu_suppresions and EI_index_scores');

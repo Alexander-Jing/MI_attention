@@ -26,6 +26,19 @@ mu_suppressions_scores = load(fullfile(root_path, sub_offline_collection_folder,
 mu_suppressions_offline = mu_suppressions_scores.mu_suppressions;
 min_max_value = mu_suppressions_scores.min_max_value;
 
+% 计算归一化之后的在线mu衰减指标
+% 初始化一个空的归一化结果矩阵
+mu_suppressions_normalized = zeros(size(mu_suppresions(1,:)));
+% 对每一个Trigger进行归一化
+for i = 1:(length(mu_suppressions_normalized))
+    % 获取当前Trigger
+    current_Trigger = mu_suppresions(2,i);
+    
+    % 对当前Trigger对应的数值进行归一化
+    mu_suppressions_normalized(1, i) = mu_normalization(mu_suppresions(1, i), min_max_value, current_Trigger+1);
+end
+mu_suppressions_normalized = [mu_suppressions_normalized(1,:); mu_suppresions(2,:)];
+
 % 读取在线的轨迹数据
 Online_traj_path = fullfile(root_path, sub_online_collection_folder, ['Online_EEGMI_trajectory_', subject_name_online]);
 Online_traj_files = dir(fullfile(Online_traj_path, '*.mat'));
@@ -35,6 +48,8 @@ traj = Online_EEGMI_trajectory.traj;
 MI_MUSup_thres = Online_EEGMI_trajectory.MI_MUSup_thres;
 MI_MUSup_thre_weights = Online_EEGMI_trajectory.MI_MUSup_thre_weights;
 %visual_feedbacks_trial = Online_EEGMI_trajectory.visual_feedbacks_trial;
+visual_feedbacks_trial = mu_suppressions_normalized(1,:) .* resultsMI_trials(1,:);
+visual_feedbacks_trial = [visual_feedbacks_trial(1,:); mu_suppresions(2,:)];
 MI_MUSup_thres_normalized = Online_EEGMI_trajectory.MI_MUSup_thres_normalized;
 
 % 读取对比实验的数据
@@ -46,23 +61,22 @@ EI_index_scores_compare = scores_compare.EI_index_scores_trialmean;
 resultsMI_compare = results_compare.resultsMI;
 resultsMI_trial_compare = mean(reshape(resultsMI_compare(1,:), 4, []));  % 计算对比实验组的每一个trial的平均准确率
 resultsMI_trial_compare = [resultsMI_trial_compare; mu_suppressions_trial_compare(2,:)];
-Triggers = unique(mu_suppressions_compare(2,:));
+
 % 初始化一个空的归一化结果矩阵
-mu_suppressions_normalized_compare = zeros(size(mu_suppressions_compare));
+mu_suppressions_normalized_compare = zeros(size(mu_suppressions_compare(1,:)));
 % 对每一个Trigger进行归一化
-for i = 1:(length(Triggers)-1)
+for i = 1:(length(mu_suppressions_normalized_compare))
     % 获取当前Trigger
-    current_Trigger = Triggers(i);
-    
-    % 找到当前Trigger对应的索引
-    indices = mu_suppressions_compare(2,:) == current_Trigger;
+    current_Trigger = mu_suppressions_compare(2, i);
     
     % 对当前Trigger对应的数值进行归一化
-    mu_suppressions_normalized_compare(1, indices) = mu_normalization(mu_suppressions_compare(1, indices), min_max_value, current_Trigger+1);
+    mu_suppressions_normalized_compare(1, i) = mu_normalization(mu_suppressions_compare(1, i), min_max_value, current_Trigger+1);
 end
-mu_suppressions_normalized_compare = mu_normalization(mu_suppressions_compare, min_max_value, Trigger+1);
-visualfeedback_compare = mu_suppressions_normalized_compare.* resultsMI_compare;  % 计算下compare的对比实验
+visualfeedback_compare = mu_suppressions_normalized_compare(1,:).* resultsMI_compare(1,:);  % 计算下compare的对比实验
 visualfeedback_trial_compare = mean(reshape(visualfeedback_compare(1,:), 4, []));
+visualfeedback_trial_compare = [visualfeedback_trial_compare(1,:); mu_suppressions_trial_compare(2,:)];
+mu_suppressions_normalized_compare_trial = mean(reshape(mu_suppressions_normalized_compare(1,:), 4, []));
+mu_suppressions_normalized_compare_trial = [mu_suppressions_normalized_compare_trial(1,:); mu_suppressions_trial_compare(2,:)];
 
 %% 读取其余在线/离线对比实验中的数据，并且计算出一些相关的指标（备用代码，平时隐藏）
 %mu_suppressions_offline = load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0125_offline_test_20240125_203932146_data\Offline_EEGMI_Scores_Jyt_test_0125_offline_test\Offline_EEGMI_Scores_Jyt_test_0125_offline_test.mat', 'mu_suppressions');
@@ -201,20 +215,20 @@ fprintf('EI_index_scores: mean = %.2f, std = %.2f\n', EI_index_scores_mean, EI_i
 %plot_signal_and_fit(EI_index_scores(1,:), 'EI online');
 %plot_signal_and_fit(EI_index_scores_compare(1,:), 'EI compare');
 subplot(2,2,1);
-%plot_signal_and_fit_double(visual_feedbacks_trial(1,:), 'visualfeedback', visualfeedback_trial_compare(1,:), 'visualfeedback compare', 'visualfeedback');
+plot_signal_and_fit_double(visual_feedbacks_trial(1,:), 'visualfeedback', visualfeedback_trial_compare(1,:), 'visualfeedback compare', 'visualfeedback');
 subplot(2,2,2);
 plot_signal_and_fit_double(resultsMI_trials(1,:), 'results', resultsMI_trial_compare(1,:), 'results compare', 'results');
 subplot(2,2,3);
-plot_signal_and_fit_double(mu_suppresions(1,:), 'Mu sup online', mu_suppressions_trial_compare(1,:), 'Mu sup compare', 'mu sup');
+plot_signal_and_fit_double(mu_suppressions_normalized(1,:), 'Mu sup online', mu_suppressions_normalized_compare_trial(1,:), 'Mu sup compare', 'mu sup');
 subplot(2,2,4);
 plot_signal_and_fit_double(EI_index_scores(1,:), 'EI online', EI_index_scores_compare(1,:), 'EI compare', 'EI');
 %suptitle(strrep(subject_name_online, '_', ' '));
 
 disp('methods on visualfeedback')
-%[p_ttest, p_ranksum] = significance_analysis(visual_feedbacks_trial(1,:), visualfeedback_trial_compare);
-%significance_show(p_ttest,p_ranksum);
+[p_ttest, p_ranksum] = significance_analysis(visual_feedbacks_trial(1,:), visualfeedback_trial_compare);
+significance_show(p_ttest,p_ranksum);
 disp('methods on mu_suppresions');
-[p_ttest, p_ranksum] = significance_analysis(mu_suppresions, mu_suppressions_trial_compare);
+[p_ttest, p_ranksum] = significance_analysis(mu_suppressions_normalized, mu_suppressions_normalized_compare_trial);
 significance_show(p_ttest,p_ranksum);
 disp('methods on EI');
 [p_ttest, p_ranksum] = significance_analysis(EI_index_scores, EI_index_scores_compare);
