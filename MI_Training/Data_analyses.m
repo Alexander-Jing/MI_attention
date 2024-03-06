@@ -108,7 +108,6 @@ MI_MUSup_thre_weights_row1 = MI_MUSup_thre_weights(1,:);
 % 进行除法计算,得到原来的实际的轨迹
 MI_MUSUP_trajs = MI_MUSup_thre_weights_row1 ./ MI_MUSup_thres_row1;
 
-
 % 计算mu_suppresions和EI_index_scores的均值和标准差
 mu_suppresions_mean = mean(mu_suppresions(1,:));
 mu_suppresions_std = std(mu_suppresions(1,:));
