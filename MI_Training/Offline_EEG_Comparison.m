@@ -41,10 +41,10 @@ status = CheckNetStreamingVersion(con);                                    % ÅĞ¶
 %% ÔÚÏßÊµÑé²ÎÊıÉèÖÃ²¿·Ö£¬ÓÃÓÚÉèÖÃÃ¿Ò»¸ö±»ÊÔµÄÇé¿ö£¬ÒÀ¾İ±»ÊÔÇé¿ö½øĞĞĞŞ¸Ä
 
 % ÔË¶¯ÏëÏó»ù±¾²ÎÊıÉèÖÃ
-subject_name = 'Jyt_test_0205_comparison_22';  % ±»ÊÔĞÕÃû
-TrialNum = 15;  % ÉèÖÃ²É¼¯µÄÊıÁ¿
+subject_name = 'Jyt_test_0306_post_control_1';  % ±»ÊÔĞÕÃû
+TrialNum = 20;  % ÉèÖÃ²É¼¯µÄÊıÁ¿
 %TrialNum = 3*3;
-MotorClasses = 1;  % ÔË¶¯ÏëÏóµÄÖÖÀàµÄÊıÁ¿µÄÉèÖÃ£¬¶Ô±ÈÊµÑéµÄÈÎÎñÊÇ[1,2]£¬ºÍreadme.txtÀïÃæµÄ¶ÔÓ¦
+MotorClasses = 2;  % ÔË¶¯ÏëÏóµÄÖÖÀàµÄÊıÁ¿µÄÉèÖÃ£¬¶Ô±ÈÊµÑéµÄÈÎÎñÊÇ[1,2]£¬ºÍreadme.txtÀïÃæµÄ¶ÔÓ¦
 MotorClassMI = 2;  % Èç¹ûÊÇµ¥ÔË¶¯ÏëÏóÈÎÎñµÄ»°£¬ÄÇ¾ÍÖ±½ÓÖ¸¶¨ÈÎÎñ¾ÍºÃÁË
 % µ±Ç°ÉèÖÃµÄÈÎÎñ
 % Idle 0   -> SceneIdle 
@@ -78,8 +78,8 @@ AllTrial = 0;
 
 randomindex = [];   
 if MotorClasses > 1                                                       % ³õÊ¼»¯trialsµÄ¼¯ºÏ
-    for i= 1:(MotorClass)                                                    % ×¢Òâ£¬ÕâÀïÖ»Éú³ÉÔË¶¯ÏëÏóµÄÈÎÎñ£¬ºóÃæ»áÒÀ¾İÊµ¼ÊÇé¿ö¼ÓÈëÏà¹ØµÄ¾²Ï¢×´Ì¬
-        index_i = ones(TrialNum/MotorClass,1)*i;                             % size TrialNum/MotorClasses*1£¬¸÷ÖÖÈÎÎñ
+    for i= 1:(MotorClasses)                                                    % ×¢Òâ£¬ÕâÀïÖ»Éú³ÉÔË¶¯ÏëÏóµÄÈÎÎñ£¬ºóÃæ»áÒÀ¾İÊµ¼ÊÇé¿ö¼ÓÈëÏà¹ØµÄ¾²Ï¢×´Ì¬
+        index_i = ones(TrialNum/MotorClasses,1)*i;                             % size TrialNum/MotorClasses*1£¬¸÷ÖÖÈÎÎñ
         randomindex = [randomindex; index_i];                                  % ¸÷¸öÈÎÎñÕûºÏ£¬×îÖÕsize TrialNum*1
     end
 
@@ -108,7 +108,7 @@ mu_suppressions_trialmean = [];  % ÓÃÓÚ´æ´¢Ã¿Ò»¸ötrialÀïÃæµÄmu_suppressionsÖ¸±ê¾
 %% ¿ªÊ¼ÊµÑé£¬ÀëÏß²É¼¯
 Timer = 0;
 TrialData = [];
-while(AllTrial < TrialNum)
+while(AllTrial < (TrialNum+1))
     if Timer==0  %ÌáÊ¾×¨×¢ cross
         Trigger = 6;
         sendbuf(1,1) = hex2dec('01') ;

@@ -1,86 +1,71 @@
-%% è¢«è¯•åç§°å’Œå®éªŒçš„æ–‡ä»¶å¤¹
-root_path = 'F:\MI_engagement\MI_attention\MI_Training';  % æ ¹ç›®å½•ç”¨äºå­˜å‚¨æ•°æ®å’Œåˆ†æ
-subject_name_online = 'Jyt_test_0131_online'; %'Jyt_test_0101_1_online';% 'Jyt_test_0101_online'; %  % è¢«è¯•å§“å
-sub_online_collection_folder = 'Jyt_test_0131_online_20240131_210821243_data'; % 'Jyt_test_0101_1_online_20240101_200123314_data';  %'Jyt_test_0101_online_20240101_175129548_data'; %  % 
+%% ±»ÊÔÃû³ÆºÍÊµÑéµÄÎÄ¼ş¼Ğ
+root_path = 'F:\CASIA\MI_engagement\MI_attention\MI_Training';  % ¸ùÄ¿Â¼ÓÃÓÚ´æ´¢Êı¾İºÍ·ÖÎö
+subject_name_post = 'Jyt_test_0306_post_control'; %'Jyt_test_0101_1_online';% 'Jyt_test_0101_online'; %  % ±»ÊÔĞÕÃû
+sub_post_collection_folder = 'Jyt_test_0306_post_control_20240306_220707260_data';
 
-subject_name_offline =  'Jyt_test_0131_offline';  % ç¦»çº¿æ”¶é›†æ•°æ®æ—¶å€™çš„è¢«è¯•åç§°
-sub_offline_collection_folder = 'Jyt_test_0131_offline_20240131_204044614_data';  % è¢«è¯•çš„ç¦»çº¿é‡‡é›†æ•°æ®
+subject_name_pre = 'Jyt_test_0306_pre_control';
+sub_pre_collection_folder = 'Jyt_test_0306_pre_control_20240306_211616260_data';
 
-subject_name_comparison = 'Jyt_test_0131_comparison';
-sub_comparison_collection_folder = 'Jyt_test_0131_comparison_20240131_194732925_data';
-
-channels = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, 16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];  % é€‰æ‹©çš„é€šé“,
-mu_channels = struct('C3',24, 'C4',22);  % ç”¨äºè®¡ç®—ERD/ERSçš„å‡ ä¸ªchannelsï¼Œæ˜¯C3å’ŒC4ä¸¤ä¸ªé€šé“,éœ€è¦è®¾å®šä½ç½®
-EI_channels = struct('Fp1', 32, 'Fp2', 31, 'F7', 30, 'F3', 29, 'Fz', 28, 'F4', 27, 'F8', 26);  % ç”¨äºè®¡ç®—EIæŒ‡æ ‡çš„å‡ ä¸ªchannelsï¼Œéœ€è¦ç¡®å®šä¸‹ä½ç½®çš„
+channels = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, 16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];  % Ñ¡ÔñµÄÍ¨µÀ,
+mu_channels = struct('C3',24, 'C4',22);  % ÓÃÓÚ¼ÆËãERD/ERSµÄ¼¸¸öchannels£¬ÊÇC3ºÍC4Á½¸öÍ¨µÀ,ĞèÒªÉè¶¨Î»ÖÃ
+EI_channels = struct('Fp1', 32, 'Fp2', 31, 'F7', 30, 'F3', 29, 'Fz', 28, 'F4', 27, 'F8', 26);  % ÓÃÓÚ¼ÆËãEIÖ¸±êµÄ¼¸¸öchannels£¬ĞèÒªÈ·¶¨ÏÂÎ»ÖÃµÄ
 
 
-%% è¯»å–å„ç§æ•°æ®ï¼Œç”¨äºåé¢çš„æ˜¾ç¤ºå’Œæ˜¾è‘—æ€§åˆ†æ
-% è¯»å–å’Œè®¡ç®—åœ¨çº¿æ•°æ®ï¼Œç”¨äºæŒ‡æ ‡åˆ†æ
-folder_path = fullfile(sub_online_collection_folder, ['Online_Engagements_', subject_name_online]);
-% [sub_online_collection_folder, '/', 'Online_Engagements_', subject_name_online]; % è¯·å°†'./your_folder'æ›¿æ¢ä¸ºæ‚¨çš„æ–‡ä»¶å¤¹çš„ç›¸å¯¹è·¯å¾„
-[mu_suppresions, EI_index_scores, resultsMI_trials] = mu_EI_MIresult_caculation(folder_path, mu_channels, EI_channels);  % æå–ç›¸å…³æŒ‡æ ‡
-Triggers = unique(mu_suppresions(2,:));
-% åˆå§‹åŒ–ä¸€ä¸ªç©ºçš„å½’ä¸€åŒ–ç»“æœçŸ©é˜µ
-mu_suppressions_normalized = zeros(size(mu_suppresions));
-% å¯¹æ¯ä¸€ä¸ªTriggerè¿›è¡Œå½’ä¸€åŒ–
-for i = 1:(length(Triggers)-1)
-    % è·å–å½“å‰Trigger
-    current_Trigger = Triggers(i);
+%% ¶ÁÈ¡post¸÷ÖÖÊı¾İ£¬ÓÃÓÚºóÃæµÄÏÔÊ¾ºÍÏÔÖøĞÔ·ÖÎö
+% ¶ÁÈ¡¶Ô±ÈÊµÑéµÄÊı¾İ
+scores_post = load(fullfile(root_path, sub_post_collection_folder,['Offline_EEGMI_Scores_', subject_name_post], ['Offline_EEGMI_Scores_', subject_name_post, '.mat']));
+results_post = load(fullfile(root_path, sub_post_collection_folder,['Offline_EEGMI_Scores_', subject_name_post], ['Offline_EEGMI_Results_', subject_name_post, '.mat']));
+mu_suppressions_compare_post = scores_post.mu_suppressions;
+mu_suppressions_trial_compare_post = scores_post.mu_suppressions_trialmean;
+EI_index_scores_compare_post = scores_post.EI_index_scores_trialmean;
+resultsMI_compare_post = results_post.resultsMI;
+resultsMI_trial_compare_post = mean(reshape(resultsMI_compare_post(1,:), 4, []));  % ¼ÆËã¶Ô±ÈÊµÑé×éµÄÃ¿Ò»¸ötrialµÄÆ½¾ù×¼È·ÂÊ
+resultsMI_trial_compare_post = [resultsMI_trial_compare_post; mu_suppressions_trial_compare_post(2,:)];
+
+% ³õÊ¼»¯Ò»¸ö¿ÕµÄ¹éÒ»»¯½á¹û¾ØÕó
+mu_suppressions_normalized_compare_post = zeros(size(mu_suppressions_compare_post(1,:)));
+% ¶ÔÃ¿Ò»¸öTrigger½øĞĞ¹éÒ»»¯
+for i = 1:(length(mu_suppressions_normalized_compare_post))
+    % »ñÈ¡µ±Ç°Trigger
+    current_Trigger = mu_suppressions_compare_post(2, i);
     
-    % æ‰¾åˆ°å½“å‰Triggerå¯¹åº”çš„ç´¢å¼•
-    indices = mu_suppresions(2,:) == current_Trigger;
-    
-    % å¯¹å½“å‰Triggerå¯¹åº”çš„æ•°å€¼è¿›è¡Œå½’ä¸€åŒ–
-    mu_suppressions_normalized(1, indices) = mu_normalization(mu_suppresions(1, indices), min_max_value, current_Trigger+1);
+    % ¶Ôµ±Ç°Trigger¶ÔÓ¦µÄÊıÖµ½øĞĞ¹éÒ»»¯
+    mu_suppressions_normalized_compare_post(1, i) = mu_normalization(mu_suppressions_compare_post(1, i), min_max_value, current_Trigger+1);
 end
-mu_suppressions_normalized = [mu_suppressions_normalized(1,:);mu_suppresions]
+visualfeedback_compare_post = mu_suppressions_normalized_compare_post(1,:).* resultsMI_compare_post(1,:);  % ¼ÆËãÏÂcompareµÄ¶Ô±ÈÊµÑé
+visualfeedback_trial_compare_post = mean(reshape(visualfeedback_compare_post(1,:), 4, []));
+visualfeedback_trial_compare_post = [visualfeedback_trial_compare_post(1,:); mu_suppressions_trial_compare_post(2,:)];
+mu_suppressions_normalized_compare_trial_post = mean(reshape(mu_suppressions_normalized_compare_post(1,:), 4, []));
+mu_suppressions_normalized_compare_trial_post = [mu_suppressions_normalized_compare_trial_post(1,:); mu_suppressions_trial_compare_post(2,:)];
 
-% è¯»å–å’Œè®¡ç®—åç»­çš„åœ¨çº¿/ç¦»çº¿å’Œå¯¹æ¯”å®éªŒçš„æ•°æ®ï¼Œå¹¶ä¸”è®¡ç®—å‡ºç›¸å…³çš„ä¸€äº›æŒ‡æ ‡
-% è¯»å–ç¦»çº¿çš„muè¡°å‡å˜åŒ–
-mu_suppressions_scores = load(fullfile(root_path, sub_offline_collection_folder, ['Offline_EEGMI_Scores_', subject_name_offline], ['Offline_EEGMI_Scores_', subject_name_offline,'.mat']));
-mu_suppressions_offline = mu_suppressions_scores.mu_suppressions;
-min_max_value = mu_suppressions_scores.min_max_value;
+%% ¶ÁÈ¡pre¸÷ÖÖÊı¾İ£¬ÓÃÓÚºóÃæµÄÏÔÊ¾ºÍÏÔÖøĞÔ·ÖÎö
+% ¶ÁÈ¡¶Ô±ÈÊµÑéµÄÊı¾İ
+scores_pre = load(fullfile(root_path, sub_pre_collection_folder,['Offline_EEGMI_Scores_', subject_name_pre], ['Offline_EEGMI_Scores_', subject_name_pre, '.mat']));
+results_pre = load(fullfile(root_path, sub_pre_collection_folder,['Offline_EEGMI_Scores_', subject_name_pre], ['Offline_EEGMI_Results_', subject_name_pre, '.mat']));
+mu_suppressions_compare_pre = scores_pre.mu_suppressions;
+mu_suppressions_trial_compare_pre = scores_pre.mu_suppressions_trialmean;
+EI_index_scores_compare_pre = scores_pre.EI_index_scores_trialmean;
+resultsMI_compare_pre = results_pre.resultsMI;
+resultsMI_trial_compare_pre = mean(reshape(resultsMI_compare_pre(1,:), 4, []));  % ¼ÆËã¶Ô±ÈÊµÑé×éµÄÃ¿Ò»¸ötrialµÄÆ½¾ù×¼È·ÂÊ
+resultsMI_trial_compare_pre = [resultsMI_trial_compare_pre; mu_suppressions_trial_compare_pre(2,:)];
 
-% è¯»å–åœ¨çº¿çš„è½¨è¿¹æ•°æ®
-Online_traj_path = fullfile(root_path, sub_online_collection_folder, ['Online_EEGMI_trajectory_', subject_name_online]);
-Online_traj_files = dir(fullfile(Online_traj_path, '*.mat'));
-Online_traj_file = Online_traj_files(1).name;
-Online_EEGMI_trajectory = load(fullfile(Online_traj_path, Online_traj_file));
-traj = Online_EEGMI_trajectory.traj;
-MI_MUSup_thres = Online_EEGMI_trajectory.MI_MUSup_thres;
-MI_MUSup_thre_weights = Online_EEGMI_trajectory.MI_MUSup_thre_weights;
-%visual_feedbacks_trial = Online_EEGMI_trajectory.visual_feedbacks_trial;
-MI_MUSup_thres_normalized = Online_EEGMI_trajectory.MI_MUSup_thres_normalized;
-
-% è¯»å–å¯¹æ¯”å®éªŒçš„æ•°æ®
-scores_compare = load(fullfile(root_path, sub_comparison_collection_folder,['Offline_EEGMI_Scores_', subject_name_comparison], ['Offline_EEGMI_Scores_', subject_name_comparison, '.mat']));
-results_compare = load(fullfile(root_path, sub_comparison_collection_folder,['Offline_EEGMI_Scores_', subject_name_comparison], ['Offline_EEGMI_Results_', subject_name_comparison, '.mat']));
-mu_suppressions_compare = scores_compare.mu_suppressions;
-mu_suppressions_trial_compare = scores_compare.mu_suppressions_trialmean;
-EI_index_scores_compare = scores_compare.EI_index_scores_trialmean;
-resultsMI_compare = results_compare.resultsMI;
-resultsMI_trial_compare = mean(reshape(resultsMI_compare(1,:), 4, []));  % è®¡ç®—å¯¹æ¯”å®éªŒç»„çš„æ¯ä¸€ä¸ªtrialçš„å¹³å‡å‡†ç¡®ç‡
-resultsMI_trial_compare = [resultsMI_trial_compare; mu_suppressions_trial_compare(2,:)];
-Triggers = unique(mu_suppressions_compare(2,:));
-% åˆå§‹åŒ–ä¸€ä¸ªç©ºçš„å½’ä¸€åŒ–ç»“æœçŸ©é˜µ
-mu_suppressions_normalized_compare = zeros(size(mu_suppressions_compare));
-% å¯¹æ¯ä¸€ä¸ªTriggerè¿›è¡Œå½’ä¸€åŒ–
-for i = 1:(length(Triggers)-1)
-    % è·å–å½“å‰Trigger
-    current_Trigger = Triggers(i);
+% ³õÊ¼»¯Ò»¸ö¿ÕµÄ¹éÒ»»¯½á¹û¾ØÕó
+mu_suppressions_normalized_compare_pre = zeros(size(mu_suppressions_compare_pre(1,:)));
+% ¶ÔÃ¿Ò»¸öTrigger½øĞĞ¹éÒ»»¯
+for i = 1:(length(mu_suppressions_normalized_compare_pre))
+    % »ñÈ¡µ±Ç°Trigger
+    current_Trigger = mu_suppressions_compare_pre(2, i);
     
-    % æ‰¾åˆ°å½“å‰Triggerå¯¹åº”çš„ç´¢å¼•
-    indices = mu_suppressions_compare(2,:) == current_Trigger;
-    
-    % å¯¹å½“å‰Triggerå¯¹åº”çš„æ•°å€¼è¿›è¡Œå½’ä¸€åŒ–
-    mu_suppressions_normalized_compare(1, indices) = mu_normalization(mu_suppressions_compare(1, indices), min_max_value, current_Trigger+1);
+    % ¶Ôµ±Ç°Trigger¶ÔÓ¦µÄÊıÖµ½øĞĞ¹éÒ»»¯
+    mu_suppressions_normalized_compare_pre(1, i) = mu_normalization(mu_suppressions_compare_pre(1, i), min_max_value, current_Trigger+1);
 end
-visualfeedback_compare = mu_suppressions_normalized_compare(1,:).* resultsMI_compare(1,:);  % è®¡ç®—ä¸‹compareçš„å¯¹æ¯”å®éªŒ
-visualfeedback_trial_compare = mean(reshape(visualfeedback_compare(1,:), 4, []));
-mu_suppressions_normalized_compare_trial = mean(reshape(mu_suppressions_normalized_compare(1,:), 4, []));
-mu_suppressions_normalized_compare_trial = [mu_suppressions_normalized_compare_trial(1,:); mu_suppressions_trial_compare(2,:)];
+visualfeedback_compare_pre = mu_suppressions_normalized_compare_pre(1,:).* resultsMI_compare_pre(1,:);  % ¼ÆËãÏÂcompareµÄ¶Ô±ÈÊµÑé
+visualfeedback_trial_compare_pre = mean(reshape(visualfeedback_compare_pre(1,:), 4, []));
+visualfeedback_trial_compare_pre = [visualfeedback_trial_compare_pre(1,:); mu_suppressions_trial_compare_pre(2,:)];
+mu_suppressions_normalized_compare_trial_pre = mean(reshape(mu_suppressions_normalized_compare_pre(1,:), 4, []));
+mu_suppressions_normalized_compare_trial_pre = [mu_suppressions_normalized_compare_trial_pre(1,:); mu_suppressions_trial_compare_pre(2,:)];
 
-%% è¯»å–å…¶ä½™åœ¨çº¿/ç¦»çº¿å¯¹æ¯”å®éªŒä¸­çš„æ•°æ®ï¼Œå¹¶ä¸”è®¡ç®—å‡ºä¸€äº›ç›¸å…³çš„æŒ‡æ ‡ï¼ˆå¤‡ç”¨ä»£ç ï¼Œå¹³æ—¶éšè—ï¼‰
+%% ¶ÁÈ¡ÆäÓàÔÚÏß/ÀëÏß¶Ô±ÈÊµÑéÖĞµÄÊı¾İ£¬²¢ÇÒ¼ÆËã³öÒ»Ğ©Ïà¹ØµÄÖ¸±ê£¨±¸ÓÃ´úÂë£¬Æ½Ê±Òş²Ø£©
 %mu_suppressions_offline = load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0125_offline_test_20240125_203932146_data\Offline_EEGMI_Scores_Jyt_test_0125_offline_test\Offline_EEGMI_Scores_Jyt_test_0125_offline_test.mat', 'mu_suppressions');
 %mu_suppressions_offline = load('F:\MI_engagement\MI_attention\MI_Training\Jyt_test_0125_offline_test_20240125_203932146_data\Offline_EEGMI_Scores_Jyt_test_0125_offline_test\Offline_EEGMI_Scores_Jyt_test_0125_offline_test.mat', 'mu_suppressions');
 
@@ -102,28 +87,9 @@ mu_suppressions_normalized_compare_trial = [mu_suppressions_normalized_compare_t
 %mu_suppressions_compare = load('F:\MI_engagement\MI_attention\MI_Training\Jyt_test_0125_comparison_test_20240125_215803328_data\Offline_EEGMI_Scores_Jyt_test_0125_comparison_test\Offline_EEGMI_Scores_Jyt_test_0125_comparison_test.mat', 'mu_suppressions_trialmean');
 %EI_index_scores_compare = load('F:\MI_engagement\MI_attention\MI_Training\Jyt_test_0125_comparison_test_20240125_215803328_data\Offline_EEGMI_Scores_Jyt_test_0125_comparison_test\Offline_EEGMI_Scores_Jyt_test_0125_comparison_test.mat', 'EI_index_scores_trialmean');
 
-%% æå–æ•°æ®ï¼Œå¹¶ä¸”è®¡ç®—å‡å€¼å’Œæ ‡å‡†å·®
-% æå–ç¬¬ä¸€è¡Œçš„æ•°æ®
-MI_MUSup_thres_row1 = MI_MUSup_thres;
-MI_MUSup_thre_weights_row1 = MI_MUSup_thre_weights(1,:);
 
-% è¿›è¡Œé™¤æ³•è®¡ç®—,å¾—åˆ°åŸæ¥çš„å®é™…çš„è½¨è¿¹
-MI_MUSUP_trajs = MI_MUSup_thre_weights_row1 ./ MI_MUSup_thres_row1;
-
-
-% è®¡ç®—mu_suppresionså’ŒEI_index_scoresçš„å‡å€¼å’Œæ ‡å‡†å·®
-mu_suppresions_mean = mean(mu_suppresions(1,:));
-mu_suppresions_std = std(mu_suppresions(1,:));
-EI_index_scores_mean = mean(EI_index_scores(1,:));
-EI_index_scores_std = std(EI_index_scores(1,:));
-
-% æ˜¾ç¤ºå‡å€¼å’Œæ ‡å‡†å·®
-fprintf('mu_suppresions: mean = %.2f, std = %.2f\n', mu_suppresions_mean, mu_suppresions_std);
-fprintf('EI_index_scores: mean = %.2f, std = %.2f\n', EI_index_scores_mean, EI_index_scores_std);
-
-
-%% æ˜¾ç¤ºç›¸å…³æ•°å€¼ï¼Œåˆ†ææ˜¾è‘—æ€§
-% ç»˜åˆ¶mu_suppresionså’ŒEI_index_scoresçš„æŠ˜çº¿å›¾
+%% ÏÔÊ¾Ïà¹ØÊıÖµ£¬·ÖÎöÏÔÖøĞÔ
+% »æÖÆmu_suppresionsºÍEI_index_scoresµÄÕÛÏßÍ¼
 % figure;
 % plot(mu_suppresions(1,:), 'LineWidth', 2);
 % hold on;
@@ -217,45 +183,39 @@ fprintf('EI_index_scores: mean = %.2f, std = %.2f\n', EI_index_scores_mean, EI_i
 %plot_signal_and_fit(EI_index_scores(1,:), 'EI online');
 %plot_signal_and_fit(EI_index_scores_compare(1,:), 'EI compare');
 subplot(2,2,1);
-%plot_signal_and_fit_double(visual_feedbacks_trial(1,:), 'visualfeedback', visualfeedback_trial_compare(1,:), 'visualfeedback compare', 'visualfeedback');
+plot_signal_and_fit_double(visualfeedback_trial_compare_post(1,:), 'visualfeedback', visualfeedback_trial_compare_pre(1,:), 'visualfeedback compare', 'visualfeedback');
 subplot(2,2,2);
-plot_signal_and_fit_double(resultsMI_trials(1,:), 'results', resultsMI_trial_compare(1,:), 'results compare', 'results');
+plot_signal_and_fit_double(resultsMI_trial_compare_post(1,:), 'results', resultsMI_trial_compare_pre(1,:), 'results compare', 'results');
 subplot(2,2,3);
-plot_signal_and_fit_double(mu_suppresions(1,:), 'Mu sup online', mu_suppressions_trial_compare(1,:), 'Mu sup compare', 'mu sup');
+plot_signal_and_fit_double(mu_suppressions_normalized_compare_trial_post(1,:), 'Mu sup online', mu_suppressions_normalized_compare_trial_pre(1,:), 'Mu sup compare', 'mu sup');
 subplot(2,2,4);
-plot_signal_and_fit_double(EI_index_scores(1,:), 'EI online', EI_index_scores_compare(1,:), 'EI compare', 'EI');
+plot_signal_and_fit_double(EI_index_scores_compare_post(1,:), 'EI online', EI_index_scores_compare_pre(1,:), 'EI compare', 'EI');
 %suptitle(strrep(subject_name_online, '_', ' '));
 
 disp('methods on visualfeedback')
-%[p_ttest, p_ranksum] = significance_analysis(visual_feedbacks_trial(1,:), visualfeedback_trial_compare);
-%significance_show(p_ttest,p_ranksum);
+[p_ttest, p_ranksum] = significance_analysis(visualfeedback_trial_compare_post(1,:), visualfeedback_trial_compare_pre);
+significance_show(p_ttest,p_ranksum);
 disp('methods on mu_suppresions');
-[p_ttest, p_ranksum] = significance_analysis(mu_suppresions, mu_suppressions_trial_compare);
+[p_ttest, p_ranksum] = significance_analysis(mu_suppressions_normalized_compare_trial_post, mu_suppressions_normalized_compare_trial_pre);
 significance_show(p_ttest,p_ranksum);
 disp('methods on EI');
-[p_ttest, p_ranksum] = significance_analysis(EI_index_scores, EI_index_scores_compare);
+[p_ttest, p_ranksum] = significance_analysis(EI_index_scores_compare_post, EI_index_scores_compare_pre);
 significance_show(p_ttest,p_ranksum);
 disp('methods on resultsMI')
-[p_ttest, p_ranksum] = significance_analysis(resultsMI_trials(1,:), resultsMI_trial_compare);
+[p_ttest, p_ranksum] = significance_analysis(resultsMI_trial_compare_post(1,:), resultsMI_trial_compare_pre);
 significance_show(p_ttest,p_ranksum);
 
 disp('methods on mu_suppresions on triggers');
-[p_ttest, p_ranksum] = significance_analysis_trigger(mu_suppresions, mu_suppressions_trial_compare);
+[p_ttest, p_ranksum] = significance_analysis_trigger(mu_suppressions_trial_compare_post, mu_suppressions_trial_compare_pre);
 significance_show(p_ttest,p_ranksum);
 disp('methods on EI_index_scores on triggers');
-[p_ttest, p_ranksum] = significance_analysis_trigger(EI_index_scores, EI_index_scores_compare);
+[p_ttest, p_ranksum] = significance_analysis_trigger(EI_index_scores_compare_post, EI_index_scores_compare_pre);
 significance_show(p_ttest,p_ranksum);
 disp('methods on resultsMI on triggers');
-[p_ttest, p_ranksum] = significance_analysis_trigger(resultsMI_trials, resultsMI_trial_compare);
+[p_ttest, p_ranksum] = significance_analysis_trigger(resultsMI_trial_compare_post, resultsMI_trial_compare_pre);
 significance_show(p_ttest,p_ranksum);
 
-disp('method 1 on correlations on the mu_suppresions and EI_index_scores');
-display_correlation(mu_suppresions, EI_index_scores);
-display_correlation_trigger(mu_suppresions, EI_index_scores);
 
-disp('method 1 on correlations on the resultsMI_trials and EI_index_scores');
-display_correlation(mu_suppresions(1,:).*resultsMI_trials(1,:), EI_index_scores);
-display_correlation_trigger(resultsMI_trials, EI_index_scores);
 
 %disp('method 2 on correlations on the mu_suppresions and EI_index_scores');
 %display_correlation(mu_suppressions_compare.mu_suppressions_trialmean, EI_index_scores_compare.EI_index_scores_trialmean);
@@ -266,44 +226,44 @@ display_correlation_trigger(resultsMI_trials, EI_index_scores);
 %mean_std_muSup_online = compute_mean_std(mu_suppresions, 'mu_suppressions');  
 %mean_std_EI_score_online = compute_mean_std(EI_index_scores, 'EI_index_scores');
 
-%% è¯»å–åœ¨çº¿çš„æ–‡ä»¶ä¸­çš„æ¯ä¸€ä¸ªæ•°æ®
+%% ¶ÁÈ¡ÔÚÏßµÄÎÄ¼şÖĞµÄÃ¿Ò»¸öÊı¾İ
 function [mu_suppresions, EI_index_scores, resultsMI_trials] = mu_EI_MIresult_caculation(folder_path, mu_channels, EI_channels)
-    % åˆ‡æ¢åˆ°æŒ‡å®šçš„æ–‡ä»¶å¤¹
+    % ÇĞ»»µ½Ö¸¶¨µÄÎÄ¼ş¼Ğ
     cd(folder_path);
     
-    % è·å–æ–‡ä»¶å¤¹ä¸­çš„æ‰€æœ‰.matæ–‡ä»¶
+    % »ñÈ¡ÎÄ¼ş¼ĞÖĞµÄËùÓĞ.matÎÄ¼ş
     files = dir('*.mat');
     
-    % æå–å‡ºæ–‡ä»¶åä¸­çš„cçš„å€¼ï¼Œå¹¶è½¬æ¢ä¸ºæ•°å­—
+    % ÌáÈ¡³öÎÄ¼şÃûÖĞµÄcµÄÖµ£¬²¢×ª»»ÎªÊı×Ö
     c_values = cellfun(@(x) str2double(regexp(x, 'trial_(\d+)', 'tokens', 'once')), {files.name});
     
-    % æ ¹æ®cçš„å€¼å¯¹æ–‡ä»¶è¿›è¡Œæ’åº
+    % ¸ù¾İcµÄÖµ¶ÔÎÄ¼ş½øĞĞÅÅĞò
     [~, index] = sort(c_values);
     files = files(index);
     
-    % åˆå§‹åŒ–mu_suppresionså’ŒEI_index_scores
+    % ³õÊ¼»¯mu_suppresionsºÍEI_index_scores
     mu_suppresions = [];
     EI_index_scores = [];
     resultsMI_trials = [];
     
-    % éå†æ¯ä¸ªæ–‡ä»¶
+    % ±éÀúÃ¿¸öÎÄ¼ş
     for i = 1:length(files)
-        % åŠ è½½.matæ–‡ä»¶
+        % ¼ÓÔØ.matÎÄ¼ş
         data = load(files(i).name);
         
-        % æå–mu_powerså’ŒEI_indices
+        % ÌáÈ¡mu_powersºÍEI_indices
         mu_powers = data.mu_powers;
         EI_indices = data.EI_indices;
-        % æå–åˆ†ç±»æ¦‚ç‡
+        % ÌáÈ¡·ÖÀà¸ÅÂÊ
         resultsMI = data.resultsMI;
         
-        % æå–mu_power_å’Œmu_power
+        % ÌáÈ¡mu_power_ºÍmu_power
         mu_power_ = mu_powers(:,1);
         mu_powers = mu_powers(:,2:end);
         
         resultsMI = resultsMI(2:end,:);
         
-        % è®¡ç®—mu_suppresion
+        % ¼ÆËãmu_suppresion
         mu_suppresion = zeros(1, size(mu_powers, 2));
         Trigger = mu_powers(33,1);
         for j = 1:size(mu_powers, 2)
@@ -311,44 +271,44 @@ function [mu_suppresions, EI_index_scores, resultsMI_trials] = mu_EI_MIresult_ca
             mu_suppresion(j) = MI_MuSuperesion(mu_power_, mu_power, mu_channels);
         end
         
-        % è®¡ç®—mu_suppresionçš„å‡å€¼å¹¶ä¿å­˜
+        % ¼ÆËãmu_suppresionµÄ¾ùÖµ²¢±£´æ
         %mu_suppresions = [mu_suppresions, [mu_suppresion; repmat(Trigger,1,size(mu_powers, 2))]];
         mu_suppresions = [mu_suppresions, [mean(mu_suppresion); Trigger]];
         %mu_suppresions = [mu_suppresions, [max(mu_suppresion); Trigger]];
         %mu_suppresions = [mu_suppresions, [mu_suppresion(end); Trigger]];
         %mu_suppresions = [mu_suppresions, [mean(mu_suppresion(end)); Trigger]];
         
-        % è®¡ç®—EI_index_score
+        % ¼ÆËãEI_index_score
         EI_index_score = zeros(1, size(EI_indices, 2));
         for j = 1:size(EI_indices, 2)
             EI_index = EI_indices(:,j);
             EI_index_score(j) = EI_index_Caculation(EI_index, EI_channels);
         end
         
-        % è®¡ç®—EI_index_scoreçš„å‡å€¼å¹¶ä¿å­˜
+        % ¼ÆËãEI_index_scoreµÄ¾ùÖµ²¢±£´æ
         %EI_index_scores = [EI_index_scores, [EI_index_score; repmat(Trigger,1,size(mu_powers, 2))]];
         EI_index_scores = [EI_index_scores, [mean(EI_index_score); Trigger]];
         %EI_index_scores = [EI_index_scores, [max(EI_index_score); Trigger]];
         
-        % è®¡ç®—åˆ†ç±»æ¦‚ç‡åœ¨è¿™ä¸€ä¸ªtrialé‡Œé¢çš„å‡å€¼
+        % ¼ÆËã·ÖÀà¸ÅÂÊÔÚÕâÒ»¸ötrialÀïÃæµÄ¾ùÖµ
         resultsMI_trials = [resultsMI_trials, [mean(resultsMI(1,:)); Trigger]];
         %resultsMI_trials = [resultsMI_trials, [max(resultsMI(1,:)); Trigger]];
     end
 end
-%% è·å–å¹³å‡å‚ä¸åº¦åˆ†æ•°çš„å‡½æ•°
+%% »ñÈ¡Æ½¾ù²ÎÓë¶È·ÖÊıµÄº¯Êı
 function mean_std_scores = compute_mean_std(scores_task, scores_name)
-    % è·å–scoreså’Œtriggers
+    % »ñÈ¡scoresºÍtriggers
     scores = scores_task(1,:);
     triggers = scores_task(2,:);
 
-    % è·å–æ‰€æœ‰ä¸åŒçš„triggers
+    % »ñÈ¡ËùÓĞ²»Í¬µÄtriggers
     unique_triggers = unique(triggers);
 
-    % åˆå§‹åŒ–è¾“å‡º
+    % ³õÊ¼»¯Êä³ö
     mean_scores = zeros(size(unique_triggers));
     std_scores = zeros(size(unique_triggers));
 
-    % å¯¹äºæ¯ä¸€ä¸ªtriggerï¼Œè®¡ç®—å¯¹åº”çš„scoreçš„å‡å€¼
+    % ¶ÔÓÚÃ¿Ò»¸ötrigger£¬¼ÆËã¶ÔÓ¦µÄscoreµÄ¾ùÖµ
     for i = 1:length(unique_triggers)
         trigger = unique_triggers(i);
         mean_scores(i) = mean(scores(triggers == trigger));
@@ -356,152 +316,152 @@ function mean_std_scores = compute_mean_std(scores_task, scores_name)
     end
     mean_std_scores = [mean_scores; std_scores];
 
-    % è¾“å‡ºç»“æœ
-    disp(['æ¯ä¸€ä¸ªTriggerçš„å¹³å‡', scores_name, 'åˆ†æ•°æ˜¯ï¼š']);
+    % Êä³ö½á¹û
+    disp(['Ã¿Ò»¸öTriggerµÄÆ½¾ù', scores_name, '·ÖÊıÊÇ£º']);
     for i = 1:length(unique_triggers)
-        disp(['Trigger ' num2str(unique_triggers(i)) ' çš„å¹³å‡åˆ†æ•°æ˜¯ ' num2str(mean_scores(i))]);
-        disp(['Trigger ' num2str(unique_triggers(i)) ' çš„æ ‡å‡†å·®æ˜¯ ' num2str(std_scores(i))]);
+        disp(['Trigger ' num2str(unique_triggers(i)) ' µÄÆ½¾ù·ÖÊıÊÇ ' num2str(mean_scores(i))]);
+        disp(['Trigger ' num2str(unique_triggers(i)) ' µÄ±ê×¼²îÊÇ ' num2str(std_scores(i))]);
     end
 end
 
-%% è®¡ç®—ç›¸å…³mué¢‘å¸¦è¡°å‡æŒ‡æ ‡
+%% ¼ÆËãÏà¹ØmuÆµ´øË¥¼õÖ¸±ê
 function mu_suppresion = MI_MuSuperesion(mu_power_, mu_power, mu_channels)
     ERD_C3 = (mu_power(mu_channels.C3, 1) - mu_power_(mu_channels.C3, 1)); 
-    %ERD_C4 = (mu_power(mu_channels.C4, 1) - mu_power_(mu_channels.C4, 1));  % è®¡ç®—ä¸¤ä¸ªè„‘ç”µä½ç½®çš„ç›¸å…³çš„æŒ‡æ ‡ 
-    mu_suppresion = - ERD_C3;  % å½’ä¸€åŒ–åˆ°[0,1]çš„åŒºé—´é‡Œé¢
+    %ERD_C4 = (mu_power(mu_channels.C4, 1) - mu_power_(mu_channels.C4, 1));  % ¼ÆËãÁ½¸öÄÔµçÎ»ÖÃµÄÏà¹ØµÄÖ¸±ê 
+    mu_suppresion = - ERD_C3;  % ¹éÒ»»¯µ½[0,1]µÄÇø¼äÀïÃæ
 end
     
-%% è®¡ç®—ç›¸å…³çš„EIæŒ‡æ ‡çš„å‡½æ•°
+%% ¼ÆËãÏà¹ØµÄEIÖ¸±êµÄº¯Êı
 function EI_index_score = EI_index_Caculation(EI_index, EI_channels)
     channels_ = [EI_channels.Fp1,EI_channels.Fp2, EI_channels.F7, EI_channels.F3, EI_channels.Fz, EI_channels.F4, EI_channels.F8'];
     EI_index_score = mean(EI_index(channels_, 1));
 
 end
 
-%% åˆ†ææ˜¾è‘—æ€§çš„å‡½æ•°
+%% ·ÖÎöÏÔÖøĞÔµÄº¯Êı
 function [p_ttest, p_ranksum] = significance_analysis_trigger(mu_suppresions1, mu_suppresions2)
-    % è·å–ç±»åˆ«çš„å”¯ä¸€å€¼
+    % »ñÈ¡Àà±ğµÄÎ¨Ò»Öµ
     categories = unique(mu_suppresions1(2,:));
 
-    % åˆå§‹åŒ–på€¼
+    % ³õÊ¼»¯pÖµ
     p_ttest = zeros(1, length(categories));
     p_ranksum = zeros(1, length(categories));
 
-    % å¯¹æ¯ä¸ªç±»åˆ«è¿›è¡Œæ˜¾è‘—æ€§åˆ†æ
+    % ¶ÔÃ¿¸öÀà±ğ½øĞĞÏÔÖøĞÔ·ÖÎö
     for i = 1:length(categories)
-        % è·å–å½“å‰ç±»åˆ«
+        % »ñÈ¡µ±Ç°Àà±ğ
         category = categories(i);
         
-        % æå–å‡ºå½“å‰ç±»åˆ«çš„æ•°æ®
+        % ÌáÈ¡³öµ±Ç°Àà±ğµÄÊı¾İ
         data1 = mu_suppresions1(1, mu_suppresions1(2,:) == category);
         data2 = mu_suppresions2(1, mu_suppresions2(2,:) == category);
         
-        % è¿›è¡Œtæ£€éªŒ
+        % ½øĞĞt¼ìÑé
         [~,p_ttest(i)] = ttest2(data1, data2);
         
-        % è¿›è¡ŒWilcoxonç§©å’Œæ£€éªŒ
+        % ½øĞĞWilcoxonÖÈºÍ¼ìÑé
         p_ranksum(i) = ranksum(data1, data2);
     end
 end
 
 function [p_ttest, p_ranksum] = significance_analysis(mu_suppresions1, mu_suppresions2)
     
-    % åˆå§‹åŒ–på€¼
+    % ³õÊ¼»¯pÖµ
     p_ttest = zeros(1, 1);
     p_ranksum = zeros(1, 1);
 
-    % æå–å‡ºå½“å‰ç±»åˆ«çš„æ•°æ®
+    % ÌáÈ¡³öµ±Ç°Àà±ğµÄÊı¾İ
     data1 = mu_suppresions1(1, :);
     data2 = mu_suppresions2(1, :);
         
-    % è¿›è¡Œtæ£€éªŒ
+    % ½øĞĞt¼ìÑé
     [~,p_ttest(1)] = ttest2(data1, data2);
 
-    % è¿›è¡ŒWilcoxonç§©å’Œæ£€éªŒ
+    % ½øĞĞWilcoxonÖÈºÍ¼ìÑé
     p_ranksum(1) = ranksum(data1, data2);
     
 end
 
 function [p_anova] = anova_analysis(mu_suppresions1, mu_suppresions2)
-    % è·å–ç±»åˆ«çš„å”¯ä¸€å€¼
+    % »ñÈ¡Àà±ğµÄÎ¨Ò»Öµ
     categories = unique([mu_suppresions1(2,:), mu_suppresions2(2,:)]);
     %categories = [2];
-    % åˆå§‹åŒ–æ•°æ®
+    % ³õÊ¼»¯Êı¾İ
     data = [];
     group = [];
 
-    % å¯¹æ¯ä¸ªç±»åˆ«è¿›è¡Œå¤„ç†
+    % ¶ÔÃ¿¸öÀà±ğ½øĞĞ´¦Àí
     for i = 1:length(categories)
-        % è·å–å½“å‰ç±»åˆ«
+        % »ñÈ¡µ±Ç°Àà±ğ
         category = categories(i);
         
-        % æå–å‡ºå½“å‰ç±»åˆ«çš„æ•°æ®
+        % ÌáÈ¡³öµ±Ç°Àà±ğµÄÊı¾İ
         data1 = mu_suppresions1(1, mu_suppresions1(2,:) == category);
         data2 = mu_suppresions2(1, mu_suppresions2(2,:) == category);
         
-        % å°†æ•°æ®æ·»åŠ åˆ°dataæ•°ç»„ä¸­
+        % ½«Êı¾İÌí¼Óµ½dataÊı×éÖĞ
         data = [data, data1, data2];
         
-        % åˆ›å»ºä¸€ä¸ªç»„æ ‡ç­¾æ•°ç»„
+        % ´´½¨Ò»¸ö×é±êÇ©Êı×é
         group = [group, repmat({sprintf('Method1_Category%d', category)}, 1, length(data1)), ...
                          repmat({sprintf('Method2_Category%d', category)}, 1, length(data2))];
     end
     
-    % è¿›è¡Œæ–¹å·®åˆ†æ
-    p_anova = anova1(data, group, 'off'); % 'off'è¡¨ç¤ºä¸æ˜¾ç¤ºç»“æœå›¾è¡¨
+    % ½øĞĞ·½²î·ÖÎö
+    p_anova = anova1(data, group, 'off'); % 'off'±íÊ¾²»ÏÔÊ¾½á¹ûÍ¼±í
 end
-% æ˜¾ç¤ºç»“æœå¹¶æŠ¥å‘Šæ˜¾è‘—æ€§
+% ÏÔÊ¾½á¹û²¢±¨¸æÏÔÖøĞÔ
 function significance_show(p_ttest,p_ranksum)
     for i = 1:length(p_ttest)
         fprintf('Category %d: p_ttest = %.4f, p_ranksum = %.4f\n', i, p_ttest(i), p_ranksum(i));
         if p_ttest(i) < 0.05
-            fprintf('å¯¹äºtæ£€éªŒï¼Œç±»åˆ«%dçš„å·®å¼‚æ˜¯æ˜¾è‘—çš„ã€‚\n', i);
+            fprintf('¶ÔÓÚt¼ìÑé£¬Àà±ğ%dµÄ²îÒìÊÇÏÔÖøµÄ¡£\n', i);
         else
-            fprintf('å¯¹äºtæ£€éªŒï¼Œç±»åˆ«%dçš„å·®å¼‚ä¸æ˜¯æ˜¾è‘—çš„ã€‚\n', i);
+            fprintf('¶ÔÓÚt¼ìÑé£¬Àà±ğ%dµÄ²îÒì²»ÊÇÏÔÖøµÄ¡£\n', i);
         end
         if p_ranksum(i) < 0.05
-            fprintf('å¯¹äºWilcoxonç§©å’Œæ£€éªŒï¼Œç±»åˆ«%dçš„å·®å¼‚æ˜¯æ˜¾è‘—çš„ã€‚\n', i);
+            fprintf('¶ÔÓÚWilcoxonÖÈºÍ¼ìÑé£¬Àà±ğ%dµÄ²îÒìÊÇÏÔÖøµÄ¡£\n', i);
         else
-            fprintf('å¯¹äºWilcoxonç§©å’Œæ£€éªŒï¼Œç±»åˆ«%dçš„å·®å¼‚ä¸æ˜¯æ˜¾è‘—çš„ã€‚\n', i);
+            fprintf('¶ÔÓÚWilcoxonÖÈºÍ¼ìÑé£¬Àà±ğ%dµÄ²îÒì²»ÊÇÏÔÖøµÄ¡£\n', i);
         end
     end
 end
-%% åˆ†æç›¸å…³æ€§çš„å‡½æ•°
+%% ·ÖÎöÏà¹ØĞÔµÄº¯Êı
 function [correlation, p_value] = display_correlation(data1, data2)
-    % è®¡ç®—ç›¸å…³ç³»æ•°å’Œpå€¼
+    % ¼ÆËãÏà¹ØÏµÊıºÍpÖµ
     [R, P] = corrcoef(data1(1,:), data2(1,:));
 
-    % æå–ç›¸å…³ç³»æ•°å’Œpå€¼
+    % ÌáÈ¡Ïà¹ØÏµÊıºÍpÖµ
     correlation = R(1, 2);
     p_value = P(1, 2);
 
-    % æ˜¾ç¤ºç›¸å…³ç³»æ•°å’Œpå€¼
+    % ÏÔÊ¾Ïà¹ØÏµÊıºÍpÖµ
     fprintf('The correlation coefficient (r) between the two datasets is: %.4f\n', correlation);
     fprintf('The p-value for this correlation is: %.4f\n', p_value);
 end
 
 function [R, P] = display_correlation_trigger(mu_suppresions1, mu_suppresions2)
-    % è·å–ç±»åˆ«çš„å”¯ä¸€å€¼
+    % »ñÈ¡Àà±ğµÄÎ¨Ò»Öµ
     categories = unique(mu_suppresions1(2,:));
 
-    % åˆå§‹åŒ–på€¼
+    % ³õÊ¼»¯pÖµ
     R = zeros(1, length(categories));
     P = zeros(1, length(categories));
 
-    % å¯¹æ¯ä¸ªç±»åˆ«è¿›è¡Œæ˜¾è‘—æ€§åˆ†æ
+    % ¶ÔÃ¿¸öÀà±ğ½øĞĞÏÔÖøĞÔ·ÖÎö
     for i = 1:length(categories)
-        % è·å–å½“å‰ç±»åˆ«
+        % »ñÈ¡µ±Ç°Àà±ğ
         category = categories(i);
         disp(['category: ', num2str(category)]);
-        % æå–å‡ºå½“å‰ç±»åˆ«çš„æ•°æ®
+        % ÌáÈ¡³öµ±Ç°Àà±ğµÄÊı¾İ
         data1 = mu_suppresions1(1, mu_suppresions1(2,:) == category);
         data2 = mu_suppresions2(1, mu_suppresions2(2,:) == category);
         
-        % è¿›è¡Œç›¸å…³æ€§æ£€éªŒåˆ†æ
+        % ½øĞĞÏà¹ØĞÔ¼ìÑé·ÖÎö
         [R(i), P(i)] = display_correlation(data1, data2);
     end
 end
-%% ç”¨äºç»˜åˆ¶æå–åŒ…ç»œçº¿çš„å‡½æ•°
+%% ÓÃÓÚ»æÖÆÌáÈ¡°üÂçÏßµÄº¯Êı
 function envelope_extraction(x, experiment_name)
     
     fl1 = 1000;
@@ -517,21 +477,21 @@ function envelope_extraction(x, experiment_name)
     title('Hilbert Envelope')
 
 end
-%% ç”¨äºæœ€å°äºŒæ¬¡æ‹Ÿåˆçš„å‡½æ•°
+%% ÓÃÓÚ×îĞ¡¶ş´ÎÄâºÏµÄº¯Êı
 function plot_signal_and_fit(y, experiment_name, score_name)
-    % åˆ›å»ºä¸€ä¸ª x è½´çš„å€¼ï¼Œä» 1 åˆ°ä¿¡å·çš„é•¿åº¦
+    % ´´½¨Ò»¸ö x ÖáµÄÖµ£¬´Ó 1 µ½ĞÅºÅµÄ³¤¶È
     x = 1:length(y);
 
-    % ä½¿ç”¨ polyfit å‡½æ•°è¿›è¡Œæœ€å°äºŒæ¬¡æ‹Ÿåˆ
+    % Ê¹ÓÃ polyfit º¯Êı½øĞĞ×îĞ¡¶ş´ÎÄâºÏ
     p = polyfit(x, y, 2);
 
-    % åˆ›å»ºä¸€ä¸ªå‡½æ•°å¥æŸ„ï¼Œç”¨äºè®¡ç®—æ‹Ÿåˆçš„äºŒæ¬¡å‡½æ•°
+    % ´´½¨Ò»¸öº¯Êı¾ä±ú£¬ÓÃÓÚ¼ÆËãÄâºÏµÄ¶ş´Îº¯Êı
     f = @(x) p(1) * x.^2 + p(2) * x + p(3);
 
-    % è®¡ç®—æ‹Ÿåˆçš„äºŒæ¬¡å‡½æ•°
+    % ¼ÆËãÄâºÏµÄ¶ş´Îº¯Êı
     y_fit = f(x);
 
-    % ç»˜åˆ¶åŸå§‹æ•°æ®å’Œæ‹Ÿåˆçš„äºŒæ¬¡å‡½æ•°
+    % »æÖÆÔ­Ê¼Êı¾İºÍÄâºÏµÄ¶ş´Îº¯Êı
     figure;
     plot(y);
     hold on;
@@ -539,30 +499,30 @@ function plot_signal_and_fit(y, experiment_name, score_name)
     hold on;
     hold off;
 
-    % æ·»åŠ å›¾ä¾‹å’Œæ ‡é¢˜
+    % Ìí¼ÓÍ¼ÀıºÍ±êÌâ
     legend(['Original Signal', experiment_name], ['Quadratic Fit', experiment_name]);
     title(['Original Signal and Quadratic Fit: ', score_name]);
 end
 
 function plot_signal_and_fit_double(y1, experiment_name1, y2, experiment_name2, score_name)
-    % åˆ›å»ºä¸€ä¸ª x è½´çš„å€¼ï¼Œä» 1 åˆ°ä¿¡å·çš„é•¿åº¦
+    % ´´½¨Ò»¸ö x ÖáµÄÖµ£¬´Ó 1 µ½ĞÅºÅµÄ³¤¶È
     x1 = 1:length(y1);
     x2 = 1:length(y2);
     
 
-    % ä½¿ç”¨ polyfit å‡½æ•°è¿›è¡Œæœ€å°äºŒæ¬¡æ‹Ÿåˆ
+    % Ê¹ÓÃ polyfit º¯Êı½øĞĞ×îĞ¡¶ş´ÎÄâºÏ
     p1 = polyfit(x1, y1, 2);
     p2 = polyfit(x2, y2, 2);
 
-    % åˆ›å»ºä¸€ä¸ªå‡½æ•°å¥æŸ„ï¼Œç”¨äºè®¡ç®—æ‹Ÿåˆçš„äºŒæ¬¡å‡½æ•°
+    % ´´½¨Ò»¸öº¯Êı¾ä±ú£¬ÓÃÓÚ¼ÆËãÄâºÏµÄ¶ş´Îº¯Êı
     f1 = @(x) p1(1) * x.^2 + p1(2) * x + p1(3);
     f2 = @(x) p2(1) * x.^2 + p2(2) * x + p2(3);
 
-    % è®¡ç®—æ‹Ÿåˆçš„äºŒæ¬¡å‡½æ•°
+    % ¼ÆËãÄâºÏµÄ¶ş´Îº¯Êı
     y_fit1 = f1(x1);
     y_fit2 = f2(x2);
 
-    % ç»˜åˆ¶åŸå§‹æ•°æ®å’Œæ‹Ÿåˆçš„äºŒæ¬¡å‡½æ•°
+    % »æÖÆÔ­Ê¼Êı¾İºÍÄâºÏµÄ¶ş´Îº¯Êı
     %figure;
     plot(y1);
     hold on;
@@ -574,7 +534,7 @@ function plot_signal_and_fit_double(y1, experiment_name1, y2, experiment_name2, 
     hold on;
     hold off;
 
-    % æ·»åŠ å›¾ä¾‹å’Œæ ‡é¢˜
+    % Ìí¼ÓÍ¼ÀıºÍ±êÌâ
 %     legend(['Original Signal ', experiment_name1], ['Quadratic Fit ', experiment_name1],...
 %         ['Original Signal ', experiment_name2], ['Quadratic Fit ', experiment_name2]);
 %     title(['Original Signal and Quadratic Fit: ', score_name]);
@@ -582,11 +542,11 @@ function plot_signal_and_fit_double(y1, experiment_name1, y2, experiment_name2, 
          [experiment_name2], [experiment_name2]);
      title(['Original Signal and Quadratic Fit: ', score_name]);
 end
-%% å½’ä¸€åŒ–æ˜¾ç¤ºçš„å‡½æ•°ï¼Œä¸»è¦ç”¨äºå½’ä¸€åŒ–çš„å‡½æ•°æ˜¾ç¤º
+%% ¹éÒ»»¯ÏÔÊ¾µÄº¯Êı£¬Ö÷ÒªÓÃÓÚ¹éÒ»»¯µÄº¯ÊıÏÔÊ¾
 function mu_normalized = mu_normalization(mu_data, min_max_value, Trigger)
-    % æå–æœ€å¤§å’Œæœ€å°æ•°å€¼
+    % ÌáÈ¡×î´óºÍ×îĞ¡ÊıÖµ
     data_max = min_max_value(1, Trigger);
     data_min = min_max_value(2, Trigger);
-    % å½’ä¸€åŒ–ç›¸å…³çš„æ•°æ®ï¼Œä½¿å¾—å…¶åœ¨0åˆ°1çš„èŒƒå›´å†…
+    % ¹éÒ»»¯Ïà¹ØµÄÊı¾İ£¬Ê¹µÃÆäÔÚ0µ½1µÄ·¶Î§ÄÚ
     mu_normalized = (mu_data - data_min)/(data_max - data_min);
 end
