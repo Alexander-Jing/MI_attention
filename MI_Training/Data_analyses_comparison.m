@@ -1,7 +1,7 @@
 %% 被试名称和实验的文件夹
 root_path = 'F:\CASIA\MI_engagement\MI_attention\MI_Training';  % 根目录用于存储数据和分析
-subject_name_comparison = 'Jyt_test_0306_post_control';
-sub_comparison_collection_folder = 'Jyt_test_0306_post_control_20240306_220707260_data';
+subject_name_comparison = 'Jyt_test_0131_comparison';
+sub_comparison_collection_folder = 'Jyt_test_0131_comparison_20240131_194732925_data';
 
 channels = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, 16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];  % 选择的通道,
 mu_channels = struct('C3',24, 'C4',22);  % 用于计算ERD/ERS的几个channels，是C3和C4两个通道,需要设定位置
@@ -26,7 +26,7 @@ rawdata_compare = trialdata_compare.TrialData;
 
 %% 读取在线的rawdata，用于一个伪在线的识别，从而得到在线的识别准确率
 trial_length = 15;  % trial时长15s
-trial_nums = 20;  %总共14个trial
+trial_nums = 29;  %总共14个trial
 MI_start = 2;  % MI开始记录的时刻
 MI_length = 7-2;  % MI所用的时间长度
 sample_freq = 256;
