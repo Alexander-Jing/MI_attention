@@ -2,6 +2,7 @@
 function [Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgraded_DoubleThreshold_1(scores_trial, muSups_trial, Trials, AllTrial, MI_MUSup_thre_weight_baseline, RestTimeLenBaseline, TrialNum, min_max_value_EI)
     EI_max = max(min_max_value_EI(1,:));
     EI_min = min(min_max_value_EI(2,:));
+    RestTimeLenBaseline_add = 5;
     % 一开始暂时不进行修改任务
     if AllTrial < 4  
         MI_MUSup_thre_weight = MI_MUSup_thre_weight_baseline;
@@ -19,7 +20,7 @@ function [Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgra
             case 3
                 
                 % 延长休息时间
-                RestTimeLen = RestTimeLenBaseline + 5;
+                RestTimeLen = RestTimeLenBaseline + RestTimeLenBaseline_add;
                 disp(["休息时间延长至", num2str(RestTimeLen)]);
                 Trials = Trials;
                 TrialNum = TrialNum;
@@ -42,13 +43,13 @@ function [Trials, MI_MUSup_thre_weight, RestTimeLen, TrialNum] = TaskAdjustUpgra
                 
                 % 延长休息时间
                 Trials = Trials;
-                RestTimeLen = RestTimeLenBaseline + 5;
+                RestTimeLen = RestTimeLenBaseline + RestTimeLenBaseline_add;
                 disp(["休息时间延长至", num2str(RestTimeLen)]);
                 TrialNum = TrialNum;
         end
         % 如果当前的EI数值是大于最大值的话，同样参与休息
         if scores_trial(end) > EI_max
-            RestTimeLen = RestTimeLenBaseline + 5;
+            RestTimeLen = RestTimeLenBaseline + RestTimeLenBaseline_add;
         end
 
         Trigger = Trials(AllTrial);  % 确定当前的类别
