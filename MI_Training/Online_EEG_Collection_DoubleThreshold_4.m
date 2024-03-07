@@ -107,12 +107,14 @@ end
 foldername_Scores = [sub_offline_collection_folder, '\\Offline_EEGMI_Scores_', subject_name_offline]; % 指定之前存储的离线文件夹路径和名称
 mean_std_EI_score = load([foldername_Scores, '\\', ['Offline_EEGMI_Scores_', subject_name_offline], '.mat' ], 'mean_std_EI_score');
 mean_std_muSup = load([foldername_Scores, '\\', ['Offline_EEGMI_Scores_', subject_name_offline], '.mat' ], 'mean_std_muSup');
-quartile_caculation = load([foldername_Scores, '\\', ['Offline_EEGMI_Scores_', subject_name_offline], '.mat' ], 'quartile_caculation');
-min_max_value = load([foldername_Scores, '\\', ['Offline_EEGMI_Scores_', subject_name_offline], '.mat' ], 'min_max_value');
+quartile_caculation_mu = load([foldername_Scores, '\\', ['Offline_EEGMI_Scores_', subject_name_offline], '.mat' ], 'quartile_caculation_mu');
+min_max_value_mu = load([foldername_Scores, '\\', ['Offline_EEGMI_Scores_', subject_name_offline], '.mat' ], 'min_max_value_mu');
+quartile_caculation_EI = load([foldername_Scores, '\\', ['Offline_EEGMI_Scores_', subject_name_offline], '.mat' ], 'quartile_caculation_EI');
+min_max_value_EI = load([foldername_Scores, '\\', ['Offline_EEGMI_Scores_', subject_name_offline], '.mat' ], 'min_max_value_EI');
 
 % 生成现在的轨迹
 %traj = generate_traj(mean_std_muSup.mean_std_muSup, TrialNum);
-traj = generate_traj_quartile(quartile_caculation.quartile_caculation, TrialNum);
+traj = generate_traj_quartile(quartile_caculation_mu.quartile_caculation_mu, TrialNum);
 
 %% 运动想象内容安排
 TrialIndex = randperm(TrialNum);                                           % 根据采集的数量生成随机顺序的数组
@@ -138,6 +140,7 @@ TrialData = [];
 scores = [];  % 用于存储每一个trial里面的每一个window的分数值
 EI_indices = [];  % 用于存储每一个trial里面的每一个window的EI分数值
 EI_index_scores = [];  % 用于存储EI_index_Caculation(EI_index, EI_channels)计算出来的EI_index_score数值
+EI_index_scores_normalized = [];  % 用于存储归一化的EI_index_scores数值
 mu_powers = [];  % 用于存储每一个trial里面的每一个window的mu频带的能量数值
 mu_suppressions = [];  % 用于存储每一个trial里面的mu_suppression
 mu_suppressions_normalized = [];  % 用于存储每一个trial里面的mu_suppressions_normalized
@@ -221,7 +224,7 @@ while(AllTrial <= TrialNum)
             MI_MUSup_thres = [MI_MUSup_thres, [MI_MUSup_thre;Trigger]];
 
             % 归一化相关的数值，用于实时显示和判断情况
-            MI_MUSup_thre_normalized = mu_normalization(MI_MUSup_thre, min_max_value.min_max_value, Trigger+1);
+            MI_MUSup_thre_normalized = mu_normalization(MI_MUSup_thre, min_max_value_mu.min_max_value_mu, Trigger+1);
             MI_MUSup_thre_normalized = MI_MUSup_thre_weight * MI_MUSup_thre_normalized;
             disp(['Trial: ', num2str(AllTrial), ' Cls: ', num2str(Trials(AllTrial))]);
             disp(['Mu Threshold：', num2str(MI_MUSup_thre)]);
@@ -276,7 +279,7 @@ while(AllTrial <= TrialNum)
         
         
         % 得分数据归一化处理，同时保持在0-1之间，用于实时显示和比较
-        mu_suppression_normalized = mu_normalization(mu_suppression, min_max_value.min_max_value, Trigger+1);
+        mu_suppression_normalized = mu_normalization(mu_suppression, min_max_value_mu.min_max_value_mu, Trigger+1);
         visual_feedback = resultMI(2,1) * mu_suppression_normalized;
         
         if visual_feedback < 0.01
@@ -286,17 +289,23 @@ while(AllTrial <= TrialNum)
         end
         disp(['Mu Online：', num2str(mu_suppression)]);
         disp(['Mu normalized Weighted: ', num2str(visual_feedback)]);
-
+        
+        % 对于EI指标的归一化操作
+        EI_index_score_normalized = EI_normalization(EI_index_score, min_max_value_EI.min_max_value_EI);
+        
         % 存储这一系列指标的数值
         EI_index = [EI_index; Trigger];
         mu_power_MI = [mu_power_MI; Trigger];  % 这里添加上Trigger的相关数值，方便存储
         mu_suppression = [mu_suppression; Trigger]; % 这里添加上Trigger的相关数值，方便存储
         EI_index_score = [EI_index_score; Trigger];
+        EI_index_score_normalized = [EI_index_score_normalized; Trigger];
         resultMI_ = [resultMI; Trigger];
         mu_suppression_normalized = [mu_suppression_normalized; Trigger];
+
         
         resultsMI = [resultsMI, resultMI_];
         EI_index_scores = [EI_index_scores, EI_index_score];
+        EI_index_scores_normalized = [EI_index_scores_normalized, EI_index_score_normalized];
         EI_indices = [EI_indices, EI_index];  % 添加相关的EI指标数值  
         mu_powers = [mu_powers, mu_power_MI];  % 添加相关的mu节律能量
         mu_suppressions = [mu_suppressions, mu_suppression];  % 添加相关的mu衰减情况，用于后续的分析
@@ -502,7 +511,8 @@ while(AllTrial <= TrialNum)
     % 空想任务想象5s，到第7s之后开始休息，到第10s就结束任务
     if Timer == 10 && Trials(AllTrial)==0 && clsControl == 0 %结束休息，准备下一个
         % 存储相关的EI指标和mu节律能量的数据
-        SaveMIEngageTrials(EI_indices, mu_powers, mu_suppressions, subject_name, foldername, config_data, EI_index_scores, resultsMI, FES_flags, mu_suppressions_normalized, visual_feedbacks, MI_MUSup_thre1s_normalized);
+        SaveMIEngageTrials(EI_indices, mu_powers, mu_suppressions, subject_name, foldername, config_data, EI_index_scores, resultsMI, FES_flags, mu_suppressions_normalized, ...
+            visual_feedbacks, MI_MUSup_thre1s_normalized, EI_index_scores_normalized);
         %计时器清0
         Timer = 0;  % 计时器清0
         % 每一个trial的数值还原
@@ -515,6 +525,7 @@ while(AllTrial <= TrialNum)
         mu_suppressions_normalized = [];
         visual_feedbacks = [];
         MI_MUSup_thre1s_normalized = [];
+        EI_index_scores_normalized = [];
         
         RestTimeLen = RestTimeLenBaseline;  % 休息时间还原
         disp(['Trial: ', num2str(AllTrial), ', Task: ', num2str(Trials(AllTrial))]);  % 显示相关数据
@@ -522,7 +533,8 @@ while(AllTrial <= TrialNum)
     % 想对了之后，AO之后，休息3s之后，结束休息，准备下一个
     if Trials(AllTrial)>0 && Timer == (clsTime + 8 + RestTimeLen) && clsControl == 1  %结束休息
         % 存储相关的EI指标和mu节律能量的数据
-        SaveMIEngageTrials(EI_indices, mu_powers, mu_suppressions, subject_name, foldername, config_data, EI_index_scores, resultsMI, FES_flags, mu_suppressions_normalized, visual_feedbacks, MI_MUSup_thre1s_normalized);
+        SaveMIEngageTrials(EI_indices, mu_powers, mu_suppressions, subject_name, foldername, config_data, EI_index_scores, resultsMI, FES_flags, mu_suppressions_normalized, ...
+            visual_feedbacks, MI_MUSup_thre1s_normalized, EI_index_scores_normalized);
         % 计时器清0
         Timer = 0;  % 计时器清0
         % cls的两个flag清0
@@ -539,6 +551,7 @@ while(AllTrial <= TrialNum)
         mu_suppressions_normalized = [];
         visual_feedbacks = [];
         MI_MUSup_thre1s_normalized = [];
+        EI_index_scores_normalized = [];
         
         % 其余设置还原
         RestTimeLen = RestTimeLenBaseline;  % 休息时间还原
@@ -547,7 +560,8 @@ while(AllTrial <= TrialNum)
     % 运动想象没有想对，提醒之后，休息3s之后，结束休息，准备下一个
     if Trials(AllTrial)>0 && (clsFlag == 0 || clsFlag1==0) && Timer == (MaxMITime + 8 + RestTimeLen) && clsControl == 2
         % 存储相关的EI指标和mu节律能量的数据
-        SaveMIEngageTrials(EI_indices, mu_powers, mu_suppressions, subject_name, foldername, config_data, EI_index_scores, resultsMI, FES_flags, mu_suppressions_normalized, visual_feedbacks, MI_MUSup_thre1s_normalized);
+        SaveMIEngageTrials(EI_indices, mu_powers, mu_suppressions, subject_name, foldername, config_data, EI_index_scores, resultsMI, FES_flags, mu_suppressions_normalized, ...
+            visual_feedbacks, MI_MUSup_thre1s_normalized, EI_index_scores_normalized);
         % 计时器清0
         Timer = 0;  % 计时器清0
         % clsflag清0
@@ -564,6 +578,7 @@ while(AllTrial <= TrialNum)
         mu_suppressions_normalized = [];
         visual_feedbacks = [];
         MI_MUSup_thre1s_normalized = [];
+        EI_index_scores_normalized = [];
         
         % 其余设置还原
         RestTimeLen = RestTimeLenBaseline;  % 休息时间还原
@@ -592,7 +607,8 @@ save([foldername_rawdata, '\\', FunctionNowFilename(['Online_EEGMI_trajectory_',
 
 
 %% 存储在运动想象过程中的参与度指标
-function SaveMIEngageTrials(EI_indices, mu_powers, mu_suppressions, subject_name, foldername, config_data, EI_index_scores, resultsMI, FES_flags, mu_suppressions_normalized, visual_feedbacks, MI_MUSup_thre1s_normalized)
+function SaveMIEngageTrials(EI_indices, mu_powers, mu_suppressions, subject_name, foldername, config_data, EI_index_scores, resultsMI, FES_flags, mu_suppressions_normalized,...
+    visual_feedbacks, MI_MUSup_thre1s_normalized, EI_index_scores_normalized)
     
     foldername = [foldername, '\\Online_Engagements_', subject_name]; % 检验文件夹是否存在
     if ~exist(foldername, 'dir')
@@ -601,7 +617,8 @@ function SaveMIEngageTrials(EI_indices, mu_powers, mu_suppressions, subject_name
 
     save([foldername, '\\', FunctionNowFilename(['Online_EEG_data2Server_', subject_name, '_class_', num2str(config_data(3,1)),  ...
         '_session_', num2str(config_data(4,1)), '_trial_', num2str(config_data(5,1)), ...
-        '_window_', num2str(config_data(6,1)), 'EI_mu' ], '.mat' )],'EI_indices','mu_powers','mu_suppressions', 'EI_index_scores','resultsMI','FES_flags','mu_suppressions_normalized', 'visual_feedbacks', 'MI_MUSup_thre1s_normalized');  % 存储相关的数值
+        '_window_', num2str(config_data(6,1)), 'EI_mu' ], '.mat' )],'EI_indices','mu_powers','mu_suppressions', 'EI_index_scores','resultsMI','FES_flags','mu_suppressions_normalized', 'visual_feedbacks',...
+        'MI_MUSup_thre1s_normalized', 'EI_index_scores_normalized');  % 存储相关的数值
 end
 %% 计算相关mu频带衰减指标，这里需要修改
 function mu_suppresion = MI_MuSuperesion(mu_power_, mu_power, mu_channels)
@@ -682,10 +699,17 @@ function count = count_trigger(Trials, AllTrial)
 end
 
 %% 归一化显示的函数，主要用于归一化的函数显示
-function mu_normalized = mu_normalization(mu_data, min_max_value, Trigger)
+function mu_normalized = mu_normalization(mu_data, min_max_value_mu, Trigger)
     % 提取最大和最小数值
-    data_max = min_max_value(1, Trigger);
-    data_min = min_max_value(2, Trigger);
+    data_max = min_max_value_mu(1, Trigger);
+    data_min = min_max_value_mu(2, Trigger);
     % 归一化相关的数据，使得其在0到1的范围内
     mu_normalized = (mu_data - data_min)/(data_max - data_min);
+end
+function EI_normalized = EI_normalization(EI_data, min_max_value_EI)
+    % 提取最大和最小数值
+    data_max = max(min_max_value_EI(1,:));
+    data_min = min(min_max_value_EI(2,:));
+    % 归一化相关的数据，使得其在0到1的范围内
+    EI_normalized = (EI_data - data_min)/(data_max - data_min);
 end

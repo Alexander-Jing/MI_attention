@@ -26,8 +26,8 @@ function [quartile_caculation, min_max_value] = Offline_Bootstrapping_quartile(s
             data_min(class_idx) = min(data_);
             data_max(class_idx) = max(data_);
 
-            disp(['MI class?', num2str(class_idx)]);
-            disp(['index name?', scores_name]);
+            disp(['MI class: ', num2str(class_idx)]);
+            disp(['index name: ', scores_name]);
             fprintf('0.25 quartile: %f\n', dataQ1(class_idx));
             fprintf('0.50 quartile: %f\n', dataQ2(class_idx));
             fprintf('0.75 quartile: %f\n', dataQ3(class_idx));
@@ -62,8 +62,8 @@ function [quartile_caculation, min_max_value] = Offline_Bootstrapping_quartile(s
             bootstrapStdQ3(class_idx) = std(bootstrapSampleQ3);
             
             % 计算分位数和�?大最小数�?
-            disp(['MI class?', num2str(class_idx)]);
-            disp(['index name?', scores_name]);
+            disp(['MI class: ', num2str(class_idx)]);
+            disp(['index name: ', scores_name]);
             fprintf('mean quartile 0.25: %f\n', dataQ1(class_idx));
             fprintf('std quartile 0.25: %f\n', bootstrapStdQ1(class_idx));
             fprintf('mean quartile 0.50: %f\n', dataQ2(class_idx));
