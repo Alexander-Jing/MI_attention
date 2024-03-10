@@ -1,10 +1,13 @@
 %% 被试名称和实验的文件夹
 root_path = 'F:\CASIA\MI_engagement\MI_attention\MI_Training';  % 根目录用于存储数据和分析
-subject_name_post = 'Jyt_test_0306_post_control'; %'Jyt_test_0101_1_online';% 'Jyt_test_0101_online'; %  % 被试姓名
-sub_post_collection_folder = 'Jyt_test_0306_post_control_20240306_220707260_data';
+subject_name_post = 'Jyt_test_0310_post_control'; %'Jyt_test_0101_1_online';% 'Jyt_test_0101_online'; %  % 被试姓名
+sub_post_collection_folder = 'Jyt_test_0310_post_control_20240310_212613989_data';
 
-subject_name_pre = 'Jyt_test_0306_pre_control';
-sub_pre_collection_folder = 'Jyt_test_0306_pre_control_20240306_211616260_data';
+subject_name_pre = 'Jyt_test_0310_pre_control';
+sub_pre_collection_folder = 'Jyt_test_0310_pre_control_20240310_204214585_data';
+
+subject_name_offline =  'Jyt_test_0310_offline';  % 离线收集数据时候的被试名称
+sub_offline_collection_folder = 'Jyt_test_0310_offline_20240310_195952653_data';  % 被试的离线采集数据
 
 channels = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, 16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];  % 选择的通道,
 mu_channels = struct('C3',24, 'C4',22);  % 用于计算ERD/ERS的几个channels，是C3和C4两个通道,需要设定位置
@@ -12,6 +15,11 @@ EI_channels = struct('Fp1', 32, 'Fp2', 31, 'F7', 30, 'F3', 29, 'Fz', 28, 'F4', 2
 
 
 %% 读取post各种数据，用于后面的显示和显著性分析
+% 读取离线实验数据，归一化使用
+mu_suppressions_scores = load(fullfile(root_path, sub_offline_collection_folder, ['Offline_EEGMI_Scores_', subject_name_offline], ['Offline_EEGMI_Scores_', subject_name_offline,'.mat']));
+mu_suppressions_offline = mu_suppressions_scores.mu_suppressions;
+min_max_value = mu_suppressions_scores.min_max_value_mu;
+
 % 读取对比实验的数据
 scores_post = load(fullfile(root_path, sub_post_collection_folder,['Offline_EEGMI_Scores_', subject_name_post], ['Offline_EEGMI_Scores_', subject_name_post, '.mat']));
 results_post = load(fullfile(root_path, sub_post_collection_folder,['Offline_EEGMI_Scores_', subject_name_post], ['Offline_EEGMI_Results_', subject_name_post, '.mat']));
@@ -183,13 +191,13 @@ mu_suppressions_normalized_compare_trial_pre = [mu_suppressions_normalized_compa
 %plot_signal_and_fit(EI_index_scores(1,:), 'EI online');
 %plot_signal_and_fit(EI_index_scores_compare(1,:), 'EI compare');
 subplot(2,2,1);
-plot_signal_and_fit_double(visualfeedback_trial_compare_post(1,:), 'visualfeedback', visualfeedback_trial_compare_pre(1,:), 'visualfeedback compare', 'visualfeedback');
+plot_signal_and_fit_double_linear(visualfeedback_trial_compare_post(1,:), 'visualfeedback', visualfeedback_trial_compare_pre(1,:), 'visualfeedback compare', 'visualfeedback');
 subplot(2,2,2);
-plot_signal_and_fit_double(resultsMI_trial_compare_post(1,:), 'results', resultsMI_trial_compare_pre(1,:), 'results compare', 'results');
+plot_signal_and_fit_double_linear(resultsMI_trial_compare_post(1,:), 'results', resultsMI_trial_compare_pre(1,:), 'results compare', 'results');
 subplot(2,2,3);
-plot_signal_and_fit_double(mu_suppressions_normalized_compare_trial_post(1,:), 'Mu sup online', mu_suppressions_normalized_compare_trial_pre(1,:), 'Mu sup compare', 'mu sup');
+plot_signal_and_fit_double_linear(mu_suppressions_normalized_compare_trial_post(1,:), 'Mu sup online', mu_suppressions_normalized_compare_trial_pre(1,:), 'Mu sup compare', 'mu sup');
 subplot(2,2,4);
-plot_signal_and_fit_double(EI_index_scores_compare_post(1,:), 'EI online', EI_index_scores_compare_pre(1,:), 'EI compare', 'EI');
+plot_signal_and_fit_double_linear(EI_index_scores_compare_post(1,:), 'EI online', EI_index_scores_compare_pre(1,:), 'EI compare', 'EI');
 %suptitle(strrep(subject_name_online, '_', ' '));
 
 disp('methods on visualfeedback')
@@ -542,6 +550,42 @@ function plot_signal_and_fit_double(y1, experiment_name1, y2, experiment_name2, 
          [experiment_name2], [experiment_name2]);
      title(['Original Signal and Quadratic Fit: ', score_name]);
 end
+
+function plot_signal_and_fit_double_linear(y1, experiment_name1, y2, experiment_name2, score_name)
+    % 创建一个 x 轴的值，从 1 到信号的长度
+    x1 = 1:length(y1);
+    x2 = 1:length(y2);
+    
+
+    % 使用 polyfit 函数进行最小一次拟合
+    p1 = polyfit(x1, y1, 1);
+    p2 = polyfit(x2, y2, 1);
+
+    % 创建一个函数句柄，用于计算拟合的一次函数
+    f1 = @(x) p1(1) * x + p1(2);
+    f2 = @(x) p2(1) * x + p2(2);
+
+    % 计算拟合的一次函数
+    y_fit1 = f1(x1);
+    y_fit2 = f2(x2);
+
+    % 绘制原始数据和拟合的一次函数
+    %figure;
+    plot(y1);
+    hold on;
+    plot(x1, y_fit1, 'LineWidth', 2);
+    hold on;
+    plot(y2);
+    hold on;
+    plot(x2, y_fit2, 'LineWidth', 2);
+    hold off;
+
+    % 添加图例和标题
+    legend([experiment_name1], [experiment_name1],...
+         [experiment_name2], [experiment_name2]);
+     title(['Original Signal and Linear Fit: ', score_name]);
+end
+
 %% 归一化显示的函数，主要用于归一化的函数显示
 function mu_normalized = mu_normalization(mu_data, min_max_value, Trigger)
     % 提取最大和最小数值

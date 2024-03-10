@@ -41,7 +41,7 @@ status = CheckNetStreamingVersion(con);                                    % ÅĞ¶
 %% ÔÚÏßÊµÑé²ÎÊıÉèÖÃ²¿·Ö£¬ÓÃÓÚÉèÖÃÃ¿Ò»¸ö±»ÊÔµÄÇé¿ö£¬ÒÀ¾İ±»ÊÔÇé¿ö½øĞĞĞŞ¸Ä
 
 % ÔË¶¯ÏëÏó»ù±¾²ÎÊıÉèÖÃ
-subject_name = 'Jyt_test_0306_post_control_1';  % ±»ÊÔĞÕÃû
+subject_name = 'Jyt_test_0310_post_control';  % ±»ÊÔĞÕÃû
 TrialNum = 20;  % ÉèÖÃ²É¼¯µÄÊıÁ¿
 %TrialNum = 3*3;
 MotorClasses = 2;  % ÔË¶¯ÏëÏóµÄÖÖÀàµÄÊıÁ¿µÄÉèÖÃ£¬¶Ô±ÈÊµÑéµÄÈÎÎñÊÇ[1,2]£¬ºÍreadme.txtÀïÃæµÄ¶ÔÓ¦

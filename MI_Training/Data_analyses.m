@@ -1,10 +1,10 @@
 %% 被试名称和实验的文件夹
-root_path = 'F:\MI_engagement\MI_attention\MI_Training';  % 根目录用于存储数据和分析
-subject_name_online = 'Jyt_test_0131_online'; %'Jyt_test_0101_1_online';% 'Jyt_test_0101_online'; %  % 被试姓名
-sub_online_collection_folder = 'Jyt_test_0131_online_20240131_210821243_data'; % 'Jyt_test_0101_1_online_20240101_200123314_data';  %'Jyt_test_0101_online_20240101_175129548_data'; %  % 
+root_path = 'F:\CASIA\MI_engagement\MI_attention\MI_Training';  % 根目录用于存储数据和分析
+subject_name_online = 'Jyt_test_0310_online'; %'Jyt_test_0101_1_online';% 'Jyt_test_0101_online'; %  % 被试姓名
+sub_online_collection_folder = 'Jyt_test_0310_online_20240310_210638053_data'; % 'Jyt_test_0101_1_online_20240101_200123314_data';  %'Jyt_test_0101_online_20240101_175129548_data'; %  % 
 
-subject_name_offline =  'Jyt_test_0131_offline';  % 离线收集数据时候的被试名称
-sub_offline_collection_folder = 'Jyt_test_0131_offline_20240131_204044614_data';  % 被试的离线采集数据
+subject_name_offline =  'Jyt_test_0310_offline';  % 离线收集数据时候的被试名称
+sub_offline_collection_folder = 'Jyt_test_0310_offline_20240310_195952653_data';  % 被试的离线采集数据
 
 subject_name_comparison = 'Jyt_test_0131_comparison';
 sub_comparison_collection_folder = 'Jyt_test_0131_comparison_20240131_194732925_data';
@@ -24,7 +24,7 @@ folder_path = fullfile(sub_online_collection_folder, ['Online_Engagements_', sub
 % 读取离线的mu衰减变化
 mu_suppressions_scores = load(fullfile(root_path, sub_offline_collection_folder, ['Offline_EEGMI_Scores_', subject_name_offline], ['Offline_EEGMI_Scores_', subject_name_offline,'.mat']));
 mu_suppressions_offline = mu_suppressions_scores.mu_suppressions;
-min_max_value = mu_suppressions_scores.min_max_value;
+min_max_value = mu_suppressions_scores.min_max_value_mu;
 
 % 计算归一化之后的在线mu衰减指标
 % 初始化一个空的归一化结果矩阵
@@ -205,13 +205,13 @@ plot_signal_and_fit_double_linear(visual_feedbacks_trial(1,:), 'visual_feedback'
 %plot_signal_and_fit(EI_index_scores(1,:), 'EI online');
 %plot_signal_and_fit(EI_index_scores_compare(1,:), 'EI compare');
 subplot(2,2,1);
-plot_signal_and_fit_double_linear(visual_feedbacks_trial(1,:), 'visualfeedback', visualfeedback_trial_compare(1,:), 'visualfeedback compare', 'visualfeedback');
+plot_signal_and_fit_double_linear(visual_feedbacks_trial(1,:), 'visualfeedback', visualfeedback_trial_compare(1,1:20), 'visualfeedback compare', 'visualfeedback');
 subplot(2,2,2);
-plot_signal_and_fit_double_linear(resultsMI_trials(1,:), 'results', resultsMI_trial_compare(1,:), 'results compare', 'results');
+plot_signal_and_fit_double_linear(resultsMI_trials(1,:), 'results', resultsMI_trial_compare(1,1:20), 'results compare', 'results');
 subplot(2,2,3);
-plot_signal_and_fit_double_linear(mu_suppressions_normalized(1,:), 'Mu sup online', mu_suppressions_normalized_compare_trial(1,:), 'Mu sup compare', 'mu sup');
+plot_signal_and_fit_double_linear(mu_suppressions_normalized(1,:), 'Mu sup online', mu_suppressions_normalized_compare_trial(1,1:20), 'Mu sup compare', 'mu sup');
 subplot(2,2,4);
-plot_signal_and_fit_double_linear(EI_index_scores(1,:), 'EI online', EI_index_scores_compare(1,:), 'EI compare', 'EI');
+plot_signal_and_fit_double_linear(EI_index_scores(1,:), 'EI online', EI_index_scores_compare(1,1:20), 'EI compare', 'EI');
 %suptitle(strrep(subject_name_online, '_', ' '));
 
 disp('methods on visualfeedback')

@@ -42,7 +42,7 @@ status = CheckNetStreamingVersion(con);                                    % ÅĞ¶
 %% ÀëÏßÊµÑé²ÎÊıÉèÖÃ²¿·Ö£¬ÓÃÓÚÉèÖÃÃ¿Ò»¸ö±»ÊÔµÄÇé¿ö£¬ÒÀ¾İ±»ÊÔÇé¿ö½øĞĞĞŞ¸Ä
 
 % ÔË¶¯ÏëÏó»ù±¾²ÎÊıÉèÖÃ
-subject_name = 'Jyt_test_0306_offline';  % ±»ÊÔĞÕÃû
+subject_name = 'Jyt_test_0310_offline';  % ±»ÊÔĞÕÃû
 TrialNum = 3*30;  % ÉèÖÃ²É¼¯µÄÊıÁ¿
 %TrialNum = 3*3;
 MotorClasses = 3;  % ÔË¶¯ÏëÏóµÄÖÖÀàµÄÊıÁ¿µÄÉèÖÃ£¬×¢ÒâÕâÀïÊÇ°Ñ¿ÕÏëidle×´Ì¬Ò²Òª·Å½øÈ¥µÄ£¬×¢ÒâÕâÀïµÄÈÎÎñÊÇ[0,1,2]£¬ºÍreadme.txtÀïÃæµÄ¶ÔÓ¦
@@ -160,6 +160,7 @@ while(AllTrial <= TrialNum)
             fwrite(StimControl,StimCommand);
             disp(['MIÖ®Ç°¸¨Öúµç´Ì¼¤']);
         end
+        %Trigger = Trigger + 6;  % ¼ÇÂ¼´ËÊ±ÓĞµç´Ì¼¤Ê±ºòµÄÊı¾İ£¬·ÀÖ¹ºóĞøµÄÊı¾İ´¦ÀíÓĞÓ°Ïì
     end
     
     % µÚ5s¿ªÊ¼È¡512µÄTrigger~=6µÄMIµÄ´°¿Ú£¬Êı¾İ´¦Àí²¢ÇÒ½øĞĞ·ÖÎö£¬ÕâÀï¾àÀëµç´Ì¼¤»¹¼ä¸ôÁË1s£¬·ÀÖ¹³öÏÖµç´Ì¼¤µÄÓ°Ïì
