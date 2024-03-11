@@ -191,26 +191,26 @@ mu_suppressions_normalized_compare_trial_pre = [mu_suppressions_normalized_compa
 %plot_signal_and_fit(EI_index_scores(1,:), 'EI online');
 %plot_signal_and_fit(EI_index_scores_compare(1,:), 'EI compare');
 subplot(2,2,1);
-plot_signal_and_fit_double_linear(visualfeedback_trial_compare_post(1,:), 'visualfeedback', visualfeedback_trial_compare_pre(1,:), 'visualfeedback compare', 'visualfeedback');
+plot_signal_and_fit_double_linear(visualfeedback_trial_compare_post(1,1:10), 'visualfeedback', visualfeedback_trial_compare_pre(1,1:10), 'visualfeedback compare', 'visualfeedback');
 subplot(2,2,2);
-plot_signal_and_fit_double_linear(resultsMI_trial_compare_post(1,:), 'results', resultsMI_trial_compare_pre(1,:), 'results compare', 'results');
+plot_signal_and_fit_double_linear(resultsMI_trial_compare_post(1,1:10), 'results', resultsMI_trial_compare_pre(1,1:10), 'results compare', 'results');
 subplot(2,2,3);
-plot_signal_and_fit_double_linear(mu_suppressions_normalized_compare_trial_post(1,:), 'Mu sup online', mu_suppressions_normalized_compare_trial_pre(1,:), 'Mu sup compare', 'mu sup');
+plot_signal_and_fit_double_linear(mu_suppressions_normalized_compare_trial_post(1,1:10), 'Mu sup online', mu_suppressions_normalized_compare_trial_pre(1,1:10), 'Mu sup compare', 'mu sup');
 subplot(2,2,4);
-plot_signal_and_fit_double_linear(EI_index_scores_compare_post(1,:), 'EI online', EI_index_scores_compare_pre(1,:), 'EI compare', 'EI');
+plot_signal_and_fit_double_linear(EI_index_scores_compare_post(1,1:10), 'EI online', EI_index_scores_compare_pre(1,1:10), 'EI compare', 'EI');
 %suptitle(strrep(subject_name_online, '_', ' '));
 
-disp('methods on visualfeedback');
-[p_ttest, p_ranksum] = significance_analysis(visualfeedback_trial_compare_post, visualfeedback_trial_compare_pre);
+disp('methods on visualfeedback')
+[p_ttest, p_ranksum] = significance_analysis(visualfeedback_trial_compare_post(1,10:), visualfeedback_trial_compare_pre(1:10));
 significance_show(p_ttest,p_ranksum);
 disp('methods on mu_suppresions');
-[p_ttest, p_ranksum] = significance_analysis(mu_suppressions_normalized_compare_trial_post, mu_suppressions_normalized_compare_trial_pre);
+[p_ttest, p_ranksum] = significance_analysis(mu_suppressions_normalized_compare_trial_post(1,1:10), mu_suppressions_normalized_compare_trial_pre(1,:10));
 significance_show(p_ttest,p_ranksum);
 disp('methods on EI');
-[p_ttest, p_ranksum] = significance_analysis(EI_index_scores_compare_post, EI_index_scores_compare_pre);
+[p_ttest, p_ranksum] = significance_analysis(EI_index_scores_compare_post(1,), EI_index_scores_compare_pre);
 significance_show(p_ttest,p_ranksum);
 disp('methods on resultsMI')
-[p_ttest, p_ranksum] = significance_analysis(resultsMI_trial_compare_post, resultsMI_trial_compare_pre);
+[p_ttest, p_ranksum] = significance_analysis(resultsMI_trial_compare_post(1,:), resultsMI_trial_compare_pre);
 significance_show(p_ttest,p_ranksum);
 
 disp('methods on mu_suppresions on triggers');
