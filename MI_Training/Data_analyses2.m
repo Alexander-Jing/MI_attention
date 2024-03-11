@@ -20,6 +20,7 @@ subject_rawdata_folder = ['.\', sub_online_collection_folder, '\' 'Online_EEGMI_
 rawdata = load([subject_rawdata_folder, '\', sub_online_rawdata_file]);
 %rawdata_comparison = load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0131_comparison_20240131_194732925_data\Offline_EEGMI_RawData_Jyt_test_0131_comparison\Offline_EEGMI_RawData_Jyt_test_0131_comparison20240131_195537284.mat');
 rawdata_comparison = load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0310_post_control_20240310_212613989_data\Offline_EEGMI_RawData_Jyt_test_0310_post_control\Offline_EEGMI_RawData_Jyt_test_0310_post_control20240310_213147853.mat');
+
 %rawdata_offline = load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0131_offline_20240131_204044614_data\Offline_EEGMI_RawData_Jyt_test_0131_offline\Offline_EEGMI_RawData_Jyt_test_0131_offline20240131_205742247.mat');%load('F:\CASIA\MI_engagement\MI_attention\MI_Training\Jyt_test_0101_1_offline_20240101_193332077_data\Offline_EEGMI_RawData_Jyt_test_0101_1_offline\Offline_EEGMI_RawData_Jyt_test_0101_1_offline20240101_194900541.mat', 'TrialData');
 
 rawdata = rawdata.TrialData;

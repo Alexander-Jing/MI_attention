@@ -3,8 +3,8 @@ root_path = 'F:\MI_engagement\MI_attention\MI_Training';  % 根目录用于存�
 subject_name_online = 'Jyt_test_0306_online'; %'Jyt_test_0101_1_online';% 'Jyt_test_0101_online'; %  % 被试姓名
 sub_online_collection_folder = 'Jyt_test_0306_online_20240306_214050122_data'; % 'Jyt_test_0101_1_online_20240101_200123314_data';  %'Jyt_test_0101_online_20240101_175129548_data'; %  % 
 
-subject_name_offline =  'Jyt_test_0306_offline';  % 离线收集数据时候的被试名称
-sub_offline_collection_folder = 'Jyt_test_0306_offline_20240306_204541507_data';  % 被试的离线采集数据
+subject_name_offline =  'Jyt_test_0131_offline';  % 离线收集数据时候的被试名称
+sub_offline_collection_folder = 'Jyt_test_0131_offline_20240131_204044614_data';  % 被试的离线采集数据
 
 subject_name_comparison = 'Jyt_test_0131_comparison';
 sub_comparison_collection_folder = 'Jyt_test_0131_comparison_20240131_194732925_data';
@@ -15,7 +15,7 @@ EI_channels = struct('Fp1', 32, 'Fp2', 31, 'F7', 30, 'F3', 29, 'Fz', 28, 'F4', 2
 
 
 %% 读取各种数据，用于后面的显示和显著性分析
-% 读取和计算在线数据，用于指标分析
+% 读取和计算在线数据，用于指标分析;
 folder_path = fullfile(sub_online_collection_folder, ['Online_Engagements_', subject_name_online]);
 % [sub_online_collection_folder, '/', 'Online_Engagements_', subject_name_online]; % 请将'./your_folder'替换为您的文件夹的相对路径
 [mu_suppresions, EI_index_scores, resultsMI_trials] = mu_EI_MIresult_caculation(folder_path, mu_channels, EI_channels, 'average');  % 提取相关指标
@@ -205,13 +205,13 @@ plot_signal_and_fit_double_linear(visual_feedbacks_trial(1,:), 'visual_feedback'
 %plot_signal_and_fit(EI_index_scores(1,:), 'EI online');
 %plot_signal_and_fit(EI_index_scores_compare(1,:), 'EI compare');
 subplot(2,2,1);
-plot_signal_and_fit_double_linear(visual_feedbacks_trial(1,:), 'visualfeedback', visualfeedback_trial_compare(1,:), 'visualfeedback compare', 'visualfeedback');
+plot_signal_and_fit_double_linear(visual_feedbacks_trial(1,1:20), 'visualfeedback', visualfeedback_trial_compare(1,:), 'visualfeedback compare', 'visualfeedback');
 subplot(2,2,2);
-plot_signal_and_fit_double_linear(resultsMI_trials(1,:), 'results', resultsMI_trial_compare(1,:), 'results compare', 'results');
+plot_signal_and_fit_double_linear(resultsMI_trials(1,1:20), 'results', resultsMI_trial_compare(1,:), 'results compare', 'results');
 subplot(2,2,3);
-plot_signal_and_fit_double_linear(mu_suppressions_normalized(1,:), 'Mu sup online', mu_suppressions_normalized_compare_trial(1,:), 'Mu sup compare', 'mu sup');
+plot_signal_and_fit_double_linear(mu_suppressions_normalized(1,1:20), 'Mu sup online', mu_suppressions_normalized_compare_trial(1,:), 'Mu sup compare', 'mu sup');
 subplot(2,2,4);
-plot_signal_and_fit_double_linear(EI_index_scores(1,:), 'EI online', EI_index_scores_compare(1,:), 'EI compare', 'EI');
+plot_signal_and_fit_double_linear(EI_index_scores(1,1:), 'EI online', EI_index_scores_compare(1,:), 'EI compare', 'EI');
 %suptitle(strrep(subject_name_online, '_', ' '));
 
 disp('methods on visualfeedback')
@@ -605,11 +605,11 @@ function plot_signal_and_fit_double_linear(y1, experiment_name1, y2, experiment_
     %figure;
     plot(y1);
     hold on;
-    plot(x1, y_fit1, '-');
+    plot(x1, y_fit1, 'LineWidth', 2);
     hold on;
     plot(y2);
     hold on;
-    plot(x2, y_fit2, '-');
+    plot(x2, y_fit2, 'LineWidth', 2);
     hold off;
 
     % 添加图例和标题
