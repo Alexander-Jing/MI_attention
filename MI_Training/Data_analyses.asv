@@ -1,10 +1,10 @@
 %% 被试名称和实验的文件夹
 root_path = 'F:\MI_engagement\MI_attention\MI_Training';  % 根目录用于存储数据和分析
-subject_name_online = 'Jyt_test_0306_online'; %'Jyt_test_0101_1_online';% 'Jyt_test_0101_online'; %  % 被试姓名
-sub_online_collection_folder = 'Jyt_test_0306_online_20240306_214050122_data'; % 'Jyt_test_0101_1_online_20240101_200123314_data';  %'Jyt_test_0101_online_20240101_175129548_data'; %  % 
+subject_name_online = 'Jyt_test_0310_online'; %'Jyt_test_0101_1_online';% 'Jyt_test_0101_online'; %  % 被试姓名
+sub_online_collection_folder = 'Jyt_test_0310_online_20240310_210638053_data'; % 'Jyt_test_0101_1_online_20240101_200123314_data';  %'Jyt_test_0101_online_20240101_175129548_data'; %  % 
 
-subject_name_offline =  'Jyt_test_0131_offline';  % 离线收集数据时候的被试名称
-sub_offline_collection_folder = 'Jyt_test_0131_offline_20240131_204044614_data';  % 被试的离线采集数据
+subject_name_offline =  'Jyt_test_0310_offline';  % 离线收集数据时候的被试名称
+sub_offline_collection_folder = 'Jyt_test_0310_offline_20240310_195952653_data';  % 被试的离线采集数据
 
 subject_name_comparison = 'Jyt_test_0131_comparison';
 sub_comparison_collection_folder = 'Jyt_test_0131_comparison_20240131_194732925_data';
@@ -24,7 +24,7 @@ folder_path = fullfile(sub_online_collection_folder, ['Online_Engagements_', sub
 % 读取离线的mu衰减变化
 mu_suppressions_scores = load(fullfile(root_path, sub_offline_collection_folder, ['Offline_EEGMI_Scores_', subject_name_offline], ['Offline_EEGMI_Scores_', subject_name_offline,'.mat']));
 mu_suppressions_offline = mu_suppressions_scores.mu_suppressions;
-min_max_value = mu_suppressions_scores.min_max_value;
+min_max_value = mu_suppressions_scores.min_max_value_mu;
 
 % 计算归一化之后的在线mu衰减指标
 % 初始化一个空的归一化结果矩阵
@@ -143,19 +143,19 @@ fprintf('EI_index_scores: mean = %.2f, std = %.2f\n', EI_index_scores_mean, EI_i
 % title('Line plot of EI');
 % grid on;
 % 
-% figure;
-% resultsTrigger = resultsMI_trials(2,:);
-% plot(mu_suppresions(1,:).* resultsMI_trials(1,:), 'LineWidth', 2);  %.* resultsMI_trials(1,:)
-% hold on;
-% plot(MI_MUSup_thres_row1(1,:), 'LineWidth', 2);
-% hold on;
-% plot(resultsMI_trials(1,:), 'LineWidth', 2);
-% hold off;
-% legend('mu sup online', 'mu sup thre', 'resultsMI');
-% xlabel('Index');
-% ylabel('Value');
-% title('Line plot of thresholds');
-% grid on;
+figure;
+resultsTrigger = resultsMI_trials(2,:);
+plot(mu_suppresions(1,:).* resultsMI_trials(1,:), 'LineWidth', 2);  %.* resultsMI_trials(1,:)
+hold on;
+plot(MI_MUSup_thres_row1(1,:), 'LineWidth', 2);
+hold on;
+plot(resultsMI_trials(1,:), 'LineWidth', 2);
+hold off;
+legend('mu sup online', 'mu sup thre', 'resultsMI');
+xlabel('Index');
+ylabel('Value');
+title('Line plot of thresholds');
+grid on;
 % 
 % figure;
 % resultsTrigger = resultsMI_trials(2,:);
@@ -204,27 +204,28 @@ plot_signal_and_fit_double_linear(visual_feedbacks_trial(1,:), 'visual_feedback'
 
 %plot_signal_and_fit(EI_index_scores(1,:), 'EI online');
 %plot_signal_and_fit(EI_index_scores_compare(1,:), 'EI compare');
+figure;
 subplot(2,2,1);
-plot_signal_and_fit_double_linear(visual_feedbacks_trial(1,1:20), 'visualfeedback', visualfeedback_trial_compare(1,:), 'visualfeedback compare', 'visualfeedback');
+plot_signal_and_fit_double_linear(visual_feedbacks_trial(1,:), 'visualfeedback', visualfeedback_trial_compare(1,1:20), 'visualfeedback compare', 'visualfeedback');
 subplot(2,2,2);
-plot_signal_and_fit_double_linear(resultsMI_trials(1,1:20), 'results', resultsMI_trial_compare(1,:), 'results compare', 'results');
+plot_signal_and_fit_double_linear(resultsMI_trials(1,:), 'results', resultsMI_trial_compare(1,1:20), 'results compare', 'results');
 subplot(2,2,3);
-plot_signal_and_fit_double_linear(mu_suppressions_normalized(1,1:20), 'Mu sup online', mu_suppressions_normalized_compare_trial(1,:), 'Mu sup compare', 'mu sup');
+plot_signal_and_fit_double_linear(mu_suppressions_normalized(1,:), 'Mu sup online', mu_suppressions_normalized_compare_trial(1,1:20), 'Mu sup compare', 'mu sup');
 subplot(2,2,4);
-plot_signal_and_fit_double_linear(EI_index_scores(1,1:), 'EI online', EI_index_scores_compare(1,:), 'EI compare', 'EI');
+plot_signal_and_fit_double_linear(EI_index_scores(1,:), 'EI online', EI_index_scores_compare(1,1:20), 'EI compare', 'EI');
 %suptitle(strrep(subject_name_online, '_', ' '));
 
 disp('methods on visualfeedback')
-[p_ttest, p_ranksum] = significance_analysis(visual_feedbacks_trial(1,:), visualfeedback_trial_compare);
+[p_ttest, p_ranksum] = significance_analysis(visual_feedbacks_trial(1,1:20), visualfeedback_trial_compare(1,1:20));
 significance_show(p_ttest,p_ranksum);
 disp('methods on mu_suppresions');
-[p_ttest, p_ranksum] = significance_analysis(mu_suppressions_normalized, mu_suppressions_normalized_compare_trial);
+[p_ttest, p_ranksum] = significance_analysis(mu_suppressions_normalized(1,1:20), mu_suppressions_normalized_compare_trial(1,1:20));
 significance_show(p_ttest,p_ranksum);
 disp('methods on EI');
-[p_ttest, p_ranksum] = significance_analysis(EI_index_scores, EI_index_scores_compare);
+[p_ttest, p_ranksum] = significance_analysis(EI_index_scores(1,1:20), EI_index_scores_compare(1,1:20));
 significance_show(p_ttest,p_ranksum);
 disp('methods on resultsMI')
-[p_ttest, p_ranksum] = significance_analysis(resultsMI_trials(1,:), resultsMI_trial_compare);
+[p_ttest, p_ranksum] = significance_analysis(resultsMI_trials(1,1:20), resultsMI_trial_compare(1,1:20));
 significance_show(p_ttest,p_ranksum);
 
 disp('methods on mu_suppresions on triggers');
@@ -298,7 +299,7 @@ function [mu_suppresions, EI_index_scores, resultsMI_trials] = mu_EI_MIresult_ca
             mu_power = mu_powers(:,j);
             mu_suppresion(j) = MI_MuSuperesion(mu_power_, mu_power, mu_channels);
         end
-        
+
         % 计算mu_suppresion的均值并保存
         %mu_suppresions = [mu_suppresions, [mu_suppresion; repmat(Trigger,1,size(mu_powers, 2))]];
         if strcmp(mode, 'average')
@@ -326,6 +327,92 @@ function [mu_suppresions, EI_index_scores, resultsMI_trials] = mu_EI_MIresult_ca
             EI_index_scores = [EI_index_scores, [max(EI_index_score); Trigger]];
             resultsMI_trials = [resultsMI_trials, [max(resultsMI(1,:)); Trigger]];
         end
+        %EI_index_scores = [EI_index_scores, [EI_index_score; repmat(Trigger,1,size(mu_powers, 2))]];
+        %EI_index_scores = [EI_index_scores, [mean(EI_index_score); Trigger]];
+        %EI_index_scores = [EI_index_scores, [max(EI_index_score); Trigger]];
+        
+        % 计算分类概率在这一个trial里面的均值
+        %resultsMI_trials = [resultsMI_trials, [mean(resultsMI(1,:)); Trigger]];
+        %resultsMI_trials = [resultsMI_trials, [max(resultsMI(1,:)); Trigger]];
+    end
+end
+
+% 加入视觉反馈的版本
+function [mu_suppresions, EI_index_scores, resultsMI_trials, vb_values] = mu_EI_MIresult_caculation_vb(folder_path, mu_channels, EI_channels, mode)
+    % 切换到指定的文件夹
+    cd(folder_path);
+    
+    % 获取文件夹中的所有.mat文件
+    files = dir('*.mat');
+    
+    % 提取出文件名中的c的值，并转换为数字
+    c_values = cellfun(@(x) str2double(regexp(x, 'trial_(\d+)', 'tokens', 'once')), {files.name});
+    
+    % 根据c的值对文件进行排序
+    [~, index] = sort(c_values);
+    files = files(index);
+    
+    % 初始化mu_suppresions和EI_index_scores
+    mu_suppresions = [];
+    EI_index_scores = [];
+    resultsMI_trials = [];
+    vb_values = [];
+    
+    % 遍历每个文件
+    for i = 1:length(files)
+        % 加载.mat文件
+        data = load(files(i).name);
+        
+        % 提取mu_powers和EI_indices
+        mu_powers = data.mu_powers;
+        EI_indices = data.EI_indices;
+        % 提取分类概率
+        resultsMI = data.resultsMI;
+        
+        % 提取mu_power_和mu_power
+        mu_power_ = mu_powers(:,1);
+        mu_powers = mu_powers(:,2:end);
+        
+        resultsMI = resultsMI(2:end,:);
+        
+        % 计算mu_suppresion
+        mu_suppresion = zeros(1, size(mu_powers, 2));
+        Trigger = mu_powers(33,1);
+        for j = 1:size(mu_powers, 2)
+            mu_power = mu_powers(:,j);
+            mu_suppresion(j) = MI_MuSuperesion(mu_power_, mu_power, mu_channels);
+        end
+
+        % 计算mu_suppresion的均值并保存
+        %mu_suppresions = [mu_suppresions, [mu_suppresion; repmat(Trigger,1,size(mu_powers, 2))]];
+        if strcmp(mode, 'average')
+            mu_suppresions = [mu_suppresions, [mean(mu_suppresion); Trigger]];
+        elseif strcmp(mode, 'max')
+            mu_suppresions = [mu_suppresions, [max(mu_suppresion); Trigger]];
+        end
+
+        %mu_suppresions = [mu_suppresions, [max(mu_suppresion); Trigger]];
+        %mu_suppresions = [mu_suppresions, [mu_suppresion(end); Trigger]];
+        %mu_suppresions = [mu_suppresions, [mean(mu_suppresion(end)); Trigger]];
+        
+        % 计算EI_index_score
+        EI_index_score = zeros(1, size(EI_indices, 2));
+        for j = 1:size(EI_indices, 2)
+            EI_index = EI_indices(:,j);
+            EI_index_score(j) = EI_index_Caculation(EI_index, EI_channels);
+        end
+        
+        % 计算EI_index_score的均值并保存
+        if strcmp(mode, 'average')
+            EI_index_scores = [EI_index_scores, [mean(EI_index_score); Trigger]];
+            resultsMI_trials = [resultsMI_trials, [mean(resultsMI(1,:)); Trigger]];
+        elseif strcmp(mode, 'max')
+            EI_index_scores = [EI_index_scores, [max(EI_index_score); Trigger]];
+            resultsMI_trials = [resultsMI_trials, [max(resultsMI(1,:)); Trigger]];
+        end
+        
+        vb_value = mu_suppresion.*
+        
         %EI_index_scores = [EI_index_scores, [EI_index_score; repmat(Trigger,1,size(mu_powers, 2))]];
         %EI_index_scores = [EI_index_scores, [mean(EI_index_score); Trigger]];
         %EI_index_scores = [EI_index_scores, [max(EI_index_score); Trigger]];
